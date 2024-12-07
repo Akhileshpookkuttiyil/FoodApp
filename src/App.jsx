@@ -1,9 +1,9 @@
 import { BrowserRouter as Router } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
-// import Home from "./Pages/Home/Home";
-// import { Routes, Route } from "react-router-dom";
-// import Menus from "./Pages/Menus/Menus";
+import Home from "./Pages/Home/Home";
+import { Routes, Route } from "react-router-dom";
+import Menus from "./Pages/Menus/Menus";
 
 function App() {
   return (
@@ -13,10 +13,10 @@ function App() {
           {/* Navbar (sample) */}
           <Navbar />
           {/* Routes (sample) */}
-          {/* <Routes>
+          <Routes>
             <Route exact path="/" element={<Home />} />
             <Route exact path="/menus" element={<Menus />} />
-          </Routes> */}
+          </Routes>
           {/* Footer (sample) */}
           <Footer />
         </div>
