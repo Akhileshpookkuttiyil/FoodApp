@@ -8,7 +8,7 @@ const Hero = () => {
             <h6 className="text-orange-200/70 text-base font-normal bg-neutral-900/40 w-fit px-3 py-0 5 rounded-lg">
               Try Healthy & Quality
             </h6>
-            <h1 className="text-neutral-50 font-black md:text-[5rem] text-5xl leading-tight">
+            <h1 className="text-neutral-50 font-black md:text-[5rem] text-5xl">
               Healthy Foods for Every Taste
             </h1>
             <p className="md:text-base text-sm text-neutral-300 font-normal">
