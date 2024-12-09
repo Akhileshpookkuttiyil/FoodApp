@@ -1,7 +1,7 @@
 import Banner from "./Banner/Banner";
 import Category from "./Category/Category";
 import Hero from "./Hero/Hero";
-// import Menu from "./Menu/Menu";
+import Menu from "./Menu/Menu";
 import Offer from "./Offer/Offer";
 
 const Home = () => {
@@ -11,7 +11,7 @@ const Home = () => {
       <Banner />
       <Category />
       <Offer />
-      {/* <Menu/> */}
+      <Menu/>
     </div>
   );
 };
