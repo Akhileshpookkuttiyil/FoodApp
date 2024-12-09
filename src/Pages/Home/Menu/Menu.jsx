@@ -26,7 +26,7 @@ const Menu = () => {
       title: "Momos",
       img: Momos,
       name: "Steamed Momos",
-      desc: "Soft dumplings filled with veggies or chicken.",
+      desc: "Soft dumplings filled with vegs or chicken.",
       price: "Rs. 120",
       inStock: true,
     },
@@ -113,17 +113,18 @@ const Menu = () => {
               <img
                 src={data.img}
                 alt={data.name}
-                className="w-full aspect-[5/4] object-contain rounded-lg"
+                className="w-full h-48 object-contain rounded-lg"
                 loading="lazy"
               />
+              {/* Unavailable Overlay */}
               {!data.inStock && (
-                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 text-white text-lg font-semibold">
+                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 text-white text-lg font-semibold rounded-lg">
                   Unavailable
                 </div>
               )}
             </div>
             <div className="mt-4">
-              <h6 className="text-lg text-neutral-800 font-semibold">
+              <h6 className="text-lg text-neutral-800 font-semibold truncate">
                 {data.name}
               </h6>
               <p className="text-sm text-neutral-500 line-clamp-2 h-10 overflow-hidden">
@@ -143,7 +144,7 @@ const Menu = () => {
                 disabled={!data.inStock}
                 aria-disabled={!data.inStock}
               >
-                {data.inStock ? "Order Now" : "Unavailable"}
+                {data.inStock ? "Order Now" : "Not available"}
               </button>
             </div>
           </Link>

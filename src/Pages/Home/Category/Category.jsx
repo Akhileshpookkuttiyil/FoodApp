@@ -1,4 +1,5 @@
-import { FaPizzaSlice } from "react-icons/fa6";
+import { FaPizzaSlice, FaHamburger, FaIceCream, FaFish } from "react-icons/fa";
+import { GiNoodles, GiSushis, GiHotDog, GiChiliPepper } from "react-icons/gi";
 import { Link } from "react-router-dom";
 
 const Category = () => {
@@ -16,14 +17,14 @@ const Category = () => {
           View All
         </Link>
       </div>
-      {/*  */}
+      {/* Categories */}
       <div className="grid md:grid-cols-8 sm:grid-cols-4 grid-cols-3 md:gap-x-6 md:gap-y-6 sm:gap-x-4 sm:gap-y-4 gap-x-3 gap-y-3.5 items-center">
         <Link
           to={"/"}
           className="w-full bg-neutral-300/60 flex items-center justify-center gap-x-2.5 px-3.5 py-3 rounded-full hover:bg-neutral-400/50 focus:bg-zinc-400/50 ease-in-out duration-300"
         >
           <FaPizzaSlice className="w-5 h-5 text-orange-500" />
-          <h6 className="md:text-base text-sm text neutral-600 font-medium">
+          <h6 className="md:text-base text-sm text-neutral-600 font-medium">
             Pizza
           </h6>
         </Link>
@@ -31,63 +32,63 @@ const Category = () => {
           to={"/"}
           className="w-full bg-neutral-300/60 flex items-center justify-center gap-x-2.5 px-3.5 py-3 rounded-full hover:bg-neutral-400/50 focus:bg-zinc-400/50 ease-in-out duration-300"
         >
-          <FaPizzaSlice className="w-5 h-5 text-orange-500" />
-          <h6 className="md:text-base text-sm text neutral-600 font-medium">
-            Pizza
+          <FaHamburger className="w-5 h-5 text-orange-500" />
+          <h6 className="md:text-base text-sm text-neutral-600 font-medium">
+            Burger
           </h6>
         </Link>
         <Link
           to={"/"}
           className="w-full bg-neutral-300/60 flex items-center justify-center gap-x-2.5 px-3.5 py-3 rounded-full hover:bg-neutral-400/50 focus:bg-zinc-400/50 ease-in-out duration-300"
         >
-          <FaPizzaSlice className="w-5 h-5 text-orange-500" />
-          <h6 className="md:text-base text-sm text neutral-600 font-medium">
-            Pizza
+          <FaIceCream className="w-5 h-5 text-orange-500" />
+          <h6 className="md:text-base text-sm text-neutral-600 font-medium">
+            Ice Cream
           </h6>
         </Link>
         <Link
           to={"/"}
           className="w-full bg-neutral-300/60 flex items-center justify-center gap-x-2.5 px-3.5 py-3 rounded-full hover:bg-neutral-400/50 focus:bg-zinc-400/50 ease-in-out duration-300"
         >
-          <FaPizzaSlice className="w-5 h-5 text-orange-500" />
-          <h6 className="md:text-base text-sm text neutral-600 font-medium">
-            Pizza
+          <GiNoodles className="w-5 h-5 text-orange-500" />
+          <h6 className="md:text-base text-sm text-neutral-600 font-medium">
+            Noodles
           </h6>
         </Link>
         <Link
           to={"/"}
           className="w-full bg-neutral-300/60 flex items-center justify-center gap-x-2.5 px-3.5 py-3 rounded-full hover:bg-neutral-400/50 focus:bg-zinc-400/50 ease-in-out duration-300"
         >
-          <FaPizzaSlice className="w-5 h-5 text-orange-500" />
-          <h6 className="md:text-base text-sm text neutral-600 font-medium">
-            Pizza
+          <GiSushis className="w-5 h-5 text-orange-500" />
+          <h6 className="md:text-base text-sm text-neutral-600 font-medium">
+            Sushi
           </h6>
         </Link>
         <Link
           to={"/"}
           className="w-full bg-neutral-300/60 flex items-center justify-center gap-x-2.5 px-3.5 py-3 rounded-full hover:bg-neutral-400/50 focus:bg-zinc-400/50 ease-in-out duration-300"
         >
-          <FaPizzaSlice className="w-5 h-5 text-orange-500" />
-          <h6 className="md:text-base text-sm text neutral-600 font-medium">
-            Pizza
+          <GiHotDog className="w-5 h-5 text-orange-500" />
+          <h6 className="md:text-base text-sm text-neutral-600 font-medium">
+            Hot Dog
           </h6>
         </Link>
         <Link
           to={"/"}
           className="w-full bg-neutral-300/60 flex items-center justify-center gap-x-2.5 px-3.5 py-3 rounded-full hover:bg-neutral-400/50 focus:bg-zinc-400/50 ease-in-out duration-300"
         >
-          <FaPizzaSlice className="w-5 h-5 text-orange-500" />
-          <h6 className="md:text-base text-sm text neutral-600 font-medium">
-            Pizza
+          <FaFish className="w-5 h-5 text-orange-500" />
+          <h6 className="md:text-base text-sm text-neutral-600 font-medium">
+            Seafood
           </h6>
         </Link>
         <Link
           to={"/"}
           className="w-full bg-neutral-300/60 flex items-center justify-center gap-x-2.5 px-3.5 py-3 rounded-full hover:bg-neutral-400/50 focus:bg-zinc-400/50 ease-in-out duration-300"
         >
-          <FaPizzaSlice className="w-5 h-5 text-orange-500" />
-          <h6 className="md:text-base text-sm text neutral-600 font-medium">
-            Pizza
+          <GiChiliPepper className="w-5 h-5 text-orange-500" />
+          <h6 className="md:text-base text-sm text-neutral-600 font-medium">
+            Spicy Food
           </h6>
         </Link>
       </div>
