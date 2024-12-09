@@ -19,6 +19,7 @@ const Menu = () => {
       name: "Full Grilled Chicken",
       desc: "Juicy grilled chicken seasoned with spices.",
       price: "Rs. 800",
+      inStock: true,
     },
     {
       id: 2,
@@ -27,6 +28,7 @@ const Menu = () => {
       name: "Steamed Momos",
       desc: "Soft dumplings filled with veggies or chicken.",
       price: "Rs. 120",
+      inStock: true,
     },
     {
       id: 3,
@@ -35,6 +37,7 @@ const Menu = () => {
       name: "Hyderabadi Biryani",
       desc: "Flavorful rice with tender chicken pieces.",
       price: "Rs. 300",
+      inStock: true,
     },
     {
       id: 4,
@@ -43,6 +46,7 @@ const Menu = () => {
       name: "Grilled Fish",
       desc: "Fresh fish fillet grilled to perfection.",
       price: "Rs. 500",
+      inStock: false,
     },
     {
       id: 5,
@@ -51,6 +55,7 @@ const Menu = () => {
       name: "Veg Fried Rice",
       desc: "Classic fried rice with vegetables.",
       price: "Rs. 150",
+      inStock: true,
     },
     {
       id: 6,
@@ -59,6 +64,7 @@ const Menu = () => {
       name: "Cheese Burger",
       desc: "Beef patty with cheese, lettuce, and sauce.",
       price: "Rs. 200",
+      inStock: true,
     },
     {
       id: 7,
@@ -67,6 +73,7 @@ const Menu = () => {
       name: "Pepperoni Pizza",
       desc: "Loaded with pepperoni and cheese.",
       price: "Rs. 600",
+      inStock: true,
     },
     {
       id: 8,
@@ -75,13 +82,14 @@ const Menu = () => {
       name: "Club Sandwich",
       desc: "Triple-layer sandwich with a variety of fillings.",
       price: "Rs. 250",
+      inStock: true,
     },
   ];
 
   return (
     <div className="w-full lg:px-11 md:px-8 sm:px-4 px-4 space-y-6">
       <div className="w-full flex items-center justify-between">
-        <h5 className="text-xl text-neutral-700 font-semibold">
+        <h5 className="text-2xl text-neutral-800 font-semibold">
           Our Best Menus
         </h5>
         <Link
@@ -92,36 +100,43 @@ const Menu = () => {
         </Link>
       </div>
 
-      {/*  */}
+      {/* Menu Items */}
       <div className="grid md:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-5">
         {menuData.map((data) => (
           <Link
             to={"/"}
             key={data.id}
-            className="bg-neutral-400/10 hover:bg-neutral-400/20 border border-neutral-400/20 px-2 pt-2 pb-3 rounded-xl space-y-2.5 ease-in-out duration-300"
+            className="bg-white hover:bg-neutral-50 border border-neutral-200 px-4 py-5 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out"
           >
             <img
               src={data.img}
-              alt="foodImage"
-              className="w-full aspect-[5/4] object-contain object-center"
+              alt={data.name}
+              className="w-full aspect-[5/4] object-cover rounded-lg"
+              loading="lazy"
             />
-            <div className="space-y-4 px-2 py-1">
-              <div className="space-y-1.5">
-                <h6 className="text-xl text-neutral-700 font-semibold">
-                  {data.name}
-                </h6>
-                <p className="text-sm text-neutral-400 font-normal line-clamp-1">
-                  {data.desc}
-                </p>
-              </div>
-              <div className="flex items-center justify-between">
-                <h6 className="text-2xl text-neutral-700 font-bold">
-                  {data.price}
-                </h6>
-                <button className="w-fit px-3 py-1 bg-orange-500 rounded-xl font-medium text-base text-neutral-700 hover:bg-orange-600/60 ease-in-out duration-300">
-                  Order Now
-                </button>
-              </div>
+            <div className="mt-4">
+              <h6 className="text-lg text-neutral-800 font-semibold">
+                {data.name}
+              </h6>
+              {/* Description with a fixed height */}
+              <p className="text-sm text-neutral-500 line-clamp-2 h-10 overflow-hidden">
+                {data.desc}
+              </p>
+            </div>
+            <div className="flex justify-between items-center mt-4">
+              <h6 className="text-xl text-neutral-800 font-bold">
+                {data.price}
+              </h6>
+              <button
+                className={`px-4 py-2 rounded-lg font-medium text-white ${
+                  data.inStock
+                    ? "bg-orange-500 hover:bg-orange-600"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
+                disabled={!data.inStock}
+              >
+                {data.inStock ? "Order Now" : "Unavailable"}
+              </button>
             </div>
           </Link>
         ))}
