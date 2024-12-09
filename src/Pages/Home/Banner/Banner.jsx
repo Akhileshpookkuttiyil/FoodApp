@@ -29,31 +29,26 @@ const Banner = () => {
   ];
 
   return (
-    <div className="container-fluid py-5 bg-gray-200">
-      <div className="flex justify-center">
-        {/* Added max-w-7xl and px-4 for responsiveness */}
-        <div className="container max-w-7xl px-4 sm:px-6 lg:px-8 py-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-8 md:gap-6 lg:gap-4">
-            {features.map((feature, index) => (
-              <article
-                key={index}
-                className="featurs-item text-center rounded-lg bg-white p-4 shadow-lg transition-shadow hover:shadow-xl duration-300"
+    <div className="bg-gray-100 py-5">
+      <div className="container max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {features.map((feature, index) => (
+            <article
+              key={index}
+              className="text-center rounded-lg bg-white p-6 shadow-lg transition-shadow hover:shadow-xl duration-300"
+            >
+              <div
+                className="w-20 sm:w-24 h-20 sm:h-24 rounded-full bg-orange-500 mb-5 mx-auto flex items-center justify-center text-3xl text-white transition-transform transform hover:scale-110 hover:rotate-6 duration-300"
+                aria-label={feature.ariaLabel}
               >
-                <div
-                  className="featurs-icon w-20 sm:w-24 md:w-28 lg:w-32 h-20 sm:h-24 md:h-28 lg:h-32 rounded-full bg-orange-500 mb-5 mx-auto flex items-center justify-center text-3xl text-white transition-transform transform hover:scale-110 hover:rotate-6 duration-300 ease-in-out"
-                  aria-label={feature.ariaLabel}
-                >
-                  {feature.icon}
-                </div>
-                <div className="featurs-content text-center">
-                  <h5 className="text-lg font-semibold text-gray-700">
-                    {feature.title}
-                  </h5>
-                  <p className="mb-0 text-gray-500">{feature.description}</p>
-                </div>
-              </article>
-            ))}
-          </div>
+                {feature.icon}
+              </div>
+              <h5 className="text-lg font-semibold text-gray-700">
+                {feature.title}
+              </h5>
+              <p className="text-gray-500">{feature.description}</p>
+            </article>
+          ))}
         </div>
       </div>
     </div>
