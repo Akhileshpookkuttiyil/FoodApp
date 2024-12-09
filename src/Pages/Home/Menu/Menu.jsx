@@ -79,7 +79,7 @@ const Menu = () => {
   ];
 
   return (
-    <div className="w-full lg:px-11 md:px-10 sm:px-4 px-4n space-y-6">
+    <div className="w-full lg:px-11 md:px-8 sm:px-4 px-4 space-y-6">
       <div className="w-full flex items-center justify-between">
         <h5 className="text-xl text-neutral-700 font-semibold">
           Our Best Menus
