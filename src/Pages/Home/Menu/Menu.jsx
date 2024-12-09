@@ -88,12 +88,13 @@ const Menu = () => {
 
   return (
     <div className="w-full lg:px-11 md:px-8 sm:px-4 px-4 space-y-6">
+      {/* Top Section */}
       <div className="w-full flex items-center justify-between">
         <h5 className="text-2xl text-neutral-800 font-semibold">
           Our Best Menus
         </h5>
         <Link
-          to={"/"}
+          to={"/menu"}
           className="text-sm text-neutral-500 font-medium hover:text-orange-500 ease-in-out duration-300"
         >
           View All
@@ -104,21 +105,27 @@ const Menu = () => {
       <div className="grid md:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-5">
         {menuData.map((data) => (
           <Link
-            to={"/"}
+            to={`/menu/${data.id}`}
             key={data.id}
             className="bg-white hover:bg-neutral-50 border border-neutral-200 px-4 py-5 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out"
           >
-            <img
-              src={data.img}
-              alt={data.name}
-              className="w-full aspect-[5/4] object-cover rounded-lg"
-              loading="lazy"
-            />
+            <div className="relative">
+              <img
+                src={data.img}
+                alt={data.name}
+                className="w-full aspect-[5/4] object-contain rounded-lg"
+                loading="lazy"
+              />
+              {!data.inStock && (
+                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 text-white text-lg font-semibold">
+                  Unavailable
+                </div>
+              )}
+            </div>
             <div className="mt-4">
               <h6 className="text-lg text-neutral-800 font-semibold">
                 {data.name}
               </h6>
-              {/* Description with a fixed height */}
               <p className="text-sm text-neutral-500 line-clamp-2 h-10 overflow-hidden">
                 {data.desc}
               </p>
@@ -134,6 +141,7 @@ const Menu = () => {
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
                 disabled={!data.inStock}
+                aria-disabled={!data.inStock}
               >
                 {data.inStock ? "Order Now" : "Unavailable"}
               </button>
