@@ -2,7 +2,7 @@ import Banner from "./Banner/Banner";
 import Category from "./Category/Category";
 import Hero from "./Hero/Hero";
 // import Menu from "./Menu/Menu";
-// import Offer from "./Offer/Offer";
+import Offer from "./Offer/Offer";
 
 const Home = () => {
   return (
@@ -10,8 +10,8 @@ const Home = () => {
       <Hero />
       <Banner />
       <Category />
-      {/* <Offer />
-      <Menu/> */}
+      <Offer />
+      {/* <Menu/> */}
     </div>
   );
 };
