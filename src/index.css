@@ -12,6 +12,12 @@
   font-family: "Roboto", sans-serif;
 }
 
+.offer_bg{
+  background: url("./assets/img/offer.png") no-repeat;
+  background-position: center bottom;
+  background-size: cover;
+}
+
 ::-webkit-scrollbar {
   display: none;
 }
