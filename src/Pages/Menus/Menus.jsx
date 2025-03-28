@@ -3,6 +3,7 @@ import { FaStar, FaRegStarHalf } from "react-icons/fa";
 import FilterDialog from "./FilterDialog";
 import HeroBanner from "./Banner/Banner";
 import bannerImg from "../../assets/img/banner.jpg";
+import BottomBanner from "./BottomBanner/BottomBanner";
 import PageHeader from "./Banner/PageHeader/PageHeader";
 import Categories from "./Categories/Categories";
 import SearchBar from "./SearchBar/SearchBar";
@@ -95,6 +96,8 @@ const Menus = () => {
         renderStars={renderStars}
         noResultsImg={noResultsImg}
       />
+            {/* 🏆 New Bottom Banner */}
+            <BottomBanner />
     </div>
   );
 };

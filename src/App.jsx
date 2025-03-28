@@ -4,12 +4,14 @@ import Footer from "./components/Footer/Footer";
 import Home from "./Pages/Home/Home";
 import { Routes, Route } from "react-router-dom";
 import Menus from "./Pages/Menus/Menus";
+import ScrollToTop from "./ScrolltoTop";
 
 function App() {
   return (
     <>
       <Router>
         <div className="w-full min-h-screen bg-neutral-100/40 flex flex-col">
+          <ScrollToTop /> {/* This ensures every page starts from the top */}
           {/* Navbar (sample) */}
           <Navbar />
           {/* Routes (sample) */}
