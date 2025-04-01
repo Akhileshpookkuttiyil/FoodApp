@@ -18,7 +18,7 @@ const Hero = () => {
               quasi unde libero consequatur? Recusandae sint nihil ut ipsa iure.
             </p>
           </div>
-          <button className="w-fit px-8 py-2 text-lg font-medium text-neutral-900 bg-orange-500 hover:bg-orange-600 border-2 border-orange-600 rounded-xl ease-in-out duration-300">
+          <button className="w-fit px-8 py-2 text-lg font-medium text-neutral-900 bg-orange-500 hover:bg-orange-600 border-2 border-orange-500 rounded-xl ease-in-out duration-300">
             Order Now
           </button>
         </div>
