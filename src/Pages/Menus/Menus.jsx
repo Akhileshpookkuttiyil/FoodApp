@@ -10,8 +10,9 @@ import SearchBar from "./SearchBar/SearchBar";
 import FilterButton from "./FilterButton/FilterButton";
 import SortDropdown from "./SortDropdown/SortDropdown";
 import MenuGrid from "./MenuGrid/Menugrid";
-import { menuItems } from "./Data/MenuData";  // Import menu data
+import { menuItems } from "./Data/MenuData"; // Import menu data
 import noResultsImg from "../../assets/img/Noimg.gif"; // "No results" image
+import LimitedOffers from "./LimitedOffers/LimitedOffers";
 
 //  Generate categories dynamically
 const categories = ["All", ...new Set(menuItems.map((item) => item.category))];
@@ -96,8 +97,10 @@ const Menus = () => {
         renderStars={renderStars}
         noResultsImg={noResultsImg}
       />
-            {/* 🏆 New Bottom Banner */}
-            <BottomBanner />
+      {/* 🏆 New Bottom Banner */}
+      <BottomBanner />
+      {/* Your other menu sections */}
+      <LimitedOffers />
     </div>
   );
 };

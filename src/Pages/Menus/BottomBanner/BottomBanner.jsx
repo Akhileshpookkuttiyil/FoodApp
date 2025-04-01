@@ -3,7 +3,6 @@ import smallImg1 from "../../../assets/img/small1.png"; // Small images
 import smallImg2 from "../../../assets/img/small2.png";
 import smallImg3 from "../../../assets/img/small3.png";
 import smallImg4 from "../../../assets/img/small4.png";
-import smallImg5 from "../../../assets/img/small5.png";
 import smallImg6 from "../../../assets/img/small6.png";
 
 const BottomBanner = () => {
