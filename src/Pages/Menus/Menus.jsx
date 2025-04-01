@@ -13,6 +13,7 @@ import MenuGrid from "./MenuGrid/Menugrid";
 import { menuItems } from "./Data/MenuData"; // Import menu data
 import noResultsImg from "../../assets/img/Noimg.gif"; // "No results" image
 import LimitedOffers from "./LimitedOffers/LimitedOffers";
+import BannerAd from "./BannerAd/BannerAd";
 
 //  Generate categories dynamically
 const categories = ["All", ...new Set(menuItems.map((item) => item.category))];
@@ -97,10 +98,11 @@ const Menus = () => {
         renderStars={renderStars}
         noResultsImg={noResultsImg}
       />
-      {/* 🏆 New Bottom Banner */}
-      <BottomBanner />
+      <BannerAd />
       {/* Your other menu sections */}
       <LimitedOffers />
+      {/* 🏆 New Bottom Banner */}
+      <BottomBanner />
     </div>
   );
 };
