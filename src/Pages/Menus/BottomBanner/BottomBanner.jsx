@@ -7,7 +7,7 @@ import smallImg6 from "../../../assets/img/small6.png";
 
 const BottomBanner = () => {
   return (
-    <div className="relative w-full flex flex-col-reverse lg:flex-row items-center justify-between bg-gradient-to-r from-black via-gray-900 to-gray-800 shadow-lg overflow-hidden px-6 py-8 sm:px-12 lg:px-20 mt-10 min-h-[250px]">
+    <div className="relative w-full flex flex-col-reverse lg:flex-row items-center justify-between bg-gradient-to-r from-black via-gray-900 to-gray-800 shadow-lg overflow-hidden px-6 py-8 sm:px-12 lg:px-20 mt-5 min-h-[250px]">
       {/* Left Side: FoodieMania Title & App Promotion */}
       <div className="text-white text-center lg:text-left max-w-lg">
         <h2 className="text-3xl md:text-4xl font-bold">

@@ -1,9 +1,21 @@
-import { FaStar, FaRegStarHalf } from "react-icons/fa";
+import {
+  FaStar,
+  FaRegStarHalf,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
+import { useState } from "react";
 import butterChicken from "../../../assets/img/butterChicken.png";
 import paneerTikka from "../../../assets/img/paneerTikka.png";
 import masalaDosa from "../../../assets/img/masalaDosa.png";
 import chickenBiryani from "../../../assets/img/chickenBiryani.png";
 import chickenFriedRice from "../../../assets/img/chickenFriedRice.png";
+import muttonBiriyani from "../../../assets/img/muttonBiriyani.png";
+import fishCurry from "../../../assets/img/fishCurry.png";
+import falafel from "../../../assets/img/falafel.png";
+import lambShawarma from "../../../assets/img/lambShawarma.png";
+import veggieBurger from "../../../assets/img/veggieBurger.png";
+import choleBhature from "../../../assets/img/choleBhature.png";
 
 const LimitedOffers = () => {
   const offers = [
@@ -57,7 +69,71 @@ const LimitedOffers = () => {
       hotelName: "Rice & Spice",
       rating: 4.4,
     },
+    {
+      id: 6,
+      name: "Mutton Biriyani",
+      price: "₹399",
+      oldPrice: "₹499",
+      image: muttonBiriyani,
+      discount: "20% OFF",
+      hotelName: "Royal Biryani",
+      rating: 4.6,
+    },
+    {
+      id: 7,
+      name: "Fish Curry",
+      price: "₹299",
+      oldPrice: "₹399",
+      image: fishCurry,
+      discount: "25% OFF",
+      hotelName: "Seafood Haven",
+      rating: 4.3,
+    },
+    {
+      id: 8,
+      name: "Falafel Plate",
+      price: "₹179",
+      oldPrice: "₹249",
+      image: falafel,
+      discount: "28% OFF",
+      hotelName: "Arabian Nights",
+      rating: 4.0,
+    },
+    {
+      id: 9,
+      name: "Lamb Shawarma",
+      price: "₹399",
+      oldPrice: "₹499",
+      image: lambShawarma,
+      discount: "20% OFF",
+      hotelName: "Shawarma King",
+      rating: 4.6,
+    },
+    {
+      id: 10,
+      name: "Veggie Burger",
+      price: "₹149",
+      oldPrice: "₹199",
+      image: veggieBurger,
+      discount: "25% OFF",
+      hotelName: "Veggie Delights",
+      rating: 4.3,
+    },
+    {
+      id: 11,
+      name: "Chole Bhature",
+      price: "₹159",
+      oldPrice: "₹219",
+      image: choleBhature,
+      discount: "30% OFF",
+      hotelName: "Bharati Bites",
+      rating: 4.2,
+    },
+    // Add more items if needed
   ];
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10; // Total of 10 items (5 per row)
 
   // Function to render full, half, and empty stars based on rating
   const renderStars = (rating) => {
@@ -87,16 +163,52 @@ const LimitedOffers = () => {
     return stars;
   };
 
+  // Paginate offers based on the current page (only show 10 per page)
+  const displayedOffers = offers.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+
+  const nextPage = () => {
+    if ((currentPage + 1) * itemsPerPage < offers.length) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
-    <div className="w-full py-10 mt-10">
-      <h2 className="text-3xl font-bold text-center mb-6 text-red-700">
+    <div className="w-full py-10 mt-3 relative">
+      <h2 className="text-3xl font-bold text-center mb-10 text-red-700">
         🍛 Limited-Time Indian Delights!
       </h2>
-      <div className="flex flex-wrap justify-center gap-6">
-        {offers.map((item) => (
+      <div className="absolute top-20 right-4 flex items-center space-x-3">
+        <button
+          onClick={prevPage}
+          disabled={currentPage === 0}
+          className="flex items-center justify-center px-1 py-1 bg-orange-400 text-white rounded-full shadow-md hover:bg-orange-500 disabled:bg-gray-300"
+        >
+          <FaChevronLeft />
+        </button>
+
+        <button
+          onClick={nextPage}
+          disabled={(currentPage + 1) * itemsPerPage >= offers.length}
+          className="flex items-center justify-center px-1 py-1 bg-orange-400 text-white rounded-full shadow-md hover:bg-orange-500 disabled:bg-gray-300"
+        >
+          <FaChevronRight />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 px-4 mt-10">
+        {displayedOffers.map((item) => (
           <div
             key={item.id}
-            className="bg-white p-4 shadow-lg rounded-lg w-64 text-center border border-orange-500 transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+            className="bg-white p-4 shadow-lg rounded-lg w-full text-center border transform transition-transform duration-300 hover:scale-105 hover:shadow-xl relative"
           >
             <img
               src={item.image}

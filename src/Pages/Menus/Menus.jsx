@@ -14,6 +14,7 @@ import { menuItems } from "./Data/MenuData"; // Import menu data
 import noResultsImg from "../../assets/img/Noimg.gif"; // "No results" image
 import LimitedOffers from "./LimitedOffers/LimitedOffers";
 import BannerAd from "./BannerAd/BannerAd";
+import BottomLinks from "./bottomLinks/bottomLinks";
 
 //  Generate categories dynamically
 const categories = ["All", ...new Set(menuItems.map((item) => item.category))];
@@ -103,6 +104,7 @@ const Menus = () => {
       <LimitedOffers />
       {/* 🏆 New Bottom Banner */}
       <BottomBanner />
+      <BottomLinks />
     </div>
   );
 };
