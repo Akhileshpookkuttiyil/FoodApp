@@ -49,7 +49,7 @@ const Navbar = () => {
       </div>
 
       {/* Right Side Icons for Medium Screens and Above */}
-      <div className="flex items-center space-x-6 lg:space-x-14 md:space-x-8">
+      <div className="flex items-center space-x-6 lg:space-x-14 md:space-x-8 ml-auto justify-end">
         {/* Search Bar for Large Screens */}
         <div className="hidden md:flex w-[250px] lg:w-[300px] hide-range:hidden rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden">
           <input
@@ -99,7 +99,7 @@ const Navbar = () => {
           open ? "menu-range:flex flex absolute top-14 left-0 w-full" : "hidden"
         } flex-col lg:hidden bg-neutral-100 shadow-md rounded-md p-4 mt-3`}
       >
-        <ul className="list-none flex flex-col items-start gap-y-3 text-base text-neutral-600 font-medium">
+        <ul className="hide-range:hidden list-none flex flex-col items-start gap-y-3 text-base text-neutral-600 font-medium">
           {NavLinks.map((link) => (
             <li key={link.href}>
               <Link
