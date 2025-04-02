@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { FaBars, FaSearch, FaShoppingCart, FaUser } from "react-icons/fa";
+import {
+  FaBars,
+  FaSearch,
+  FaShoppingCart,
+  FaUser,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 import { LiaTimesSolid } from "react-icons/lia";
 import { Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [showLocation, setShowLocation] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState("Kochi");
   const location = useLocation();
 
   const NavLinks = [
@@ -20,7 +28,7 @@ const Navbar = () => {
   const handleClose = () => setOpen(false);
 
   return (
-    <nav className="w-full h-[8ch] bg-neutral-50 flex items-center justify-between lg:px-28 md:px-16 sm:px-7 px-4 fixed top-0 z-50 shadow-md">
+    <nav className="w-full h-[8ch] bg-neutral-50 flex items-center justify-between lg:px-5 md:px-16 sm:px-7 px-4 fixed top-0 z-50 shadow-md">
       {/* Logo */}
       <Link to="/" className="text-2xl text-neutral-800 font-bold">
         <span className="text-orange-400">F</span>oodie
@@ -80,6 +88,24 @@ const Navbar = () => {
         >
           <FaUser className="text-xl lg:text-2xl" />
         </Link>
+
+        {/* Location Dropdown (Moved to Right of Account Icon) */}
+        <div className="relative">
+          <button
+            onClick={() => setShowLocation(!showLocation)}
+            className="flex items-center text-gray-800 hover:text-orange-500 transition-all duration-300"
+          >
+            <FaMapMarkerAlt className="text-sm lg:text-sm" />
+            <span>{currentLocation}</span>
+          </button>
+
+          {showLocation && (
+            <div className="absolute top-10 right-0 bg-white shadow-md rounded-md p-3 w-40 text-neutral-700">
+              <p className="text-sm">Your Location:</p>
+              <p className="font-semibold">{currentLocation}</p>
+            </div>
+          )}
+        </div>
 
         {/* Mobile Menu Toggle Button (Visible in Small Screens) */}
         <button
