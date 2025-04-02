@@ -51,7 +51,7 @@ const Navbar = () => {
       {/* Right Side Icons for Medium Screens and Above */}
       <div className="flex items-center space-x-6 lg:space-x-14 md:space-x-8">
         {/* Search Bar for Large Screens */}
-        <div className="hidden md:flex w-[250px] lg:w-[300px] rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden shadow-sm">
+        <div className="hidden md:flex w-[250px] lg:w-[300px] hide-range:hidden rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden">
           <input
             type="text"
             placeholder="Search here..."
