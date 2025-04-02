@@ -84,7 +84,7 @@ const Navbar = () => {
         {/* Mobile Menu Toggle Button (Visible in Small Screens) */}
         <button
           onClick={handleClick}
-          className="lg:hidden text-neutral-600 flex items-center justify-end"
+          className="lg:hidden menu-range:flex text-neutral-600 flex items-center justify-end"
         >
           {open ? (
             <LiaTimesSolid className="text-xl" />
@@ -93,13 +93,11 @@ const Navbar = () => {
           )}
         </button>
       </div>
-
-      {/* Mobile Menu for Small Screens */}
       {/* Mobile Menu for Small and Medium Screens */}
       <div
         className={`${
-          open ? "flex absolute top-14 left-0 w-full" : "hidden"
-        } flex-col lg:hidden bg-neutral-100 shadow-md rounded-md p-4`}
+          open ? "menu-range:flex flex absolute top-14 left-0 w-full" : "hidden"
+        } flex-col lg:hidden bg-neutral-100 shadow-md rounded-md p-4 mt-3`}
       >
         <ul className="list-none flex flex-col items-start gap-y-3 text-base text-neutral-600 font-medium">
           {NavLinks.map((link) => (
@@ -120,7 +118,7 @@ const Navbar = () => {
         </ul>
 
         {/* Search Bar inside Mobile Menu */}
-        <div className="md:hidden flex w-full mt-4 rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden shadow-sm">
+        <div className="md:hidden menu-range:flex flex w-full mt-4 rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden shadow-sm">
           <input
             type="text"
             placeholder="Search here..."

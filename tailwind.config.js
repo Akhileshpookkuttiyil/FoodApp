@@ -5,7 +5,8 @@ export default {
   theme: {
     extend: {
       screens: {
-        "hide-range": { min: "1024px", max: "1300px" }, // Custom range
+        "hide-range": { min: "1024px", max: "1300px" },
+        'menu-range': { min: '1024px', max: '1300px' },
       },
     },
   },
