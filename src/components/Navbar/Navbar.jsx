@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   FaBars,
   FaSearch,
@@ -12,21 +12,63 @@ import { Link, useLocation } from "react-router-dom";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [showLocation, setShowLocation] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState("Kochi");
+  const [currentLocation, setCurrentLocation] = useState("Fetching...");
   const location = useLocation();
 
-  const NavLinks = [
-    { href: "/", name: "Home" },
-    { href: "/menus", name: "Menus" },
-    { href: "/location", name: "Locations" },
-    { href: "/category", name: "Blogs" },
-    { href: "/contact", name: "Contact" },
-    { href: "/about", name: "About" },
-  ];
+  const NavLinks = useMemo(
+    () => [
+      { href: "/", name: "Home" },
+      { href: "/menus", name: "Menus" },
+      { href: "/location", name: "Locations" },
+      { href: "/category", name: "Blogs" },
+      { href: "/contact", name: "Contact" },
+      { href: "/about", name: "About" },
+    ],
+    []
+  );
 
-  const handleClick = () => setOpen(!open);
-  const handleClose = () => setOpen(false);
+  const handleClick = useCallback(() => setOpen((prev) => !prev), []);
+  const handleClose = useCallback(() => setOpen(false), []);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchLocation = async (lat, lon) => {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+        );
+        const data = await response.json();
+        if (isMounted) {
+          setCurrentLocation(
+            data.address?.city || data.address?.town || "Unknown"
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching city name:", error);
+        if (isMounted) setCurrentLocation("Unknown Location");
+      }
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          fetchLocation(latitude, longitude);
+        },
+        (error) => {
+          console.error("Error fetching location:", error);
+          if (isMounted) setCurrentLocation("Location not found");
+        }
+      );
+    } else {
+      setCurrentLocation("Geolocation not supported");
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   return (
     <nav className="w-full h-[8ch] bg-neutral-50 flex items-center justify-between lg:px-5 md:px-16 sm:px-7 px-4 fixed top-0 z-50 shadow-md">
       {/* Logo */}
@@ -89,9 +131,10 @@ const Navbar = () => {
           <FaUser className="text-xl lg:text-2xl" />
         </Link>
 
-        {/* Location Dropdown (Moved to Right of Account Icon) */}
+        {/* Location Dropdown */}
         <div className="relative">
           <button
+            aria-label="Show location"
             onClick={() => setShowLocation(!showLocation)}
             className="flex items-center text-gray-800 hover:text-orange-500 transition-all duration-300"
           >
@@ -106,7 +149,6 @@ const Navbar = () => {
             </div>
           )}
         </div>
-
         {/* Mobile Menu Toggle Button (Visible in Small Screens) */}
         <button
           onClick={handleClick}

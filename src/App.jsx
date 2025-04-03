@@ -4,6 +4,7 @@ import Footer from "./components/Footer/Footer";
 import Home from "./Pages/Home/Home";
 import { Routes, Route } from "react-router-dom";
 import Menus from "./Pages/Menus/Menus";
+import Locations from "./Pages/Locations/Locations";
 import ScrollToTop from "./ScrolltoTop";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Routes>
             <Route exact path="/" element={<Home />} />
             <Route exact path="/menus" element={<Menus />} />
+            <Route exact path="/location" element={<Locations />} />
           </Routes>
           {/* Footer (sample) */}
           <Footer />

@@ -4,10 +4,10 @@ import arabic from "../../../assets/img/arab.jpg";
 import seafood from "../../../assets/img/seafood.jpg";
 import vegetarian from "../../../assets/img/vegetarian.jpg";
 import desserts from "../../../assets/img/desserts.jpg";
-import chinese from "../../../assets/img/chinese.jpg"; // New category
-import italian from "../../../assets/img/italian.jpg"; // New category
-import mexican from "../../../assets/img/mexican.jpg"; // New category
-import bbq from "../../../assets/img/bbq.jpg"; // New category
+import chinese from "../../../assets/img/chinese.jpg";
+import italian from "../../../assets/img/italian.jpg";
+import mexican from "../../../assets/img/mexican.jpg";
+import bbq from "../../../assets/img/bbq.jpg";
 
 const BottomLinks = () => {
   const categories = [
@@ -18,9 +18,9 @@ const BottomLinks = () => {
     { name: "Vegetarian", image: vegetarian },
     { name: "Desserts", image: desserts },
     { name: "Chinese", image: chinese },
-    { name: "Italian", image: italian }, // New category
-    { name: "Mexican", image: mexican }, // New category
-    { name: "BBQ", image: bbq }, // New category
+    { name: "Italian", image: italian },
+    { name: "Mexican", image: mexican },
+    { name: "BBQ", image: bbq },
   ];
 
   return (

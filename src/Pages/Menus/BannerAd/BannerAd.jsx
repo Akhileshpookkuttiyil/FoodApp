@@ -1,4 +1,4 @@
-import muttonBiriyani from "../../../assets/img/muttonBiriyani.png";
+import muttonBiriyani from "../../../assets/img/muttonB.png";
 import bannerBg from "../../../assets/img/fire.png"; // Background image
 
 const BannerAd = () => {
