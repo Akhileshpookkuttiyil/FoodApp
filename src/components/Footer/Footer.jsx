@@ -14,7 +14,6 @@ const Footer = () => {
     <>
       <footer className="w-full bg-neutral-700 lg:px-6 md:px-6 sm:px-4 px-4 py-12 mt-[3ch]">
         <div className="grid md:grid-cols-6 sm:grid-cols-4 grid-cols-1 gap-14">
-          {/* Branding Section */}
           <div className="col-span-2 space-y-7">
             <div className="space-y-3">
               <Link to={"/"} className="text-4xl text-neutral-800 font-bold">

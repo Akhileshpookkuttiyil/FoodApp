@@ -221,7 +221,7 @@ const RestaurantList = ({ selectedCategory }) => {
         );
         break;
       case "veg":
-        filteredRestaurants = filteredRestaurants.filter((r) => r.isVeg);
+        filteredRestaurants = filteredRestaurants.filter((r) => r.category === "Vegetarian");
         break;
       case "offers":
         filteredRestaurants = filteredRestaurants.filter((r) => r.hasOffer);
