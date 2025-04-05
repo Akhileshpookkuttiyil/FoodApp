@@ -75,10 +75,10 @@ const RestaurantList = ({ selectedCategory }) => {
 
   const applyCustomFilters = () => {
     console.log("🔍 Applying custom filters:", customFilters);
-  
+
     let filtered = [...restaurantsData];
     console.log("📦 Starting with", filtered.length, "restaurants");
-  
+
     if (userLocation) {
       filtered = filtered.map((r) => ({
         ...r,
@@ -89,75 +89,98 @@ const RestaurantList = ({ selectedCategory }) => {
           r.longitude
         ),
       }));
-      console.log("📍 Distances calculated:", filtered.map(r => `${r.name}: ${r.distance} km`));
+      console.log(
+        "📍 Distances calculated:",
+        filtered.map((r) => `${r.name}: ${r.distance} km`)
+      );
     }
-  
+
     // 🔽 Sort By
     if (customFilters.sortBy === "distance" && userLocation) {
       console.log("Sorting by distance...");
       filtered.sort((a, b) => a.distance - b.distance);
     }
-    
-  
+
     if (customFilters.sortBy === "deliveryTime") {
       console.log("Sorting by Fast Delivery");
-    
+
       const withMin = filtered.filter((r) => {
         const hasMin = r.duration.includes("min");
-        if (!hasMin) console.warn("Skipping (no 'min' in duration):", r.name, r.duration);
+        if (!hasMin)
+          console.warn("Skipping (no 'min' in duration):", r.name, r.duration);
         return hasMin;
       });
-    
-      console.log("Before sort:", withMin.map(r => `${r.name}: ${r.duration}`));
-    
+
+      console.log(
+        "Before sort:",
+        withMin.map((r) => `${r.name}: ${r.duration}`)
+      );
+
       const sorted = withMin.sort((a, b) => {
         const timeA = parseInt(a.duration);
         const timeB = parseInt(b.duration);
         console.log(`Comparing ${a.name} (${timeA}) vs ${b.name} (${timeB})`);
         return timeA - timeB;
       });
-    
-      console.log("After sort:", sorted.map(r => `${r.name}: ${r.duration}`));
-    
+
+      console.log(
+        "After sort:",
+        sorted.map((r) => `${r.name}: ${r.duration}`)
+      );
+
       filtered = sorted;
     }
-    
-    
-  
+
     if (customFilters.sortBy === "rating") {
       filtered.sort((a, b) => b.rating - a.rating);
-      console.log("🌟 Sorted by rating:", filtered.map(r => `${r.name}: ${r.rating}`));
+      console.log(
+        "🌟 Sorted by rating:",
+        filtered.map((r) => `${r.name}: ${r.rating}`)
+      );
     }
-  
+
     // 🔽 Filter by rating
     if (customFilters.rating > 0) {
       filtered = filtered.filter((r) => r.rating >= customFilters.rating);
-      console.log("⭐ Filtered by rating >=", customFilters.rating, "→", filtered.length, "restaurants");
+      console.log(
+        "⭐ Filtered by rating >=",
+        customFilters.rating,
+        "→",
+        filtered.length,
+        "restaurants"
+      );
     }
-  
+
     // 🔽 Filter by distance
     if (customFilters.distance > 0 && userLocation) {
       filtered = filtered.filter((r) => r.distance <= customFilters.distance);
-      console.log("📏 Filtered by max distance <=", customFilters.distance, "→", filtered.length, "restaurants");
+      console.log(
+        "📏 Filtered by max distance <=",
+        customFilters.distance,
+        "→",
+        filtered.length,
+        "restaurants"
+      );
     }
-  
-    // 🔽 Happy Hours
+
     if (customFilters.happyHours) {
-      filtered = filtered.filter((r) => r.tags?.includes("happyHours"));
-      console.log("🍻 Filtered by Happy Hours:", filtered.map(r => r.name));
+      console.log("Applying Happy Hours filter");
+      const before = filtered.length;
+      filtered = filtered.filter((r) => r.happyHours); // or however your data is structured
+      console.log(`Filtered Happy Hours: ${before} → ${filtered.length}`);
     }
-  
-    // 🔽 Drinks Night
+
     if (customFilters.drinksNight) {
-      filtered = filtered.filter((r) => r.tags?.includes("drinksNight"));
-      console.log("🍸 Filtered by Drinks Night:", filtered.map(r => r.name));
+      console.log("Applying Drinks Night filter");
+      const before = filtered.length;
+      filtered = filtered.filter((r) => r.drinksNight);
+      console.log(`Filtered Drinks Night: ${before} → ${filtered.length}`);
     }
-  
+
     setRestaurants(filtered);
     setActiveFilter(null);
     setCustomFilterActive(true);
   };
-  
 
   const handleFilterClick = (value) => {
     if (activeFilter === value) {
