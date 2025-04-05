@@ -4,7 +4,7 @@ import Category from "./Category/Category";
 import RestaurantList from "../Locations/RestaurantList/RestaurantList";
 
 const Locations = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All"); // Store selected category
+  const [selectedCategory, setSelectedCategory] = useState("All"); 
 
   return (
     <div className="space-y-9">

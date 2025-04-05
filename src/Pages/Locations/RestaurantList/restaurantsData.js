@@ -13,8 +13,12 @@ const restaurantsData = [
     duration: "30-40 mins",
     rating: 4.5,
     image: greenLeaf,
-    latitude: 19.1197, // Andheri West, Mumbai
+    latitude: 19.1197,
     longitude: 72.8465,
+    distance: 2.1,
+    deliveryTime: 35,
+    happyHours: false,
+    drinksNight: false,
   },
   {
     id: 2,
@@ -24,8 +28,12 @@ const restaurantsData = [
     duration: "25-35 mins",
     rating: 4.2,
     image: tandooriFlames,
-    latitude: 28.6315, // Connaught Place, Delhi
+    latitude: 28.6315,
     longitude: 77.2167,
+    distance: 5.4,
+    deliveryTime: 30,
+    happyHours: true,
+    drinksNight: true,
   },
   {
     id: 3,
@@ -35,8 +43,12 @@ const restaurantsData = [
     duration: "35-45 mins",
     rating: 4.8,
     image: royalBiryani,
-    latitude: 17.3616, // Charminar, Hyderabad
+    latitude: 17.3616,
     longitude: 78.4747,
+    distance: 8.2,
+    deliveryTime: 40,
+    happyHours: false,
+    drinksNight: true,
   },
   {
     id: 4,
@@ -46,8 +58,12 @@ const restaurantsData = [
     duration: "20-30 mins",
     rating: 4.3,
     image: shanghaiExpress,
-    latitude: 12.9716, // Brigade Road, Bengaluru
+    latitude: 12.9716,
     longitude: 77.5946,
+    distance: 1.6,
+    deliveryTime: 25,
+    happyHours: true,
+    drinksNight: false,
   },
   {
     id: 5,
@@ -57,8 +73,12 @@ const restaurantsData = [
     duration: "40-50 mins",
     rating: 4.6,
     image: arabianNights,
-    latitude: 13.0491, // Marina Beach, Chennai
+    latitude: 13.0491,
     longitude: 80.2824,
+    distance: 9.3,
+    deliveryTime: 45,
+    happyHours: false,
+    drinksNight: false,
   },
 ];
 
