@@ -221,8 +221,13 @@ const RestaurantList = ({ selectedCategory }) => {
         );
         break;
       case "veg":
-        filteredRestaurants = filteredRestaurants.filter((r) => r.category === "Vegetarian");
+        filteredRestaurants = filteredRestaurants.filter(
+          (r) =>
+            r.category.toLowerCase().includes("veg") || // covers "vegetarian", "veg", "pure veg"
+            r.category.toLowerCase() === "vegetarian"
+        );
         break;
+
       case "offers":
         filteredRestaurants = filteredRestaurants.filter((r) => r.hasOffer);
         break;

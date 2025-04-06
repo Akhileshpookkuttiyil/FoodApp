@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import Menus from "./Pages/Menus/Menus";
 import Locations from "./Pages/Locations/Locations";
 import ScrollToTop from "./ScrolltoTop";
+import Blogs from "./Pages/Blogs/Blogs";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route exact path="/" element={<Home />} />
             <Route exact path="/menus" element={<Menus />} />
             <Route exact path="/location" element={<Locations />} />
+            <Route exact path="/blogs" element={<Blogs />} />
           </Routes>
           {/* Footer (sample) */}
           <Footer />

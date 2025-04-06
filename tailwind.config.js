@@ -4,9 +4,12 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        playfair: ['"Playfair Display"', "serif"],
+      },
       screens: {
         "hide-range": { min: "1024px", max: "1300px" },
-        'menu-range': { min: '1024px', max: '1300px' },
+        "menu-range": { min: "1024px", max: "1300px" },
       },
     },
   },
