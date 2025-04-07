@@ -8,6 +8,7 @@ import Locations from "./Pages/Locations/Locations";
 import ScrollToTop from "./ScrolltoTop";
 import Blogs from "./Pages/Blogs/Blogs";
 import ContactSection from "./Pages/Contact/contact";
+import About from "./Pages/About/About";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route exact path="/location" element={<Locations />} />
             <Route exact path="/blogs" element={<Blogs />} />
             <Route exact path="/contact" element={<ContactSection />} />
+            <Route exact path="/about" element={<About />} />
           </Routes>
           {/* Footer (sample) */}
           <Footer />
