@@ -31,7 +31,7 @@ const Blog = () => {
               <div className="flex items-center gap-x-5">
                 <div className="flex items-center gap-x-1.5 text-sm text-neutral-500/70">
                   <FaCircleUser />
-                  <span className="text-neutral-500">{blog.Author}</span>
+                  <span className="text-neutral-500">{blog.author}</span>
                 </div>
                 <div className="flex items-center gap-x-1.5 text-sm text-neutral-500/70">
                   <FaCalendar />
