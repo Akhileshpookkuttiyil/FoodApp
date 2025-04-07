@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <>
-      <footer className="w-full bg-neutral-700 lg:px-6 md:px-6 sm:px-4 px-4 py-12 mt-[3ch]">
+      <footer className="w-full bg-neutral-700 lg:px-6 md:px-6 sm:px-4 px-4 py-12">
         <div className="grid md:grid-cols-6 sm:grid-cols-4 grid-cols-1 gap-14">
           <div className="col-span-2 space-y-7">
             <div className="space-y-3">
@@ -135,8 +135,7 @@ const Footer = () => {
                     <FaMapPin />
                   </div>
                   <p className="text-base text-neutral-400 font-normal">
-                    1234 Elmwood Drive, Suite 567, Springtown, Newville, United
-                    States
+                    Bangalore - 560038 Karnataka, India
                   </p>
                 </div>
               </div>
@@ -149,7 +148,7 @@ const Footer = () => {
                     <FaPhone />
                   </div>
                   <p className="text-base text-neutral-400 font-normal">
-                    +1 (555) 123-4567
+                    +91 98765 43210
                   </p>
                 </div>
               </div>
@@ -162,7 +161,7 @@ const Footer = () => {
                     <FaEnvelope />
                   </div>
                   <p className="text-base text-neutral-400 font-normal">
-                    contact@foodiemania.com
+                    support@foodiemania.com
                   </p>
                 </div>
               </div>

@@ -7,6 +7,7 @@ import Menus from "./Pages/Menus/Menus";
 import Locations from "./Pages/Locations/Locations";
 import ScrollToTop from "./ScrolltoTop";
 import Blogs from "./Pages/Blogs/Blogs";
+import ContactSection from "./Pages/Contact/contact";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route exact path="/menus" element={<Menus />} />
             <Route exact path="/location" element={<Locations />} />
             <Route exact path="/blogs" element={<Blogs />} />
+            <Route exact path="/contact" element={<ContactSection />} />
           </Routes>
           {/* Footer (sample) */}
           <Footer />

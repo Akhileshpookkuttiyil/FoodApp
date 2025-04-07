@@ -40,12 +40,20 @@ const Navbar = () => {
         );
         const data = await response.json();
         if (isMounted) {
-          setCurrentLocation(
-            data.address?.city || data.address?.town || "Unknown"
-          );
+          const cityName =
+            data?.address?.city ||
+            data?.address?.town ||
+            data?.address?.village ||
+            data?.address?.hamlet ||
+            data?.address?.county ||
+            data?.address?.state ||
+            "Unknown";
+
+          setCurrentLocation(cityName);
+          console.log("📍 Location fetched:", cityName);
         }
       } catch (error) {
-        console.error("Error fetching city name:", error);
+        console.error("❌ Error fetching location data:", error);
         if (isMounted) setCurrentLocation("Unknown Location");
       }
     };
@@ -54,10 +62,11 @@ const Navbar = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          console.log("📡 Coordinates:", latitude, longitude);
           fetchLocation(latitude, longitude);
         },
         (error) => {
-          console.error("Error fetching location:", error);
+          console.error("⚠️ Geolocation error:", error.message);
           if (isMounted) setCurrentLocation("Location not found");
         }
       );
