@@ -81,7 +81,7 @@ const Navbar = () => {
   return (
     <nav className="w-full h-[8ch] bg-neutral-50 flex items-center justify-between lg:px-5 md:px-16 sm:px-7 px-4 fixed top-0 z-50 shadow-md">
       {/* Logo */}
-      <Link to="/" className="text-2xl text-neutral-800 font-bold">
+      <Link to="/" className="text-3xl text-neutral-800 font-bold">
         <span className="text-orange-400">F</span>oodie
         <span className="text-orange-400">M</span>ania
       </Link>
