@@ -13,6 +13,7 @@ const Navbar = ({ setShowLogin }) => {
   const [open, setOpen] = useState(false);
   const [showLocation, setShowLocation] = useState(false);
   const [currentLocation, setCurrentLocation] = useState("Fetching...");
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const location = useLocation();
 
   const NavLinks = useMemo(
@@ -55,7 +56,6 @@ const Navbar = ({ setShowLogin }) => {
             "Unknown Location";
 
           setCurrentLocation(localName);
-          console.log("Exact Local Location:", localName);
         }
       } catch (error) {
         console.error("Error fetching location data:", error);
@@ -67,7 +67,6 @@ const Navbar = ({ setShowLogin }) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          console.log("📡 Coordinates:", latitude, longitude);
           fetchLocation(latitude, longitude);
         },
         (error) => {
@@ -115,8 +114,8 @@ const Navbar = ({ setShowLogin }) => {
 
       {/* Right Icons */}
       <div className="flex items-center space-x-6 lg:space-x-14 md:space-x-8 ml-auto justify-end">
-        {/* Search Bar */}
-        <div className="hidden md:flex w-[250px] lg:w-[300px] rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden">
+        {/* Full Search Bar */}
+        <div className="hidden md:flex menu-range:hidden ml-4 w-[250px] lg:w-[300px] rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden">
           <input
             type="text"
             placeholder="Search here..."
@@ -126,6 +125,14 @@ const Navbar = ({ setShowLogin }) => {
             <FaSearch className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Search Icon in menu-range */}
+        <button
+          onClick={() => setShowSearchModal(true)}
+          className="hidden menu-range:flex text-orange-500 hover:text-orange-600"
+        >
+          <FaSearch className="text-xl" />
+        </button>
 
         {/* Cart */}
         <Link
@@ -138,7 +145,7 @@ const Navbar = ({ setShowLogin }) => {
           </span>
         </Link>
 
-        {/* Login → Trigger Modal */}
+        {/* Login */}
         <button
           onClick={() => setShowLogin(true)}
           className="text-neutral-800 hover:text-orange-400 transition-all duration-300"
@@ -214,6 +221,25 @@ const Navbar = ({ setShowLogin }) => {
           </button>
         </div>
       </div>
+
+      {/* Search Modal (for menu-range screens) */}
+      {showSearchModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-[99]">
+          <div className="bg-white rounded-lg p-6 w-[90%] max-w-md relative">
+            <button
+              onClick={() => setShowSearchModal(false)}
+              className="absolute top-2 right-3 text-xl text-neutral-600 hover:text-red-400"
+            >
+              <LiaTimesSolid />
+            </button>
+            <input
+              type="text"
+              placeholder="Search food or restaurants..."
+              className="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 ring-orange-400"
+            />
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

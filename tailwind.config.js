@@ -10,6 +10,7 @@ export default {
       screens: {
         "hide-range": { min: "1024px", max: "1300px" },
         "menu-range": { min: "1024px", max: "1300px" },
+        "hide-part": { min: "1024px", max: "1245px" },
       },
       keyframes: {
         fadeIn: {
