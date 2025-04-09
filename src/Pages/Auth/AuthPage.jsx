@@ -2,27 +2,63 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { X, Eye, EyeOff } from "lucide-react";
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import loginImage from "../../assets/img/login.jpg";
 
 const AuthPage = ({ setToken, url, setShowLogin }) => {
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [data, setData] = useState({ name: "", email: "", password: "" });
+  const [errors, setErrors] = useState({ name: "", email: "", password: "" });
+  const [touched, setTouched] = useState({}); // Track touched fields
+
+  const validate = () => {
+    const errs = { name: "", email: "", password: "" };
+
+    if (isSignup && data.name.trim().length < 2)
+      errs.name = "Name must be at least 2 characters";
+
+    if (!data.email.includes("@"))
+      errs.email = "Please enter a valid email address";
+
+    if (data.password.length < 6)
+      errs.password = "Password must be at least 6 characters";
+
+    return errs;
+  };
 
   const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
+
+    if (touched[e.target.name]) {
+      const newErrors = validate();
+      setErrors(newErrors);
+    }
+  };
+
+  const handleBlur = (e) => {
+    setTouched({ ...touched, [e.target.name]: true });
+    const newErrors = validate();
+    setErrors(newErrors);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!data.email.includes("@")) return toast.error("Invalid email");
-    if (isSignup && data.name.trim().length < 2)
-      return toast.error("Name too short");
-    if (data.password.length < 6)
-      return toast.error("Password must be 6+ characters");
+    const validation = validate();
+    const hasError = Object.values(validation).some((v) => v);
+    setErrors(validation);
+    setTouched({ name: true, email: true, password: true });
+
+    if (hasError || (isSignup && !agreed)) {
+      toast.error("Please fix the errors above");
+      return;
+    }
 
     const route = isSignup ? "/user/register" : "/user/login";
+    setLoading(true);
 
     try {
       const res = await axios.post(url + route, data);
@@ -33,10 +69,12 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
         setData({ name: "", email: "", password: "" });
         setShowLogin(false);
       } else {
-        toast.error(res.data.message || "Login failed");
+        toast.error(res.data.message || "Authentication failed");
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Server error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,52 +96,86 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
       } else {
         toast.error("Google login failed");
       }
-    } catch (err) {
-      toast.error("Google login error");
+    } catch (error) {
+      toast.error("Google login error", error);
     }
   };
 
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: handleGoogleLogin,
+    onError: () => toast.error("Google login failed"),
+  });
+
+  const isSignupValid =
+    !loading &&
+    data.email.includes("@") &&
+    data.password.length >= 6 &&
+    (!isSignup || (data.name.trim().length >= 2 && agreed));
+
+  const switchMode = (toSignup) => {
+    setIsSignup(toSignup);
+    setData({
+      name: "",
+      email: "", // Keep email if you want: data.email
+      password: "",
+    });
+    setErrors({ name: "", email: "", password: "" });
+    setTouched({});
+    setAgreed(false);
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-4xl h-[540px] bg-white rounded-2xl shadow-2xl overflow-hidden flex relative">
-        {/* Close Button - Top Right of Modal */}
+    <div className="fixed inset-0 z-50 flex items-start justify-center px-2 pt-6 sm:pt-8">
+      <div className="w-full max-w-4xl h-[92vh] rounded-2xl shadow-2xl bg-white flex flex-col lg:flex-row relative overflow-hidden">
         <button
           onClick={() => setShowLogin(false)}
-          className="absolute top-4 right-4 bg-white text-orange-500 rounded-full p-2 shadow-md z-50 hover:bg-orange-100 transition"
+          className="absolute top-3 right-3 text-orange-500 bg-gray-100 rounded-full p-1.5 hover:bg-orange-100 transition z-50"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* Left Panel */}
-        <div className="w-1/2 bg-orange-500 text-white flex flex-col items-center justify-center p-8">
-          <h2 className="text-4xl font-bold mb-4">Welcome to FoodieMania</h2>
-          <p className="text-center text-lg">
-            Discover the best food & deals around you. Sign up now or login to
-            start ordering!
-          </p>
-          <img src="/logo.svg" alt="logo" className="mt-8 w-24 h-24" />
+        {/* Left Image */}
+        <div
+          className="w-full h-48 sm:h-64 lg:h-auto lg:w-1/2 bg-cover bg-center flex items-center justify-center relative"
+          style={{ backgroundImage: `url(${loginImage})` }}
+        >
+          <div className="text-white text-center p-6 space-y-3 animate-float z-10">
+            <h2 className="text-4xl font-extrabold drop-shadow-lg">
+              Welcome to <span className="text-yellow-400">FoodieMania</span>
+            </h2>
+            <p className="text-lg font-medium drop-shadow-sm">
+              Discover the best food & deals around you.
+            </p>
+          </div>
+          <div className="absolute inset-0 bg-black bg-opacity-5 z-0" />
         </div>
 
-        {/* Right Panel - Form */}
-        <div className="w-1/2 bg-white p-8 flex flex-col justify-center">
-          <h2 className="text-2xl font-bold text-orange-500 mb-1">
+        {/* Form Section */}
+        <div className="w-full lg:w-1/2 px-5 py-6 flex flex-col justify-center relative z-10">
+          <h2 className="text-xl font-bold text-orange-500 mb-1">
             {isSignup ? "Create Account" : "Login"}
           </h2>
-          <p className="text-gray-500 mb-6">
+          <p className="text-gray-500 mb-4 text-sm">
             {isSignup ? "Join FoodieMania today!" : "Welcome back, foodie!"}
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {isSignup && (
-              <input
-                type="text"
-                name="name"
-                value={data.name}
-                onChange={handleChange}
-                placeholder="Full Name"
-                className="w-full px-4 py-2 border rounded focus:outline-orange-400"
-                required
-              />
+              <>
+                <input
+                  type="text"
+                  name="name"
+                  value={data.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Full Name"
+                  className="w-full px-3 py-2 border rounded text-sm focus:outline-orange-400"
+                  required
+                />
+                {touched.name && errors.name && (
+                  <p className="text-xs text-red-500">{errors.name}</p>
+                )}
+              </>
             )}
 
             <input
@@ -111,10 +183,14 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
               name="email"
               value={data.email}
               onChange={handleChange}
+              onBlur={handleBlur}
               placeholder="Email"
-              className="w-full px-4 py-2 border rounded focus:outline-orange-400"
+              className="w-full px-3 py-2 border rounded text-sm focus:outline-orange-400"
               required
             />
+            {touched.email && errors.email && (
+              <p className="text-xs text-red-500">{errors.email}</p>
+            )}
 
             <div className="relative">
               <input
@@ -122,22 +198,32 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
                 name="password"
                 value={data.password}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 placeholder="Password"
-                className="w-full px-4 py-2 border rounded focus:outline-orange-400"
+                className="w-full px-3 py-2 border rounded text-sm focus:outline-orange-400"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-gray-500"
+                className="absolute right-3 top-2 text-gray-500"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+            {touched.password && errors.password && (
+              <p className="text-xs text-red-500">{errors.password}</p>
+            )}
 
             {isSignup && (
-              <label className="text-sm text-gray-600 flex gap-2">
-                <input type="checkbox" required />I agree to the{" "}
+              <label className="text-xs text-gray-600 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  required
+                />
+                I agree to the{" "}
                 <span className="text-orange-500 underline cursor-pointer">
                   terms & privacy
                 </span>
@@ -146,29 +232,38 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
 
             <button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded font-semibold"
+              disabled={!isSignupValid}
+              className={`w-full ${
+                isSignupValid
+                  ? "bg-orange-500 hover:bg-orange-600"
+                  : "bg-orange-300 cursor-not-allowed"
+              } text-white py-2 rounded font-semibold text-sm transition`}
             >
-              {isSignup ? "Sign Up" : "Login"}
+              {loading ? "Please wait..." : isSignup ? "Sign Up" : "Login"}
             </button>
           </form>
 
-          {/* Google Login */}
-          <div className="my-4 text-center">
-            <GoogleLogin
-              onSuccess={handleGoogleLogin}
-              onError={() => toast.error("Google login failed")}
-              theme="outline"
-              size="large"
-            />
-          </div>
+          <button
+            onClick={loginWithGoogle}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 mt-3 bg-white hover:bg-gray-100 text-gray-800 py-2 rounded border border-gray-300 text-sm transition disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <svg width="20" height="20" viewBox="0 0 48 48">
+              {/* Google logo paths */}
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+            </svg>
+            Continue with Google
+          </button>
 
-          {/* Toggle Mode */}
-          <p className="text-center text-sm mt-2 text-gray-600">
+          <p className="text-center text-xs mt-3 text-gray-600">
             {isSignup ? (
               <>
                 Already a member?{" "}
                 <button
-                  onClick={() => setIsSignup(false)}
+                  onClick={() => switchMode(false)}
                   className="text-orange-500 font-semibold"
                 >
                   Login
@@ -178,7 +273,7 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
               <>
                 New to FoodieMania?{" "}
                 <button
-                  onClick={() => setIsSignup(true)}
+                  onClick={() => switchMode(true)}
                   className="text-orange-500 font-semibold"
                 >
                   Sign up

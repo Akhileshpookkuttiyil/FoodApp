@@ -1,4 +1,3 @@
-/*  */
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap");
 
 @tailwind base;
@@ -12,17 +11,19 @@
   font-family: "Roboto", sans-serif;
 }
 
-
-.offer_bg{
+/* Offer section background */
+.offer_bg {
   background: url("./assets/img/offer.png") no-repeat;
   background-position: center bottom;
   background-size: cover;
 }
 
+/* Hide scrollbar */
 ::-webkit-scrollbar {
   display: none;
 }
 
+/* Fade in animation */
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -38,5 +39,22 @@
   animation: fadeIn 0.4s ease-out;
 }
 
+/* Float animation (gentle up-down movement) */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
 
-/*  */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Optional: Hover effect with float */
+.hover-float:hover {
+  transform: translateY(-4px) scale(1.02);
+  transition: transform 0.3s ease;
+}
