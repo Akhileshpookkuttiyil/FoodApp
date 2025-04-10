@@ -8,9 +8,10 @@ export default {
         playfair: ['"Playfair Display"', "serif"],
       },
       screens: {
-        "hide-range": { min: "1024px", max: "1300px" },
-        "menu-range": { min: "1024px", max: "1300px" },
-        "hide-part": { min: "1024px", max: "1245px" },
+        // "hide-range": { min: "1024px", max: "1300px" },
+        "menu-range": { min: "1024px", max: "1260px" },
+        // 'lg-only': { min: '1024px', max: '1279px' },
+        // "hide-part": { min: "1024px", max: "1245px" },
       },
       keyframes: {
         fadeIn: {
