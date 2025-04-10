@@ -13,7 +13,6 @@ const Navbar = ({ setShowLogin }) => {
   const [open, setOpen] = useState(false);
   const [showLocation, setShowLocation] = useState(false);
   const [currentLocation, setCurrentLocation] = useState("Fetching...");
-  const [showSearchModal, setShowSearchModal] = useState(false);
   const location = useLocation();
 
   const NavLinks = useMemo(
@@ -43,7 +42,6 @@ const Navbar = ({ setShowLogin }) => {
 
         if (isMounted) {
           const address = data?.address;
-
           const localName =
             address?.village ||
             address?.hamlet ||
@@ -58,19 +56,18 @@ const Navbar = ({ setShowLogin }) => {
           setCurrentLocation(localName);
         }
       } catch (error) {
-        console.error("Error fetching location data:", error);
+        console.error("Error fetching location:", error);
         if (isMounted) setCurrentLocation("Unknown Location");
       }
     };
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          fetchLocation(latitude, longitude);
+        ({ coords }) => {
+          fetchLocation(coords.latitude, coords.longitude);
         },
         (error) => {
-          console.error("⚠️ Geolocation error:", error.message);
+          console.error("Geolocation error:", error.message);
           if (isMounted) setCurrentLocation("Location not found");
         }
       );
@@ -91,15 +88,15 @@ const Navbar = ({ setShowLogin }) => {
         <span className="text-orange-400">M</span>ania
       </Link>
 
-      {/* Nav Links */}
-      <div className="hidden lg:flex items-center space-x-6 flex-1 justify-center">
-        <ul className="list-none flex items-center gap-x-7 text-base text-neutral-600 font-medium">
+      {/* Nav Links (center) */}
+      <div className="hidden lg:flex items-center flex-1 justify-center">
+        <ul className="flex gap-x-7 text-base text-neutral-600 font-medium">
           {NavLinks.map((link) => (
             <li key={link.href}>
               <Link
-                onClick={handleClose}
                 to={link.href}
-                className={`ease-in-out duration-300 ${
+                onClick={handleClose}
+                className={`duration-300 ${
                   location.pathname === link.href
                     ? "text-orange-400 font-semibold"
                     : "hover:text-orange-400"
@@ -112,10 +109,10 @@ const Navbar = ({ setShowLogin }) => {
         </ul>
       </div>
 
-      {/* Right Icons */}
-      <div className="flex items-center space-x-6 lg:space-x-14 md:space-x-8 ml-auto justify-end">
-        {/* Full Search Bar */}
-        <div className="hidden md:flex menu-range:hidden ml-4 w-[250px] lg:w-[300px] rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden">
+      {/* Right section */}
+      <div className="flex items-center space-x-4 md:space-x-6 lg:space-x-10 justify-end ml-auto">
+        {/* Search (hidden between 1024px–1300px using menu-range) */}
+        <div className="hidden md:flex items-center border border-neutral-400/70 rounded-full bg-white overflow-hidden w-[250px] lg:w-[300px]">
           <input
             type="text"
             placeholder="Search here..."
@@ -125,57 +122,49 @@ const Navbar = ({ setShowLogin }) => {
             <FaSearch className="w-5 h-5" />
           </button>
         </div>
-
-        {/* Search Icon in menu-range */}
-        <button
-          onClick={() => setShowSearchModal(true)}
-          className="hidden menu-range:flex text-orange-500 hover:text-orange-600"
-        >
-          <FaSearch className="text-xl" />
-        </button>
-
-        {/* Cart */}
-        <Link
-          to="/cart"
-          className="relative text-neutral-800 hover:text-orange-400 transition-all duration-300"
-        >
-          <FaShoppingCart className="text-xl lg:text-2xl" />
-          <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-            3
-          </span>
-        </Link>
-
-        {/* Login */}
-        <button
-          onClick={() => setShowLogin(true)}
-          className="text-neutral-800 hover:text-orange-400 transition-all duration-300"
-        >
-          <FaUser className="text-xl lg:text-2xl" />
-        </button>
-
-        {/* Location */}
-        <div className="relative">
-          <button
-            aria-label="Show location"
-            onClick={() => setShowLocation(!showLocation)}
-            className="flex items-center text-gray-800 hover:text-orange-500 transition-all duration-300"
+        <div className="flex items-center gap-8 menu-range:hidden ">
+          {/* Cart */}
+          <Link
+            to="/cart"
+            className="relative text-neutral-800 hover:text-orange-400 transition-all duration-300"
           >
-            <FaMapMarkerAlt className="text-sm lg:text-sm" />
-            <span>{currentLocation}</span>
+            <FaShoppingCart className="text-xl lg:text-2xl" />
+            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+              3
+            </span>
+          </Link>
+
+          {/* User Login */}
+          <button
+            onClick={() => setShowLogin(true)}
+            className="text-neutral-800 hover:text-orange-400 transition-all duration-300"
+          >
+            <FaUser className="text-xl lg:text-2xl" />
           </button>
 
-          {showLocation && (
-            <div className="absolute top-10 right-0 bg-white shadow-md rounded-md p-3 w-40 text-neutral-700">
-              <p className="text-sm">Your Location:</p>
-              <p className="font-semibold">{currentLocation}</p>
-            </div>
-          )}
+          {/* Location */}
+          <div className="relative">
+            <button
+              onClick={() => setShowLocation(!showLocation)}
+              className="flex items-center text-gray-800 hover:text-orange-500 transition-all duration-300"
+            >
+              <FaMapMarkerAlt className="text-sm mr-1" />
+              <span className="text-sm">{currentLocation}</span>
+            </button>
+
+            {showLocation && (
+              <div className="absolute top-10 right-0 bg-white shadow-md rounded-md p-3 w-44 text-neutral-700 z-40">
+                <p className="text-sm">Your Location:</p>
+                <p className="font-semibold">{currentLocation}</p>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Mobile Toggle */}
+        {/* Hamburger */}
         <button
           onClick={handleClick}
-          className="lg:hidden text-neutral-600 flex items-center justify-end"
+          className="lg:hidden menu-range:flex text-neutral-600"
         >
           {open ? (
             <LiaTimesSolid className="text-xl" />
@@ -184,20 +173,20 @@ const Navbar = ({ setShowLogin }) => {
           )}
         </button>
       </div>
-
       {/* Mobile Menu */}
       <div
-        className={`${
-          open ? "flex absolute top-14 left-0 w-full" : "hidden"
-        } flex-col lg:hidden bg-neutral-100 shadow-md rounded-md p-4 mt-3`}
+        className={`absolute top-[100%] left-0 w-full flex-col bg-neutral-100 shadow-md rounded-md p-4 z-40 lg:hidden ${
+          open ? "flex menu-range:flex" : "hidden"
+        }`}
       >
-        <ul className="list-none flex flex-col items-start gap-y-3 text-base text-neutral-600 font-medium">
+        {/* Nav Links (hidden in menu-range) */}
+        <ul className="flex flex-col gap-y-3 text-base text-neutral-600 font-medium menu-range:hidden">
           {NavLinks.map((link) => (
             <li key={link.href}>
               <Link
-                onClick={handleClose}
                 to={link.href}
-                className={`ease-in-out duration-300 ${
+                onClick={handleClose}
+                className={`duration-300 ${
                   location.pathname === link.href
                     ? "text-orange-400 font-semibold"
                     : "hover:text-orange-400"
@@ -209,8 +198,8 @@ const Navbar = ({ setShowLogin }) => {
           ))}
         </ul>
 
-        {/* Search (Mobile) */}
-        <div className="md:hidden flex w-full mt-4 rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden shadow-sm">
+        {/* Search Bar (hidden in menu-range) */}
+        <div className="flex w-full mt-4 rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden menu-range:hidden">
           <input
             type="text"
             placeholder="Search here..."
@@ -220,26 +209,48 @@ const Navbar = ({ setShowLogin }) => {
             <FaSearch className="w-5 h-5" />
           </button>
         </div>
-      </div>
 
-      {/* Search Modal (for menu-range screens) */}
-      {showSearchModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-[99]">
-          <div className="bg-white rounded-lg p-6 w-[90%] max-w-md relative">
+        {/* Action Icons */}
+        <div className="flex items-center justify-between mt-4 px-1 text-neutral-800">
+          {/* Cart */}
+          <Link
+            to="/cart"
+            className="relative hover:text-orange-400 transition-all duration-300"
+          >
+            <FaShoppingCart className="text-xl lg:text-2xl" />
+            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+              3
+            </span>
+          </Link>
+
+          {/* User Login */}
+          <button
+            onClick={() => setShowLogin(true)}
+            className="hover:text-orange-400 transition-all duration-300"
+          >
+            <FaUser className="text-xl lg:text-2xl" />
+          </button>
+
+          {/* Location */}
+          <div className="relative">
             <button
-              onClick={() => setShowSearchModal(false)}
-              className="absolute top-2 right-3 text-xl text-neutral-600 hover:text-red-400"
+              onClick={() => setShowLocation(!showLocation)}
+              className="flex items-center hover:text-orange-500 transition-all duration-300"
             >
-              <LiaTimesSolid />
+              <FaMapMarkerAlt className="text-sm mr-1" />
+              <span className="text-sm">{currentLocation}</span>
             </button>
-            <input
-              type="text"
-              placeholder="Search food or restaurants..."
-              className="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 ring-orange-400"
-            />
+
+            {/* Location Dropdown */}
+            {showLocation && (
+              <div className="absolute top-10 right-0 bg-white shadow-md rounded-md p-3 w-44 text-neutral-700 z-40">
+                <p className="text-sm">Your Location:</p>
+                <p className="font-semibold">{currentLocation}</p>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 };
