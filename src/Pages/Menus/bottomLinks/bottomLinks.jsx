@@ -24,23 +24,23 @@ const BottomLinks = () => {
   ];
 
   return (
-    <div className="py-8 mt-3">
-      <div className="container mx-auto px-1">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-10 text-black">
-          Restaurants Near Me
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+    <div className="py-8 mt-3 min-h-screen w-full">
+      <h2 className="text-3xl sm:text-4xl font-bold text-center mb-10 text-black">
+        Restaurants Near Me
+      </h2>
+      <div className="w-full px-4 sm:px-6 lg:px-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 lg:gap-12 auto-rows-fr">
           {categories.map((category, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:scale-105 transform transition-all duration-300"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:scale-105 transform transition-all duration-300 h-full flex flex-col"
             >
               <img
-                src={category.image} // Use the imported image directly
+                src={category.image}
                 alt={category.name}
                 className="w-full h-48 object-cover"
               />
-              <div className="p-4 text-center">
+              <div className="p-4 text-center flex-grow flex flex-col justify-between">
                 <h4 className="text-xl font-semibold text-gray-800">
                   {category.name}
                 </h4>
