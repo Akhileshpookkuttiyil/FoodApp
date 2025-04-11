@@ -122,7 +122,7 @@ const Navbar = ({ setShowLogin }) => {
             <FaSearch className="w-5 h-5" />
           </button>
         </div>
-        <div className="flex items-center gap-8 menu-range:hidden ">
+        <div className="flex items-center gap-8 menu-range:hidden xsm:hidden">
           {/* Cart */}
           <Link
             to="/cart"
@@ -175,7 +175,7 @@ const Navbar = ({ setShowLogin }) => {
       </div>
       {/* Mobile Menu */}
       <div
-        className={`absolute top-[100%] left-0 w-full flex-col bg-neutral-100 shadow-md rounded-md p-4 z-40 lg:hidden ${
+        className={`absolute top-[100%] left-0 w-full flex-col bg-neutral-100 shadow-md p-4 z-40 lg:hidden ${
           open ? "flex menu-range:flex" : "hidden"
         }`}
       >
@@ -199,7 +199,7 @@ const Navbar = ({ setShowLogin }) => {
         </ul>
 
         {/* Search Bar (hidden in menu-range) */}
-        <div className="flex w-full mt-4 rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden menu-range:hidden">
+        <div className="flex w-full mt-4 rounded-full border border-neutral-400/70 bg-white items-center overflow-hidden menu-range:hidden md:hidden">
           <input
             type="text"
             placeholder="Search here..."
@@ -211,7 +211,7 @@ const Navbar = ({ setShowLogin }) => {
         </div>
 
         {/* Action Icons */}
-        <div className="flex items-center justify-between mt-4 px-1 text-neutral-800">
+        <div className="hidden xsm:flex menu-range:flex items-center justify-between mt-4 px-1 text-neutral-800">
           {/* Cart */}
           <Link
             to="/cart"
