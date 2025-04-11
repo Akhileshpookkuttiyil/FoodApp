@@ -90,7 +90,7 @@ const Navbar = ({ setShowLogin }) => {
 
       {/* Nav Links (center) */}
       <div className="hidden lg:flex items-center flex-1 justify-center">
-        <ul className="flex gap-x-7 text-base text-neutral-600 font-medium">
+        <ul className="flex text-base text-neutral-600 font-medium gap-x-5 lg:gap-x-7 xl:gap-x-14 2xl:gap-x-20">
           {NavLinks.map((link) => (
             <li key={link.href}>
               <Link
