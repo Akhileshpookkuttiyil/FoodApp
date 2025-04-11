@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { FaMapMarkerAlt, FaEnvelope, FaPhone } from "react-icons/fa";
 import { motion } from "framer-motion";
 import ContactForm from "../ContactForm/ContactForm";
@@ -6,8 +5,8 @@ import ContactInfo from "../ContactInfo/ContactInfo";
 
 const ContactSection = () => {
   return (
-    <section className="relative bg-white dark:bg-[#0f172a] py-24 px-4 sm:px-6 md:px-16 font-sans transition duration-500">
-      <div className="max-w-6xl mx-auto">
+    <section className="relative w-full bg-white dark:bg-[#0f172a] py-24 px-4 sm:px-6 lg:px-10 font-sans transition duration-500">
+      <div className="w-full">
         <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -24,7 +23,7 @@ const ContactSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-14 lg:gap-20 xl:gap-28 2xl:gap-32">
           <motion.div
             className="space-y-10"
             initial={{ opacity: 0, x: -50 }}

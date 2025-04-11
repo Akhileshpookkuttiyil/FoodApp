@@ -10,7 +10,7 @@ const Blogs = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="max-w-7xl mx-auto px-5 pt-20 sm:pt-24 md:pt-28 pb-24 sm:pb-28"
+      className="w-full px-4 sm:px-6 lg:px-10 pt-20 sm:pt-24 md:pt-28 pb-24 sm:pb-28"
     >
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-12 sm:mb-16 gap-6">
@@ -33,7 +33,7 @@ const Blogs = () => {
       </div>
 
       {/* Blog Grid */}
-      <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3 lg:gap-12 auto-rows-fr">
         {blogData.map((blog) => (
           <motion.div
             key={blog.id}
