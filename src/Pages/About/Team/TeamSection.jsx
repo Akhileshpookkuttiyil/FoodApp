@@ -1,29 +1,9 @@
-const teamMembers = [
-  {
-    name: "Ananya Sharma",
-    position: "Operations Lead",
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-  {
-    name: "Rohit Mehta",
-    position: "Head of Logistics",
-    image: "https://randomuser.me/api/portraits/men/45.jpg",
-  },
-  {
-    name: "Priya Patel",
-    position: "Creative Strategist",
-    image: "https://randomuser.me/api/portraits/women/68.jpg",
-  },
-  {
-    name: "Karan Singh",
-    position: "Product Manager",
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-];
-
 const TeamSection = () => {
   return (
-    <section className="bg-white py-24 px-6 lg:px-24" data-aos="fade-up">
+    <section
+      className="bg-white py-24 px-6 lg:px-24 xl:px-32 2xl:px-48"
+      data-aos="fade-up"
+    >
       <h2 className="text-5xl font-bold text-center text-gray-900 mb-14">
         Meet Our Team
       </h2>
@@ -51,5 +31,3 @@ const TeamSection = () => {
     </section>
   );
 };
-
-export default TeamSection;
