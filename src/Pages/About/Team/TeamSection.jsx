@@ -1,3 +1,26 @@
+const teamMembers = [
+  {
+    name: "Ananya Sharma",
+    position: "Operations Lead",
+    image: "https://randomuser.me/api/portraits/women/44.jpg",
+  },
+  {
+    name: "Rohit Mehta",
+    position: "Head of Logistics",
+    image: "https://randomuser.me/api/portraits/men/45.jpg",
+  },
+  {
+    name: "Priya Patel",
+    position: "Creative Strategist",
+    image: "https://randomuser.me/api/portraits/women/68.jpg",
+  },
+  {
+    name: "Karan Singh",
+    position: "Product Manager",
+    image: "https://randomuser.me/api/portraits/men/32.jpg",
+  },
+];
+
 const TeamSection = () => {
   return (
     <section
@@ -31,3 +54,4 @@ const TeamSection = () => {
     </section>
   );
 };
+export default TeamSection;

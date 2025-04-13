@@ -8,8 +8,11 @@ import {
 } from "react-icons/fa";
 import { LiaTimesSolid } from "react-icons/lia";
 import { Link, useLocation } from "react-router-dom";
+import { useCart } from "../../Context/CartContext";
 
 const Navbar = ({ setShowLogin }) => {
+  const { cartItems } = useCart();
+  const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const [open, setOpen] = useState(false);
   const [showLocation, setShowLocation] = useState(false);
   const [currentLocation, setCurrentLocation] = useState("Fetching...");
@@ -68,7 +71,7 @@ const Navbar = ({ setShowLogin }) => {
         },
         (error) => {
           console.error("Geolocation error:", error.message);
-          if (isMounted) setCurrentLocation("Location not found");
+          if (isMounted) setCurrentLocation("not found");
         }
       );
     } else {
@@ -129,9 +132,11 @@ const Navbar = ({ setShowLogin }) => {
             className="relative text-neutral-800 hover:text-orange-400 transition-all duration-300"
           >
             <FaShoppingCart className="text-xl lg:text-2xl" />
-            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-              3
-            </span>
+            {totalQty > 0 && (
+              <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                {totalQty}
+              </span>
+            )}
           </Link>
 
           {/* User Login */}

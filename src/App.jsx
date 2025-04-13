@@ -12,6 +12,8 @@ import ContactSection from "./Pages/Contact/contact";
 import About from "./Pages/About/About";
 import AuthPage from "./Pages/Auth/AuthPage";
 import { StoreContext } from "./context/StoreContext";
+import CartPage from "./Pages/Cart/CartPage";
+import DishDetail from './pages/detail/DishDetail';
 
 function App() {
   const { url, setToken } = useContext(StoreContext);
@@ -30,7 +32,8 @@ function App() {
           <Route exact path="/blogs" element={<Blogs />} />
           <Route exact path="/contact" element={<ContactSection />} />
           <Route exact path="/about" element={<About />} />
-          {/* Removed routed login */}
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/dish/:id" element={<DishDetail />} /> {/* Route for dish detail */}
         </Routes>
 
         <Footer />
