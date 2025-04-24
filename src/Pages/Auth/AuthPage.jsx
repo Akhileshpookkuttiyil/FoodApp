@@ -5,8 +5,10 @@ import { X, Eye, EyeOff } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import loginImage from "../../assets/img/login.jpg";
+import { useAuthContext } from "../../Context/AuthContext"; // Import useAuth hook
 
-const AuthPage = ({ setToken, url, setShowLogin }) => {
+const AuthPage = () => {
+  const { setShowLogin } = useAuthContext(); // Get setShowLogin from context
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -61,13 +63,12 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
     setLoading(true);
 
     try {
-      const res = await axios.post(url + route, data);
+      const res = await axios.post(route, data);
       if (res.data.success) {
-        setToken(res.data.token);
         localStorage.setItem("token", res.data.token);
         toast.success(isSignup ? "Signed up!" : "Logged in!");
         setData({ name: "", email: "", password: "" });
-        setShowLogin(false);
+        setShowLogin(false); // Close the modal by calling context method
       } else {
         toast.error(res.data.message || "Authentication failed");
       }
@@ -87,12 +88,11 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
         avatar: decoded.picture,
       };
 
-      const response = await axios.post(url + "/user/google-login", googleUser);
+      const response = await axios.post("/user/google-login", googleUser);
       if (response.data.success) {
-        setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
         toast.success("Google login success");
-        setShowLogin(false);
+        setShowLogin(false); // Close the modal by calling context method
       } else {
         toast.error("Google login failed");
       }
@@ -116,7 +116,7 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
     setIsSignup(toSignup);
     setData({
       name: "",
-      email: "", // Keep email if you want: data.email
+      email: "",
       password: "",
     });
     setErrors({ name: "", email: "", password: "" });
@@ -125,10 +125,10 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center px-2 pt-6 sm:pt-8">
-      <div className="w-full max-w-4xl h-[92vh] rounded-2xl shadow-2xl bg-white flex flex-col lg:flex-row relative overflow-hidden">
+    <div className="fixed inset-0 z-30 flex items-start justify-center px-2 pt-6 sm:pt-8 bg-black/50 mt-12">
+      <div className="w-full max-w-4xl h-[85vh] rounded-2xl shadow-2xl bg-white flex flex-col lg:flex-row relative overflow-hidden">
         <button
-          onClick={() => setShowLogin(false)}
+          onClick={() => setShowLogin(false)} // Close modal with context method
           className="absolute top-3 right-3 text-orange-500 bg-gray-100 rounded-full p-1.5 hover:bg-orange-100 transition z-50"
         >
           <X className="w-5 h-5" />
@@ -248,39 +248,36 @@ const AuthPage = ({ setToken, url, setShowLogin }) => {
             disabled={loading}
             className="w-full flex items-center justify-center gap-3 mt-3 bg-white hover:bg-gray-100 text-gray-800 py-2 rounded border border-gray-300 text-sm transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <svg width="20" height="20" viewBox="0 0 48 48">
-              {/* Google logo paths */}
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+            <svg width="20" height="20" viewBox="0 0 533.5 544.3">
+              <path
+                fill="#4285F4"
+                d="M533.5 278.4c0-17.4-1.6-34.2-4.6-50.4H272v95.4h147.4c-6.4 34.4-25.6 63.6-54.8 83.2v68h88.4c51.6-47.6 80.5-117.8 80.5-196.2z"
+              />
+              <path
+                fill="#34A853"
+                d="M272 544.3c73.6 0 135.2-24.4 180.2-66.4l-88.4-68c-24.4 16.4-55.4 25.6-91.8 25.6-70.6 0-130.4-47.6-151.8-111.2H30.8v69.6C75.8 481.1 167.2 544.3 272 544.3z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M120.2 324.3c-10.2-30.2-10.2-62.4 0-92.6V162H30.8c-36.4 72.8-36.4 158.6 0 231.4l89.4-69.1z"
+              />
+              <path
+                fill="#EA4335"
+                d="M272 107.6c39.6 0 75.4 13.6 103.6 40.2l77.4-77.4C407.2 24.8 345.6 0 272 0 167.2 0 75.8 63.2 30.8 162l89.4 69.6C141.6 155.2 201.4 107.6 272 107.6z"
+              />
             </svg>
-            Continue with Google
+            Login with Google
           </button>
 
-          <p className="text-center text-xs mt-3 text-gray-600">
-            {isSignup ? (
-              <>
-                Already a member?{" "}
-                <button
-                  onClick={() => switchMode(false)}
-                  className="text-orange-500 font-semibold"
-                >
-                  Login
-                </button>
-              </>
-            ) : (
-              <>
-                New to FoodieMania?{" "}
-                <button
-                  onClick={() => switchMode(true)}
-                  className="text-orange-500 font-semibold"
-                >
-                  Sign up
-                </button>
-              </>
-            )}
-          </p>
+          <div className="mt-5 text-sm text-center">
+            <button
+              type="button"
+              onClick={() => switchMode(!isSignup)}
+              className="text-orange-500 font-semibold"
+            >
+              {isSignup ? "Already have an account?" : "Don't have an account?"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

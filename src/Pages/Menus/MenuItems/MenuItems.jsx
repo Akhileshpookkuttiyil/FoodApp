@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-
+// eslint-disable-next-line react/prop-types
 const MenuItem = ({ item, renderStars }) => {
   return (
     <motion.div

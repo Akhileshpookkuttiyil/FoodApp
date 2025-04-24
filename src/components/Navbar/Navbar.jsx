@@ -9,9 +9,11 @@ import {
 import { LiaTimesSolid } from "react-icons/lia";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../../Context/CartContext";
+import { useAuthContext } from "../../Context/AuthContext";
 
-const Navbar = ({ setShowLogin }) => {
+const Navbar = () => {
   const { cartItems } = useCart();
+  const { setShowLogin } = useAuthContext();
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const [open, setOpen] = useState(false);
   const [showLocation, setShowLocation] = useState(false);
@@ -218,7 +220,7 @@ const Navbar = ({ setShowLogin }) => {
         {/* Action Icons */}
         <div className="hidden xsm:flex menu-range:flex items-center justify-between mt-4 px-1 text-neutral-800">
           {/* Cart */}
-          <Link
+          <Link onClick={()=> setOpen(false)}
             to="/cart"
             className="relative hover:text-orange-400 transition-all duration-300"
           >
@@ -230,7 +232,10 @@ const Navbar = ({ setShowLogin }) => {
 
           {/* User Login */}
           <button
-            onClick={() => setShowLogin(true)}
+            onClick={() => {
+              setShowLogin(true);
+              setOpen(false);
+            }}
             className="hover:text-orange-400 transition-all duration-300"
           >
             <FaUser className="text-xl lg:text-2xl" />
