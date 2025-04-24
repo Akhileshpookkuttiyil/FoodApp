@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useContext, useState } from "react";
 
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
@@ -11,20 +10,20 @@ import Blogs from "./Pages/Blogs/Blogs";
 import ContactSection from "./Pages/Contact/contact";
 import About from "./Pages/About/About";
 import AuthPage from "./Pages/Auth/AuthPage";
-import { StoreContext } from "./context/StoreContext";
 import CartPage from "./Pages/Cart/CartPage";
-import DishDetail from './pages/detail/DishDetail';
+import DishDetail from "./pages/detail/DishDetail";
+import { useAuthContext } from "./Context/AuthContext"; // Import the context
 
 function App() {
-  const { url, setToken } = useContext(StoreContext);
-  const [showLogin, setShowLogin] = useState(false);
+  // Manage the showLogin state directly in App
+  const { showLogin } = useAuthContext();
 
   return (
     <Router>
       <div className="w-full min-h-screen bg-neutral-100/40 flex flex-col">
         <ScrollToTop />
-        <Navbar setShowLogin={setShowLogin} />
-
+        {/* Pass setShowLogin to Navbar */}
+        <Navbar/>
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route exact path="/menus" element={<Menus />} />
@@ -33,21 +32,13 @@ function App() {
           <Route exact path="/contact" element={<ContactSection />} />
           <Route exact path="/about" element={<About />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/dish/:id" element={<DishDetail />} /> {/* Route for dish detail */}
+          <Route path="/dish/:id" element={<DishDetail />} />
         </Routes>
 
+        {/* Conditionally render AuthPage based on showLogin */}
+        {showLogin && <AuthPage/>}
+        
         <Footer />
-
-        {/* Popup Login Modal */}
-        {showLogin && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center">
-            <AuthPage
-              setShowLogin={setShowLogin}
-              setToken={setToken}
-              url={url}
-            />
-          </div>
-        )}
       </div>
     </Router>
   );

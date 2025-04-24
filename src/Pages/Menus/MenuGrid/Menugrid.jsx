@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import MenuItem from "../MenuItems/MenuItems";
 
+// eslint-disable-next-line react/prop-types
 const MenuGrid = ({ filteredItems, renderStars, noResultsImg }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6 px-4">
