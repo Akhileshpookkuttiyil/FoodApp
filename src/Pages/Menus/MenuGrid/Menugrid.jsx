@@ -39,12 +39,12 @@ const MenuGrid = ({ items }) => {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 !== 0;
     return (
-      <div className="flex items-center">
+      <div className="flex items-center text-yellow-500">
         {[...Array(fullStars)].map((_, i) => (
-          <FaStar key={`star-${i}`} className="text-yellow-500" />
+          <FaStar key={`star-${i}`} />
         ))}
-        {halfStar && <FaRegStarHalf className="text-yellow-500" />}
-        <span className="ml-2 text-gray-600 text-sm">({rating})</span>
+        {halfStar && <FaRegStarHalf />}
+        <span className="ml-2 text-sm text-gray-500">({rating})</span>
       </div>
     );
   };
@@ -70,11 +70,11 @@ const MenuGrid = ({ items }) => {
   };
 
   return (
-    <div className="min-h-screen px-4 py-6 md:px-10 bg-gray-50">
+    <div className="min-h-screen p-6 bg-white">
       {/* Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 shadow-md rounded-xl mb-8">
+      <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 shadow-md rounded-md mb-6">
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        <div className="flex items-center gap-4">
+        <div className="flex items-center space-x-2">
           <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
           <FilterButton setIsFilterOpen={setIsFilterOpen} />
         </div>
@@ -91,77 +91,67 @@ const MenuGrid = ({ items }) => {
       />
 
       {/* Grid */}
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 px-4 mt-10">
         {isLoading ? (
-          <div className="col-span-full flex justify-center items-center text-gray-500 text-lg py-20">
+          <div className="col-span-full flex justify-center items-center text-gray-500 text-lg py-12">
             Loading...
           </div>
-        ) : filteredItems.length ? (
+        ) : filteredItems.length > 0 ? (
           filteredItems.map((item) => {
             const count = cart[item.id] || 0;
             return (
               <div
                 key={item.id}
-                className="bg-white rounded-xl shadow-sm border hover:shadow-lg transition-transform duration-300 hover:scale-[1.02] flex flex-col justify-between"
+                className="bg-white p-4 shadow-lg rounded-lg w-full text-center border transform transition-transform duration-300 hover:scale-105 hover:shadow-xl flex flex-col items-center justify-between"
               >
-                <div className="p-4 flex flex-col justify-between h-full">
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    {/* Text */}
-                    <div className="flex flex-col justify-between flex-1">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-800">
-                          {item.name}
-                        </h2>
-                        <p className="text-sm text-gray-500 mt-0.5">
-                          {item.hotel}
-                        </p>
-                      </div>
-                      <div className="mt-3">{renderStars(item.rating)}</div>
-                      <p className="text-xs text-gray-400 mt-2">
-                        Delivery: {item.deliveryTime} mins
-                      </p>
+                <img
+                  src={item.img}
+                  alt={item.name}
+                  onError={(e) =>
+                    (e.target.src = "/assets/img/default-image.png")
+                  }
+                  className="w-full h-36 object-contain rounded-md mb-3"
+                  loading="lazy"
+                />
+
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {item.name}
+                </h2>
+                <p className="text-sm text-gray-500">{item.hotel}</p>
+                <div className="mt-2">{renderStars(item.rating)}</div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Delivery: {item.deliveryTime} mins
+                </p>
+
+                {/* Cart Controls */}
+                <div className="mt-4 w-full">
+                  <div className="flex justify-between items-center w-full">
+                    <div className="text-lg font-bold text-gray-800">
+                      ₹{item.price}
                     </div>
 
-                    {/* Image */}
-                    <div className="w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0">
-                      <img
-                        src={item.img}
-                        alt={item.name}
-                        className="w-full h-full object-cover rounded-md"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Cart Controls */}
-                  <div className="mt-5">
                     {count === 0 ? (
-                      <div className="flex items-center justify-between">
-                        <div className="font-bold text-lg text-gray-900">
-                          ₹{item.price}
-                        </div>
-                        <button
-                          className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-sm transition duration-200"
-                          onClick={() => handleAddToCart(item.id)}
-                        >
-                          <FaShoppingCart size={16} />
-                          Add to Cart
-                        </button>
-                      </div>
+                      <button
+                        className="flex items-center gap-2 text-white bg-orange-400 hover:bg-orange-500 rounded-md px-3 py-2 transition font-medium"
+                        onClick={() => handleAddToCart(item.id)}
+                      >
+                        <FaShoppingCart size={18} />
+                        <span>Add</span>
+                      </button>
                     ) : (
-                      <div className="flex items-center justify-between gap-4 bg-orange-100 border border-orange-300 rounded-md py-2 px-4 w-[80%] mx-auto mt-2">
+                      <div className="flex items-center gap-4 bg-orange-100 border border-orange-300 rounded-md py-2 px-4 w-fit select-none">
                         <button
                           onClick={() => handleDecrease(item.id)}
-                          className="text-orange-600 font-bold hover:text-orange-800 text-lg"
+                          className="text-orange-600 font-bold hover:text-orange-800 text-xl"
                         >
                           −
                         </button>
-                        <span className="text-sm font-semibold text-gray-800">
+                        <span className="text-sm font-medium text-gray-800">
                           {count}
                         </span>
                         <button
                           onClick={() => handleIncrease(item.id)}
-                          className="text-orange-600 font-bold hover:text-orange-800 text-lg"
+                          className="text-orange-600 font-bold hover:text-orange-800 text-xl"
                         >
                           +
                         </button>
@@ -173,16 +163,13 @@ const MenuGrid = ({ items }) => {
             );
           })
         ) : (
-          <div className="col-span-full flex flex-col justify-center items-center py-20">
+          <div className="text-center col-span-full flex justify-center items-center">
             <img
               src={noResultsImg}
               alt="No results"
-              className="w-full max-w-md h-auto mb-6"
+              className="w-full max-w-[500px] h-auto"
               loading="lazy"
             />
-            <p className="text-gray-500 text-lg font-medium">
-              No items match your filters.
-            </p>
           </div>
         )}
       </div>
