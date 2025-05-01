@@ -11,7 +11,7 @@ import ContactSection from "./Pages/Contact/contact";
 import About from "./Pages/About/About";
 import AuthPage from "./Pages/Auth/AuthPage";
 import CartPage from "./Pages/Cart/CartPage";
-import DishDetail from "./pages/detail/DishDetail";
+import DishDetail from "./Pages/Detail/DishDetail";
 import { useAuthContext } from "./Context/AuthContext"; // Import the context
 
 function App() {

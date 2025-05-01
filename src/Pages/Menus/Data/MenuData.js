@@ -15,6 +15,8 @@ export const menuItems = [
     hotel: "Pizza Mahal",
     img: pizzaImg,
     deliveryTime: 30,
+    desc: "A classic pepperoni pizza with extra cheese and herbs.",
+    inStock: true,
   },
   {
     id: 2,
@@ -25,6 +27,8 @@ export const menuItems = [
     hotel: "Burger Darbar",
     img: burgerImg,
     deliveryTime: 25,
+    desc: "Juicy grilled patty with melted cheese in a soft bun.",
+    inStock: false,
   },
   {
     id: 3,
@@ -35,6 +39,8 @@ export const menuItems = [
     hotel: "Sushi Vihar",
     img: sushiImg,
     deliveryTime: 40,
+    desc: "Fresh salmon wrapped in seasoned rice and seaweed.",
+    inStock: true,
   },
   {
     id: 4,
@@ -45,6 +51,8 @@ export const menuItems = [
     hotel: "Mithai Bhavan",
     img: cakeImg,
     deliveryTime: 20,
+    desc: "Rich and moist chocolate cake topped with ganache.",
+    inStock: true,
   },
   {
     id: 5,
@@ -55,5 +63,7 @@ export const menuItems = [
     hotel: "Madras Coffee House",
     img: coffeeImg,
     deliveryTime: 15,
+    desc: "Chilled coffee brewed to perfection with a splash of milk.",
+    inStock: false,
   },
 ];
