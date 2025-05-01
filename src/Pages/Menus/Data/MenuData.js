@@ -1,6 +1,6 @@
 // src/data/menuData.js
 import pizzaImg from "../../../assets/img/pizza.avif";
-import burgerImg from "../../../assets/img/burger.jpg";
+import burgerImg from "../../../assets/img/Burgers.png";
 import sushiImg from "../../../assets/img/sushi.jpg";
 import cakeImg from "../../../assets/img/cake.jpeg";
 import coffeeImg from "../../../assets/img/coffee.jpeg";
