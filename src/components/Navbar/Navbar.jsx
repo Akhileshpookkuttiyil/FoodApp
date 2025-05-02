@@ -13,7 +13,8 @@ import { useAuthContext } from "../../Context/AuthContext";
 
 const Navbar = () => {
   const { cartItems } = useCart();
-  const { setShowLogin } = useAuthContext();
+  const { user, setShowLogin, logoutHandler } = useAuthContext();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const [open, setOpen] = useState(false);
   const [showLocation, setShowLocation] = useState(false);
@@ -131,7 +132,9 @@ const Navbar = () => {
           {/* Cart */}
           <Link
             to="/cart"
-            className="relative text-neutral-800 hover:text-orange-400 transition-all duration-300"
+            className={`relative text-neutral-800 hover:text-orange-400 transition-all duration-300 ${
+              location.pathname === "/cart" ? "text-orange-300" : ""
+            }`}
           >
             <FaShoppingCart className="text-xl lg:text-2xl" />
             {totalQty > 0 && (
@@ -141,13 +144,51 @@ const Navbar = () => {
             )}
           </Link>
 
-          {/* User Login */}
-          <button
-            onClick={() => setShowLogin(true)}
-            className="text-neutral-800 hover:text-orange-400 transition-all duration-300"
-          >
-            <FaUser className="text-xl lg:text-2xl" />
-          </button>
+          {/* User Login / Logout */}
+          {user ? (
+            <div className="relative">
+              <button
+                className="flex items-center gap-2 hover:text-orange-400 transition"
+                onClick={() => setDropdownOpen(!dropdownOpen)} // Toggle dropdown visibility
+              >
+                <FaUser className="text-xl" />
+              </button>
+
+              {/* Dropdown menu using <ul> and <li> */}
+              {dropdownOpen && (
+                <ul className="absolute top-full right-0 mt-2 bg-white border shadow-md rounded-md w-48 z-50">
+                  <li
+                     // Add your function to navigate to profile
+                    className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
+                  >
+                    Profile
+                  </li>
+                  <li
+                     // Add your function to navigate to settings
+                    className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
+                  >
+                    Settings
+                  </li>
+                  <li
+                    onClick={logoutHandler}
+                    className="cursor-pointer text-sm text-red-500 hover:bg-gray-100 hover:underline py-2 px-4"
+                  >
+                    Logout
+                  </li>
+                </ul>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setShowLogin(true);
+                setOpen(false);
+              }}
+              className="hover:text-orange-400"
+            >
+              <FaUser className="text-xl" />
+            </button>
+          )}
 
           {/* Location */}
           <div className="relative">
@@ -220,7 +261,8 @@ const Navbar = () => {
         {/* Action Icons */}
         <div className="hidden xsm:flex menu-range:flex items-center justify-between mt-4 px-1 text-neutral-800">
           {/* Cart */}
-          <Link onClick={()=> setOpen(false)}
+          <Link
+            onClick={() => setOpen(false)}
             to="/cart"
             className="relative hover:text-orange-400 transition-all duration-300"
           >

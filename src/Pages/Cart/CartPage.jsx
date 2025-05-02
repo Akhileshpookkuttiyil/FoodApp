@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { FaTrash } from "react-icons/fa";
-import { Link } from "react-router-dom"; // Import Link for navigation
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([
@@ -46,7 +45,7 @@ const CartPage = () => {
   };
 
   // Use useMemo to memoize calculations
-  const { subtotal, tax, shipping, total } = useMemo(() => {
+  const { subtotal, tax, total } = useMemo(() => {
     const subtotal = cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
