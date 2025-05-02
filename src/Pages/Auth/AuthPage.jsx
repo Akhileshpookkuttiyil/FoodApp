@@ -1,22 +1,37 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { X, Eye, EyeOff } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import loginImage from "../../assets/img/login.jpg";
-import { useAuthContext } from "../../Context/AuthContext"; // Import useAuth hook
+import { useAuthContext } from "../../Context/AuthContext"; // Import useAuthContext
 
 const AuthPage = () => {
-  const { setShowLogin } = useAuthContext(); // Get setShowLogin from context
+  const { setShowLogin, setUser } = useAuthContext(); // Get setShowLogin and setUser from context
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
-  const [data, setData] = useState({ name: "", email: "", password: "" });
+  const [data, setData] = useState({
+    name: "John Doe", // Dummy user name
+    email: "john.doe@example.com", // Dummy email
+    password: "password123", // Dummy password
+  });
   const [errors, setErrors] = useState({ name: "", email: "", password: "" });
   const [touched, setTouched] = useState({}); // Track touched fields
 
+  // Effect to set the dummy data when the page loads (you can remove this for a real use case)
+  useEffect(() => {
+    if (!data.name || !data.email || !data.password) {
+      setData({
+        name: "John Doe",
+        email: "john.doe@example.com",
+        password: "password123",
+      });
+    }
+  }, []);
+
+  // Validate function for form fields
   const validate = () => {
     const errs = { name: "", email: "", password: "" };
 
@@ -32,6 +47,7 @@ const AuthPage = () => {
     return errs;
   };
 
+  // Handle input changes
   const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
 
@@ -41,12 +57,14 @@ const AuthPage = () => {
     }
   };
 
+  // Handle input blur event
   const handleBlur = (e) => {
     setTouched({ ...touched, [e.target.name]: true });
     const newErrors = validate();
     setErrors(newErrors);
   };
 
+  // Handle form submission (login or signup)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validation = validate();
@@ -59,26 +77,25 @@ const AuthPage = () => {
       return;
     }
 
-    const route = isSignup ? "/user/register" : "/user/login";
+    // Using dummy user for both login and signup
     setLoading(true);
 
-    try {
-      const res = await axios.post(route, data);
-      if (res.data.success) {
-        localStorage.setItem("token", res.data.token);
-        toast.success(isSignup ? "Signed up!" : "Logged in!");
-        setData({ name: "", email: "", password: "" });
-        setShowLogin(false); // Close the modal by calling context method
-      } else {
-        toast.error(res.data.message || "Authentication failed");
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Server error");
-    } finally {
+    // Simulate a dummy response for login/signup
+    setTimeout(() => {
+      setUser({
+        name: data.name,
+        email: data.email,
+        avatar: "https://randomuser.me/api/portraits/men/1.jpg", // Dummy avatar
+      }); // Set the dummy user in context
+      localStorage.setItem("token", "dummy-token"); // Set dummy token in localStorage
+      toast.success(isSignup ? "Signed up!" : "Logged in!");
+      setData({ name: "", email: "", password: "" });
+      setShowLogin(false); // Close the modal by calling context method
       setLoading(false);
-    }
+    }, 1000); // Simulate server delay
   };
 
+  // Handle Google login (dummy in this case)
   const handleGoogleLogin = async (res) => {
     try {
       const decoded = jwtDecode(res.credential);
@@ -88,30 +105,30 @@ const AuthPage = () => {
         avatar: decoded.picture,
       };
 
-      const response = await axios.post("/user/google-login", googleUser);
-      if (response.data.success) {
-        localStorage.setItem("token", response.data.token);
-        toast.success("Google login success");
-        setShowLogin(false); // Close the modal by calling context method
-      } else {
-        toast.error("Google login failed");
-      }
+      // Simulate a successful Google login with dummy data
+      setUser(googleUser); // Set the dummy Google user in context
+      localStorage.setItem("token", "dummy-google-token"); // Set dummy token in localStorage
+      toast.success("Google login success");
+      setShowLogin(false); // Close the modal by calling context method
     } catch (error) {
       toast.error("Google login error", error);
     }
   };
 
+  // Google login hook
   const loginWithGoogle = useGoogleLogin({
     onSuccess: handleGoogleLogin,
     onError: () => toast.error("Google login failed"),
   });
 
+  // Determine if the form is valid for signup
   const isSignupValid =
     !loading &&
     data.email.includes("@") &&
     data.password.length >= 6 &&
     (!isSignup || (data.name.trim().length >= 2 && agreed));
 
+  // Switch between login and signup modes
   const switchMode = (toSignup) => {
     setIsSignup(toSignup);
     setData({
@@ -237,46 +254,49 @@ const AuthPage = () => {
                 isSignupValid
                   ? "bg-orange-500 hover:bg-orange-600"
                   : "bg-orange-300 cursor-not-allowed"
-              } text-white py-2 rounded font-semibold text-sm transition`}
+              } text-white py-2 rounded-full text-lg transition duration-300`}
             >
-              {loading ? "Please wait..." : isSignup ? "Sign Up" : "Login"}
+              {loading ? "Processing..." : isSignup ? "Sign Up" : "Log In"}
             </button>
           </form>
 
-          <button
-            onClick={loginWithGoogle}
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-3 mt-3 bg-white hover:bg-gray-100 text-gray-800 py-2 rounded border border-gray-300 text-sm transition disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <svg width="20" height="20" viewBox="0 0 533.5 544.3">
-              <path
-                fill="#4285F4"
-                d="M533.5 278.4c0-17.4-1.6-34.2-4.6-50.4H272v95.4h147.4c-6.4 34.4-25.6 63.6-54.8 83.2v68h88.4c51.6-47.6 80.5-117.8 80.5-196.2z"
-              />
-              <path
-                fill="#34A853"
-                d="M272 544.3c73.6 0 135.2-24.4 180.2-66.4l-88.4-68c-24.4 16.4-55.4 25.6-91.8 25.6-70.6 0-130.4-47.6-151.8-111.2H30.8v69.6C75.8 481.1 167.2 544.3 272 544.3z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M120.2 324.3c-10.2-30.2-10.2-62.4 0-92.6V162H30.8c-36.4 72.8-36.4 158.6 0 231.4l89.4-69.1z"
-              />
-              <path
-                fill="#EA4335"
-                d="M272 107.6c39.6 0 75.4 13.6 103.6 40.2l77.4-77.4C407.2 24.8 345.6 0 272 0 167.2 0 75.8 63.2 30.8 162l89.4 69.6C141.6 155.2 201.4 107.6 272 107.6z"
-              />
-            </svg>
-            Login with Google
-          </button>
-
-          <div className="mt-5 text-sm text-center">
+          {/* Google Login */}
+          <div className="mt-4">
             <button
-              type="button"
-              onClick={() => switchMode(!isSignup)}
-              className="text-orange-500 font-semibold"
+              onClick={loginWithGoogle}
+              className="w-full py-2 border rounded-full text-sm text-gray-800 bg-white shadow-md hover:bg-gray-100"
             >
-              {isSignup ? "Already have an account?" : "Don't have an account?"}
+              <img
+                src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg"
+                alt="Google"
+                className="w-5 h-4 inline mr-2 mb-0.5"
+              />
+              Sign in with Google
             </button>
+          </div>
+          {/* Switch between Login and Signup */}
+          <div className="text-sm text-center text-gray-500 mt-4">
+            {isSignup ? (
+              <>
+                Already have an account?{" "}
+                <span
+                  onClick={() => switchMode(false)}
+                  className="text-orange-500 cursor-pointer"
+                >
+                  Login
+                </span>
+              </>
+            ) : (
+              <>
+                Don't have an account?{" "}
+                <span
+                  onClick={() => switchMode(true)}
+                  className="text-orange-500 cursor-pointer"
+                >
+                  Sign up
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>

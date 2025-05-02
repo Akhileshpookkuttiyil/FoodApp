@@ -1,23 +1,41 @@
-import { createContext, useState, useContext } from "react";
+// Context/AuthContext.js
+import { createContext, useContext, useState } from "react";
 
-// Create AuthContext
 const AuthContext = createContext();
-
 // eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null); // initially no user
   const [showLogin, setShowLogin] = useState(false);
 
+  // Dummy login handler
+  const loginHandler = () => {
+    setUser({
+      name: "John Doe",
+      email: "john@example.com",
+      avatar: null, // optional: can use a dummy image URL here
+    });
+    setShowLogin(false);
+  };
+
+  // Dummy logout
+  const logoutHandler = () => {
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ showLogin, setShowLogin }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        showLogin,
+        setShowLogin,
+        loginHandler,
+        logoutHandler,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuthContext = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuthContext must be used within an AuthProvider");
-  }
-  return context;
-};
+export const useAuthContext = () => useContext(AuthContext);
