@@ -1,45 +1,59 @@
 import { createContext, useContext, useState } from "react";
-import PropTypes from "prop-types"; // Import PropTypes
+import PropTypes from "prop-types";
 
+// Create a Cart Context
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
-  const addToCart = (item) => {
-    setCartItems((prev) => {
-      const existing = prev.find((p) => p.id === item.id);
-      if (existing) {
-        return prev.map((p) =>
-          p.id === item.id ? { ...p, qty: p.qty + 1 } : p
+  // Helper function to update cart items
+  const updateCartItems = (updatedItems) => {
+    setCartItems(updatedItems);
+  };
+
+  // Add or update item in the cart
+  const addToCart = (newItem) => {
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === newItem.id);
+      if (existingItem) {
+        // If item exists, update its quantity
+        return prevItems.map((item) =>
+          item.id === newItem.id ? { ...item, qty: item.qty + 1 } : item
         );
       }
-      return [...prev, { ...item, qty: 1 }];
+      // If item doesn't exist, add it with qty 1
+      return [...prevItems, { ...newItem, qty: 1 }];
     });
   };
 
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const incrementQty = (id) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, qty: item.qty + 1 } : item
+  // Update item quantity (increment/decrement)
+  const updateItemQuantity = (itemId, quantityChange) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              qty: Math.max(1, item.qty + quantityChange), // Prevent qty from going below 1
+            }
+          : item
       )
     );
   };
 
-  const decrementQty = (id) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id && item.qty > 1 ? { ...item, qty: item.qty - 1 } : item
-      )
-    );
+  // Remove item from the cart
+  const removeItemFromCart = (itemId) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
   };
 
-  const totalAmount = cartItems.reduce(
-    (acc, item) => acc + item.qty * item.price,
+  // Clear the entire cart
+  const clearCart = () => {
+    updateCartItems([]); // Clear all items
+  };
+
+  // Calculate total amount
+  const cartTotalAmount = cartItems.reduce(
+    (total, item) => total + item.qty * item.price,
     0
   );
 
@@ -47,11 +61,12 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider
       value={{
         cartItems,
+        setCartItems,
         addToCart,
-        removeFromCart,
-        incrementQty,
-        decrementQty,
-        totalAmount,
+        updateItemQuantity,
+        removeItemFromCart,
+        clearCart,
+        cartTotalAmount,
       }}
     >
       {children}
@@ -59,9 +74,10 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// Add prop validation
+// Prop validation for CartProvider
 CartProvider.propTypes = {
-  children: PropTypes.node.isRequired, // Validate that children is required
+  children: PropTypes.node.isRequired,
 };
 
+// Custom hook to use Cart Context
 export const useCart = () => useContext(CartContext);
