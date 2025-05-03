@@ -1,90 +1,9 @@
 import { Link } from "react-router-dom";
-
-import Chicken from "../../../assets/img/hero2.png";
-import Momos from "../../../assets/img/hero4.png";
-import Biriyani from "../../../assets/img/hero3.png";
-import Fish from "../../../assets/img/hero5.png";
-import FriedRice from "../../../assets/img/rice.png";
-import Burger from "../../../assets/img/burger.png";
-import Pizza from "../../../assets/img/pizza.png";
-import Sandwich from "../../../assets/img/sandwich.png";
+import {menuItems as menuData} from "../../Menus/Data/MenuData"; // Import menu data
 
 const Menu = () => {
-  // Dummy Data
-  const menuData = [
-    {
-      id: 1,
-      title: "Chicken",
-      img: Chicken,
-      name: "Full Grilled Chicken",
-      desc: "Juicy grilled chicken seasoned with spices.",
-      price: "Rs. 800",
-      inStock: true,
-    },
-    {
-      id: 2,
-      title: "Momos",
-      img: Momos,
-      name: "Steamed Momos",
-      desc: "Soft dumplings filled with vegs or chicken.",
-      price: "Rs. 120",
-      inStock: true,
-    },
-    {
-      id: 3,
-      title: "Biryani",
-      img: Biriyani,
-      name: "Hyderabadi Biryani",
-      desc: "Flavorful rice with tender chicken pieces.",
-      price: "Rs. 300",
-      inStock: true,
-    },
-    {
-      id: 4,
-      title: "Fish",
-      img: Fish,
-      name: "Grilled Fish",
-      desc: "Fresh fish fillet grilled to perfection.",
-      price: "Rs. 500",
-      inStock: false,
-    },
-    {
-      id: 5,
-      title: "Fried Rice",
-      img: FriedRice,
-      name: "Veg Fried Rice",
-      desc: "Classic fried rice with vegetables.",
-      price: "Rs. 150",
-      inStock: true,
-    },
-    {
-      id: 6,
-      title: "Burger",
-      img: Burger,
-      name: "Cheese Burger",
-      desc: "Beef patty with cheese, lettuce, and sauce.",
-      price: "Rs. 200",
-      inStock: true,
-    },
-    {
-      id: 7,
-      title: "Pizza",
-      img: Pizza,
-      name: "Pepperoni Pizza",
-      desc: "Loaded with pepperoni and cheese.",
-      price: "Rs. 600",
-      inStock: true,
-    },
-    {
-      id: 8,
-      title: "Sandwich",
-      img: Sandwich,
-      name: "Club Sandwich",
-      desc: "Triple-layer sandwich with a variety of fillings.",
-      price: "Rs. 250",
-      inStock: true,
-    },
-  ];
+  // Filter the best-rated menu items (rating >= 4.0)
+  const bestMenus = menuData.filter((item) => item.rating >= 4.0);
 
   return (
     <div className="w-full lg:px-11 md:px-8 sm:px-4 px-4 space-y-6">
@@ -103,7 +22,7 @@ const Menu = () => {
 
       {/* Menu Items */}
       <div className="grid md:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-5">
-        {menuData.map((data) => (
+        {bestMenus.map((data) => (
           <Link
             to={`/menu/${data.id}`}
             key={data.id}

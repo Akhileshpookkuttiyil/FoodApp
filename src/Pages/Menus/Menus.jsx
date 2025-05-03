@@ -18,8 +18,10 @@ const Menus = () => {
 
   const categoryItems =
     selectedCategory === "All"
-      ? menuItems
-      : menuItems.filter((item) => item.category === selectedCategory);
+      ? menuItems.filter((item) => item.inStock)
+      : menuItems.filter(
+          (item) => item.category === selectedCategory && item.inStock
+        );
 
   return (
     <div className="min-h-screen w-full bg-white pb-10">

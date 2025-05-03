@@ -158,13 +158,13 @@ const Navbar = () => {
               {dropdownOpen && (
                 <ul className="absolute top-full right-0 mt-2 bg-white border shadow-md rounded-md w-48 z-50">
                   <li
-                     // Add your function to navigate to profile
+                    // Add your function to navigate to profile
                     className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
                   >
                     Profile
                   </li>
                   <li
-                     // Add your function to navigate to settings
+                    // Add your function to navigate to settings
                     className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
                   >
                     Settings
@@ -262,13 +262,15 @@ const Navbar = () => {
         <div className="hidden xsm:flex menu-range:flex items-center justify-between mt-4 px-1 text-neutral-800">
           {/* Cart */}
           <Link
-            onClick={() => setOpen(false)}
             to="/cart"
-            className="relative hover:text-orange-400 transition-all duration-300"
+            onClick={() => setOpen(false)}
+            className="relative inline-block text-black"
           >
-            <FaShoppingCart className="text-xl lg:text-2xl" />
-            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-              3
+            <span className="relative inline-block">
+              <FaShoppingCart className="text-xl lg:text-2xl" />
+              <span className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full z-50">
+                3
+              </span>
             </span>
           </Link>
 

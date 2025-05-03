@@ -1,9 +1,17 @@
 // src/data/menuData.js
-import pizzaImg from "../../../assets/img/pizza.avif";
-import burgerImg from "../../../assets/img/Burgers.png";
-import sushiImg from "../../../assets/img/sushi.jpg";
-import cakeImg from "../../../assets/img/cake.jpeg";
-import coffeeImg from "../../../assets/img/coffee.jpeg";
+import pizzaImg from "../../../assets/img/pizza.png";
+import burgerImg from "../../../assets/img/burger.png";
+import sushiImg from "../../../assets/img/sushi.png";
+import cakeImg from "../../../assets/img/cake.png";
+import coffeeImg from "../../../assets/img/coffee.png";
+
+// Updated images based on the new ones you provided
+import Chicken from "../../../assets/img/hero2.png";
+import Momos from "../../../assets/img/hero4.png";
+import Biriyani from "../../../assets/img/hero3.png";
+import Fish from "../../../assets/img/hero5.png";
+import FriedRice from "../../../assets/img/rice.png";
+import Sandwich from "../../../assets/img/sandwich.png";
 
 export const menuItems = [
   {
@@ -65,5 +73,77 @@ export const menuItems = [
     deliveryTime: 15,
     desc: "Chilled coffee brewed to perfection with a splash of milk.",
     inStock: false,
+  },
+  {
+    id: 6,
+    name: "Full Grilled Chicken",
+    category: "Chicken",
+    price: 800,
+    rating: 4.3,
+    hotel: "Grill House",
+    img: Chicken,
+    deliveryTime: 35,
+    desc: "Juicy grilled chicken seasoned with spices.",
+    inStock: true,
+  },
+  {
+    id: 7,
+    name: "Steamed Momos",
+    category: "Momos",
+    price: 120,
+    rating: 4.0,
+    hotel: "Tibetan Treats",
+    img: Momos,
+    deliveryTime: 20,
+    desc: "Soft dumplings filled with vegs or chicken.",
+    inStock: true,
+  },
+  {
+    id: 8,
+    name: "Hyderabadi Biryani",
+    category: "Biryani",
+    price: 300,
+    rating: 4.6,
+    hotel: "Biryani Bhavan",
+    img: Biriyani,
+    deliveryTime: 30,
+    desc: "Flavorful rice with tender chicken pieces.",
+    inStock: true,
+  },
+  {
+    id: 9,
+    name: "Grilled Fish",
+    category: "Fish",
+    price: 500,
+    rating: 4.1,
+    hotel: "Seafood Point",
+    img: Fish,
+    deliveryTime: 28,
+    desc: "Fresh fish fillet grilled to perfection.",
+    inStock: true,
+  },
+  {
+    id: 10,
+    name: "Veg Fried Rice",
+    category: "Fried Rice",
+    price: 150,
+    rating: 3.9,
+    hotel: "Rice Bowl",
+    img: FriedRice,
+    deliveryTime: 22,
+    desc: "Classic fried rice with vegetables.",
+    inStock: true,
+  },
+  {
+    id: 11,
+    name: "Club Sandwich",
+    category: "Sandwich",
+    price: 250,
+    rating: 4.0,
+    hotel: "Snack Shack",
+    img: Sandwich,
+    deliveryTime: 18,
+    desc: "Triple-layer sandwich with a variety of fillings.",
+    inStock: true,
   },
 ];

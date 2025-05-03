@@ -32,7 +32,7 @@ function App() {
           <Route exact path="/contact" element={<ContactSection />} />
           <Route exact path="/about" element={<About />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/dish/:id" element={<DishDetail />} />
+          <Route path="/menu/:id" element={<DishDetail />} />
         </Routes>
 
         {/* Conditionally render AuthPage based on showLogin */}
