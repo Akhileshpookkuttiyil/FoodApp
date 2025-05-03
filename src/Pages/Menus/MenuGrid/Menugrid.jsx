@@ -3,10 +3,14 @@ import SearchBar from "../SearchBar/SearchBar";
 import SortDropdown from "../SortDropdown/SortDropdown";
 import FilterButton from "../FilterButton/FilterButton";
 import FilterDialog from "../FilterDialog";
-import { FaStar, FaRegStarHalf, FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
 import noResultsImg from "../../../assets/img/Noimg.gif";
+import StarRating from "../../StarRating"; // Import StarRating
+import { FaHotel } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const MenuGrid = ({ items }) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState(1000);
@@ -34,20 +38,6 @@ const MenuGrid = ({ items }) => {
     const timeout = setTimeout(() => setIsLoading(false), 300);
     return () => clearTimeout(timeout);
   }, [filteredItems]);
-
-  const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const halfStar = rating % 1 !== 0;
-    return (
-      <div className="flex items-center text-yellow-500">
-        {[...Array(fullStars)].map((_, i) => (
-          <FaStar key={`star-${i}`} />
-        ))}
-        {halfStar && <FaRegStarHalf />}
-        <span className="ml-2 text-sm text-gray-500">({rating})</span>
-      </div>
-    );
-  };
 
   const handleAddToCart = (itemId) => {
     setCart((prev) => ({ ...prev, [itemId]: 1 }));
@@ -104,24 +94,37 @@ const MenuGrid = ({ items }) => {
                 key={item.id}
                 className="bg-white p-4 shadow-lg rounded-lg w-full text-center border transform transition-transform duration-300 hover:scale-105 hover:shadow-xl flex flex-col items-center justify-between"
               >
-                <img
-                  src={item.img}
-                  alt={item.name}
-                  onError={(e) =>
-                    (e.target.src = "/assets/img/default-image.png")
-                  }
-                  className="w-full h-36 object-contain rounded-md mb-3"
-                  loading="lazy"
-                />
+                <div
+                  onClick={() => navigate(`/menu/${item.id}`)}
+                  className="flex flex-col items-center cursor-pointer p-3 transition duration-200"
+                >
+                  <img
+                    src={item.img}
+                    alt={item.name}
+                    onError={(e) =>
+                      (e.target.src = "/assets/img/default-image.png")
+                    }
+                    className="w-full h-36 object-contain rounded-md mb-3"
+                    loading="lazy"
+                  />
 
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {item.name}
-                </h2>
-                <p className="text-sm text-gray-500">{item.hotel}</p>
-                <div className="mt-2">{renderStars(item.rating)}</div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Delivery: {item.deliveryTime} mins
-                </p>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {item.name}
+                  </h2>
+
+                  <p className="text-sm text-gray-500 flex items-center justify-center gap-1">
+                    <FaHotel className="text-orange-400 text-xs" />
+                    <span>{item.hotel}</span>
+                  </p>
+
+                  <div className="mt-2">
+                    <StarRating rating={item.rating} />
+                  </div>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    Delivery: {item.deliveryTime} mins
+                  </p>
+                </div>
 
                 {/* Cart Controls */}
                 <div className="mt-4 w-full">
