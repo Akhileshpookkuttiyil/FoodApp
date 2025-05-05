@@ -4,54 +4,55 @@ import PropTypes from "prop-types";
 // Create a Cart Context
 const CartContext = createContext();
 
+// Cart Provider Component
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
-  // Helper function to update cart items
+  // Helper function to update cart items array
   const updateCartItems = (updatedItems) => {
     setCartItems(updatedItems);
   };
 
-  // Add or update item in the cart
-  const addToCart = (newItem) => {
+  // Add item to cart or update quantity if already exists
+  const addToCart = (newItem, selectedQuantity = 1) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === newItem.id);
       if (existingItem) {
-        // If item exists, update its quantity
         return prevItems.map((item) =>
-          item.id === newItem.id ? { ...item, qty: item.qty + 1 } : item
+          item.id === newItem.id
+            ? { ...item, qty: item.qty + selectedQuantity }
+            : item
         );
       }
-      // If item doesn't exist, add it with qty 1
-      return [...prevItems, { ...newItem, qty: 1 }];
+      return [...prevItems, { ...newItem, qty: selectedQuantity }];
     });
   };
 
-  // Update item quantity (increment/decrement)
+  // Update item quantity (increment or decrement)
   const updateItemQuantity = (itemId, quantityChange) => {
+    console.log({ updated_id: itemId }, quantityChange);
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === itemId
-          ? {
-              ...item,
-              qty: Math.max(1, item.qty + quantityChange), // Prevent qty from going below 1
-            }
+          ? { ...item, qty: Math.max(1, item.qty + quantityChange) }
           : item
       )
     );
   };
 
-  // Remove item from the cart
+  // Remove an item from the cart
   const removeItemFromCart = (itemId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.id !== itemId)
+    );
   };
 
-  // Clear the entire cart
+  // Clear all items from the cart
   const clearCart = () => {
-    updateCartItems([]); // Clear all items
+    updateCartItems([]);
   };
 
-  // Calculate total amount
+  // Calculate total cart value
   const cartTotalAmount = cartItems.reduce(
     (total, item) => total + item.qty * item.price,
     0
@@ -79,5 +80,11 @@ CartProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-// Custom hook to use Cart Context
-export const useCart = () => useContext(CartContext);
+// Custom hook to use the Cart Context
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
+};

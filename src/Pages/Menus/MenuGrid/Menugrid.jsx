@@ -1,22 +1,24 @@
+// MenuGrid.jsx
 import { useState, useEffect, useMemo } from "react";
 import SearchBar from "../SearchBar/SearchBar";
 import SortDropdown from "../SortDropdown/SortDropdown";
 import FilterButton from "../FilterButton/FilterButton";
 import FilterDialog from "../FilterDialog";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaHotel } from "react-icons/fa";
 import noResultsImg from "../../../assets/img/Noimg.gif";
-import StarRating from "../../StarRating"; // Import StarRating
-import { FaHotel } from "react-icons/fa";
+import StarRating from "../../StarRating";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../../Context/CartContext";
 
 const MenuGrid = ({ items }) => {
   const navigate = useNavigate();
+  const { addToCart, updateItemQuantity, cartItems } = useCart();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState(1000);
   const [minRating, setMinRating] = useState(3);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [cart, setCart] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
   const filteredItems = useMemo(() => {
@@ -39,24 +41,16 @@ const MenuGrid = ({ items }) => {
     return () => clearTimeout(timeout);
   }, [filteredItems]);
 
-  const handleAddToCart = (itemId) => {
-    setCart((prev) => ({ ...prev, [itemId]: 1 }));
+  const handleAddToCart = (item) => {
+    addToCart(item, 1);
   };
 
   const handleIncrease = (itemId) => {
-    setCart((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+    updateItemQuantity(itemId, 1);
   };
 
   const handleDecrease = (itemId) => {
-    setCart((prev) => {
-      const updatedCount = (prev[itemId] || 0) - 1;
-      if (updatedCount <= 0) {
-        const newCart = { ...prev };
-        delete newCart[itemId];
-        return newCart;
-      }
-      return { ...prev, [itemId]: updatedCount };
-    });
+    updateItemQuantity(itemId, -1);
   };
 
   return (
@@ -88,7 +82,12 @@ const MenuGrid = ({ items }) => {
           </div>
         ) : filteredItems.length > 0 ? (
           filteredItems.map((item) => {
-            const count = cart[item.id] || 0;
+            const existingItem = cartItems.find(
+              (cartItem) => cartItem.id === item.id
+            );
+            const count = existingItem ? existingItem.qty : 0;
+            {console.log(cartItems)}
+
             return (
               <div
                 key={item.id}
@@ -136,7 +135,7 @@ const MenuGrid = ({ items }) => {
                     {count === 0 ? (
                       <button
                         className="flex items-center gap-2 text-white bg-orange-400 hover:bg-orange-500 rounded-md px-3 py-2 transition font-medium"
-                        onClick={() => handleAddToCart(item.id)}
+                        onClick={() => handleAddToCart(item)}
                       >
                         <FaShoppingCart size={18} />
                         <span>Add</span>

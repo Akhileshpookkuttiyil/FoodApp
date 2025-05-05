@@ -1,4 +1,4 @@
-import { FaArrowLeft, FaCartPlus } from "react-icons/fa";
+import { FaArrowLeft, FaCartPlus, FaShoppingCart } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { menuItems } from "../Menus/Data/MenuData";
 import { useState, useEffect } from "react";
@@ -11,8 +11,7 @@ import { useCart } from "../../Context/CartContext";
 const DishDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const {addToCart, updateItemQuantity } = useCart();
-  const [cart,setCart] = useState([])
+  const { addToCart, updateItemQuantity, cartItems } = useCart();
   const [dish, setDish] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("");
@@ -32,39 +31,39 @@ const DishDetail = () => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  const handleAddToCart = () => {
-    console.log(quantity);
+  const handleAddToCart = (item = null, qty = null) => {
+    // Fallback to default dish and quantity from current page state
+    const selectedItem = item || dish;
+    const selectedQuantity = qty ?? quantity;
 
-    const item = {
-      ...dish,
-      qty: quantity,
-    };
+    if (!selectedItem || selectedQuantity < 1) {
+      toast.error("Invalid dish or quantity.");
+      return;
+    }
 
-    // Check if the item already exists in the cart
-    const existingItem = cart.find((cartItem) => cartItem.id === item.id);
+    const existingItem = cartItems.find(
+      (cartItem) => cartItem.id === selectedItem.id
+    );
 
     if (existingItem) {
-      updateItemQuantity(item.id, existingItem.qty + quantity); // Update quantity
+      updateItemQuantity(selectedItem.id, selectedQuantity); // Update quantity
     } else {
-      addToCart(item); // Add new item to cart
+      addToCart(selectedItem, selectedQuantity); // Add new item
     }
   };
 
   const handleIncrease = (itemId) => {
-    setCart((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+    updateItemQuantity(itemId, 1); // Increase the quantity by 1
   };
 
   const handleDecrease = (itemId) => {
-    setCart((prev) => {
-      const updatedCount = (prev[itemId] || 0) - 1;
-      if (updatedCount <= 0) {
-        const newCart = { ...prev };
-        delete newCart[itemId];
-        return newCart;
-      }
-      return { ...prev, [itemId]: updatedCount };
-    });
+    updateItemQuantity(itemId, -1); // Decrease the quantity by 1
   };
+
+  useEffect(() => {
+    console.log("Cart updated:", cartItems);
+  }, [cartItems]);
+  
 
   if (loading) {
     return (
@@ -207,25 +206,29 @@ const DishDetail = () => {
           </div>
         </div>
       </div>
-
       {/* Related Dishes */}
       {relatedDishes.length > 0 && (
         <div className="mt-20">
           <h2 className="text-2xl font-semibold mb-6 text-gray-800">
             You Might Also Like
           </h2>
-
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {relatedDishes.map((item) => {
-              const count = cart[item.id] || 0;
+              const existingItem = cartItems.find(
+                (cartItem) => cartItem.id === item.id
+              );
+              const count = existingItem ? existingItem.qty : 0;
+
               return (
                 <div
                   key={item.id}
-                  className="bg-white p-4 shadow-lg rounded-lg w-full text-center border transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex flex-col items-center justify-between"
+                  className="bg-white p-4 shadow-lg rounded-lg w-full text-center border transform transition-all duration-300 hover:scale-105 hover:shadow-orange-200 hover:border-orange-300 flex flex-col items-center justify-between"
                 >
+                  {/* Clickable Dish Detail */}
                   <div
                     onClick={() => navigate(`/menu/${item.id}`)}
-                    className="flex flex-col items-center justify-center text-center cursor-pointer space-y-1"
+                    aria-label={`View details for ${item.name}`}
+                    className="flex flex-col items-center justify-center text-center cursor-pointer space-y-1 w-full"
                   >
                     <img
                       src={item.img}
@@ -233,14 +236,19 @@ const DishDetail = () => {
                       onError={(e) =>
                         (e.target.src = "/assets/img/default-image.png")
                       }
-                      className="w-full h-36 object-contain rounded-md mb-3"
+                      className="w-full aspect-[4/3] object-cover rounded-md mb-3"
                       loading="lazy"
                     />
-
-                    <h2 className="text-lg font-semibold text-gray-800">
+                    <h2
+                      className="text-lg font-semibold text-gray-800"
+                      title={item.name}
+                    >
                       {item.name}
                     </h2>
-                    <p className="text-xs text-gray-500 flex items-center">
+                    <p
+                      className="text-xs text-gray-500 flex items-center"
+                      title={item.hotel}
+                    >
                       <FaHotel className="mr-1 text-orange-400" /> {item.hotel}
                     </p>
                     <div className="mt-2 flex text-sm items-center justify-center">
@@ -257,12 +265,14 @@ const DishDetail = () => {
                       <div className="text-lg font-bold text-gray-800">
                         ₹{item.price}
                       </div>
+
                       {count === 0 ? (
                         <button
                           className="flex items-center gap-2 text-white bg-orange-400 hover:bg-orange-500 rounded-md px-3 py-2 transition font-medium"
-                          onClick={() => handleIncrease(item.id)}
+                          onClick={() => handleAddToCart(item, 1)}
                         >
-                          <FaCartPlus /> Add
+                          <FaShoppingCart size={18} />
+                          <span>Add</span>
                         </button>
                       ) : (
                         <div className="flex items-center gap-4 bg-orange-100 border border-orange-300 rounded-md py-2 px-4 w-fit select-none">
@@ -272,7 +282,9 @@ const DishDetail = () => {
                           >
                             −
                           </button>
-                          <span className="font-semibold">{count}</span>
+                          <span className="text-sm font-medium text-gray-800">
+                            {count}
+                          </span>
                           <button
                             onClick={() => handleIncrease(item.id)}
                             className="text-orange-600 font-bold hover:text-orange-800 text-xl"
