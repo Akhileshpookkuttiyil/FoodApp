@@ -8,7 +8,7 @@ import {
 } from "react-icons/fa";
 import { LiaTimesSolid } from "react-icons/lia";
 import { Link, useLocation } from "react-router-dom";
-import { useCart } from "../../Context/CartContext";
+import { useCart } from "../../context/CartContext";
 import { useAuthContext } from "../../Context/AuthContext";
 
 const Navbar = () => {
@@ -57,13 +57,13 @@ const Navbar = () => {
             address?.county ||
             address?.state_district ||
             address?.state ||
-            "Unknown Location";
+            "Unknown";
 
           setCurrentLocation(localName);
         }
       } catch (error) {
         console.error("Error fetching location:", error);
-        if (isMounted) setCurrentLocation("Unknown Location");
+        if (isMounted) setCurrentLocation("Unknown");
       }
     };
 
