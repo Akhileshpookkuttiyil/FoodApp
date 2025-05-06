@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import Skeleton from "react-loading-skeleton";
 import StarRating from "../StarRating";
 import { FaHotel } from "react-icons/fa";
-import { useCart } from "../../Context/CartContext";
+import { useCart } from "../../context/CartContext";
 
 const DishDetail = () => {
   const { id } = useParams();

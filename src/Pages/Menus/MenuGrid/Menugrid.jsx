@@ -1,5 +1,4 @@
-// MenuGrid.jsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import SearchBar from "../SearchBar/SearchBar";
 import SortDropdown from "../SortDropdown/SortDropdown";
 import FilterButton from "../FilterButton/FilterButton";
@@ -8,7 +7,8 @@ import { FaShoppingCart, FaHotel } from "react-icons/fa";
 import noResultsImg from "../../../assets/img/Noimg.gif";
 import StarRating from "../../StarRating";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../../Context/CartContext";
+import { useCart } from "../../../context/CartContext";
+import { ClipLoader } from "react-spinners"; // Using react-spinners for a loading spinner
 
 const MenuGrid = ({ items }) => {
   const navigate = useNavigate();
@@ -41,17 +41,26 @@ const MenuGrid = ({ items }) => {
     return () => clearTimeout(timeout);
   }, [filteredItems]);
 
-  const handleAddToCart = (item) => {
-    addToCart(item, 1);
-  };
+  const handleAddToCart = useCallback(
+    (item) => {
+      addToCart(item, 1);
+    },
+    [addToCart]
+  );
 
-  const handleIncrease = (itemId) => {
-    updateItemQuantity(itemId, 1);
-  };
+  const handleIncrease = useCallback(
+    (itemId) => {
+      updateItemQuantity(itemId, 1);
+    },
+    [updateItemQuantity]
+  );
 
-  const handleDecrease = (itemId) => {
-    updateItemQuantity(itemId, -1);
-  };
+  const handleDecrease = useCallback(
+    (itemId) => {
+      updateItemQuantity(itemId, -1);
+    },
+    [updateItemQuantity]
+  );
 
   return (
     <div className="min-h-screen p-6 bg-white">
@@ -78,7 +87,7 @@ const MenuGrid = ({ items }) => {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 px-4 mt-10">
         {isLoading ? (
           <div className="col-span-full flex justify-center items-center text-gray-500 text-lg py-12">
-            Loading...
+            <ClipLoader color="#FF7F50" loading={isLoading} size={50} />
           </div>
         ) : filteredItems.length > 0 ? (
           filteredItems.map((item) => {
@@ -86,7 +95,6 @@ const MenuGrid = ({ items }) => {
               (cartItem) => cartItem.id === item.id
             );
             const count = existingItem ? existingItem.qty : 0;
-            {console.log(cartItems)}
 
             return (
               <div
@@ -106,20 +114,16 @@ const MenuGrid = ({ items }) => {
                     className="w-full h-36 object-contain rounded-md mb-3"
                     loading="lazy"
                   />
-
                   <h2 className="text-lg font-semibold text-gray-800">
                     {item.name}
                   </h2>
-
                   <p className="text-sm text-gray-500 flex items-center justify-center gap-1">
                     <FaHotel className="text-orange-400 text-xs" />
                     <span>{item.hotel}</span>
                   </p>
-
                   <div className="mt-2">
                     <StarRating rating={item.rating} />
                   </div>
-
                   <p className="text-sm text-gray-500 mt-1">
                     Delivery: {item.deliveryTime} mins
                   </p>
