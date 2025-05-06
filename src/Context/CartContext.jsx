@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState ,useEffect } from "react";
 import PropTypes from "prop-types";
 
 // Create a Cart Context
@@ -28,9 +28,12 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  useEffect(() => {
+    console.log("Cart updated:", cartItems);
+  }, [cartItems]);
+
   // Update item quantity (increment or decrement)
   const updateItemQuantity = (itemId, quantityChange) => {
-    console.log({ updated_id: itemId }, quantityChange);
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         item.id === itemId
@@ -42,9 +45,7 @@ export const CartProvider = ({ children }) => {
 
   // Remove an item from the cart
   const removeItemFromCart = (itemId) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.id !== itemId)
-    );
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
   };
 
   // Clear all items from the cart
