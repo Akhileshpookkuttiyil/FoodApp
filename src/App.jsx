@@ -13,6 +13,7 @@ import AuthPage from "./Pages/Auth/AuthPage";
 import CartPage from "./Pages/Cart/CartPage";
 import DishDetail from "./Pages/Detail/DishDetail";
 import { useAuthContext } from "./Context/AuthContext"; // Import the context
+import { Toaster } from "react-hot-toast";
 
 function App() {
   // Manage the showLogin state directly in App
@@ -20,10 +21,12 @@ function App() {
 
   return (
     <Router>
+      <Toaster/>
+
       <div className="w-full min-h-screen bg-neutral-100/40 flex flex-col">
         <ScrollToTop />
         {/* Pass setShowLogin to Navbar */}
-        <Navbar/>
+        <Navbar />
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route exact path="/menus" element={<Menus />} />
@@ -36,12 +39,11 @@ function App() {
         </Routes>
 
         {/* Conditionally render AuthPage based on showLogin */}
-        {showLogin && <AuthPage/>}
-        
+        {showLogin && <AuthPage />}
+
         <Footer />
       </div>
     </Router>
   );
 }
-
 export default App;

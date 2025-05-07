@@ -133,12 +133,12 @@ const Navbar = () => {
           <Link
             to="/cart"
             className={`relative text-neutral-800 hover:text-orange-400 transition-all duration-300 ${
-              location.pathname === "/cart" ? "text-orange-300" : ""
+              location.pathname === "/cart" ? "text-orange-500" : ""
             }`}
           >
             <FaShoppingCart className="text-xl lg:text-2xl" />
             {totalQty > 0 && (
-              <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+              <span className="absolute -top-2 -right-2 bg-orange-300 text-white text-xs px-1.5 py-0.5 rounded-full">
                 {totalQty}
               </span>
             )}
