@@ -14,6 +14,7 @@ import CartPage from "./Pages/Cart/CartPage";
 import DishDetail from "./Pages/Detail/DishDetail";
 import { useAuthContext } from "./Context/AuthContext"; // Import the context
 import { Toaster } from "react-hot-toast";
+import AddAddressPage from "./Pages/AddAddress/AddAddressPage";
 
 function App() {
   // Manage the showLogin state directly in App
@@ -21,7 +22,7 @@ function App() {
 
   return (
     <Router>
-      <Toaster/>
+      <Toaster />
 
       <div className="w-full min-h-screen bg-neutral-100/40 flex flex-col">
         <ScrollToTop />
@@ -35,6 +36,7 @@ function App() {
           <Route exact path="/contact" element={<ContactSection />} />
           <Route exact path="/about" element={<About />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/add-address" element={<AddAddressPage />} />
           <Route path="/menu/:id" element={<DishDetail />} />
         </Routes>
 

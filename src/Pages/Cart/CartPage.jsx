@@ -6,8 +6,10 @@ import emptyCart from "../../assets/img/empty-cart.svg";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
 import removeIcon from "../../assets/img/remove_icon.svg";
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
+  const navigate = useNavigate();
   const { cartItems, updateItemQuantity, removeItemFromCart, clearCart } =
     useCart();
   const [showAddress, setShowAddress] = useState(false);
@@ -212,10 +214,10 @@ const CartPage = () => {
                       New York, USA
                     </button>
                     <button
-                      onClick={() => setShowAddress(false)}
-                      className="block w-full text-left p-3 text-indigo-500 hover:bg-indigo-100"
+                      onClick={() => navigate("/add-address")}
+                      className="block w-full text-left p-3 text-indigo-600 hover:bg-indigo-100 transition rounded"
                     >
-                      Add Address
+                      ➕ Add Address
                     </button>
                   </div>
                 )}
