@@ -23,7 +23,7 @@ const DishDetail = () => {
     );
     if (foundDish) {
       setDish(foundDish);
-      setSelectedImage(foundDish?.img);
+      setSelectedImage(foundDish?.image);
     } else {
       toast.error("Dish not found.");
     }
@@ -105,17 +105,17 @@ const DishDetail = () => {
 
           {dish.gallery?.length > 0 && (
             <div className="flex gap-3 mt-5 overflow-x-auto pb-2">
-              {[dish.img, ...dish.gallery].map((img, idx) => (
+              {[dish.image, ...dish.gallery].map((image, idx) => (
                 <img
                   key={idx}
-                  src={img}
+                  src={image}
                   alt={`thumb-${idx}`}
-                  onClick={() => setSelectedImage(img)}
+                  onClick={() => setSelectedImage(image)}
                   onError={(e) =>
                     (e.target.src = "/assets/img/default-image.png")
                   }
                   className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 transition transform ${
-                    selectedImage === img
+                    selectedImage === image
                       ? "border-orange-500 scale-105"
                       : "border-transparent"
                   }`}
@@ -226,7 +226,7 @@ const DishDetail = () => {
                     className="flex flex-col items-center justify-center text-center cursor-pointer space-y-1 w-full"
                   >
                     <img
-                      src={item.img}
+                      src={item.image}
                       alt={item.name}
                       onError={(e) =>
                         (e.target.src = "/assets/img/default-image.png")

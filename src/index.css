@@ -35,6 +35,7 @@
   }
 }
 
+/* Global Fade In */
 .animate-fadeIn {
   animation: fadeIn 0.4s ease-out;
 }
@@ -57,4 +58,24 @@
 .hover-float:hover {
   transform: translateY(-4px) scale(1.02);
   transition: transform 0.3s ease;
+}
+
+/* Keyframe animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Focus outline for accessibility */
+:focus-visible {
+  outline: 2px solid #FF7F50; /* Add a focus style for better accessibility */
+}
+
+/* Remove the default focus outline for elements that do not need it */
+button, input, select {
+  outline: none;
 }

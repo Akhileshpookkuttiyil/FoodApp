@@ -23,7 +23,7 @@ export const menuItems = [
     price: 349,
     rating: 4.2,
     hotel: "Pizza Mahal",
-    img: pizzaImg,
+    image: pizzaImg,
     deliveryTime: 30,
     desc: "A classic pepperoni pizza with extra cheese and herbs.",
     longDesc:
@@ -37,7 +37,7 @@ export const menuItems = [
     price: 249,
     rating: 3.5,
     hotel: "Burger Darbar",
-    img: burgerImg,
+    image: burgerImg,
     deliveryTime: 25,
     desc: "Juicy grilled patty with melted cheese in a soft bun.",
     longDesc:
@@ -51,7 +51,7 @@ export const menuItems = [
     price: 799,
     rating: 4.8,
     hotel: "Sushi Vihar",
-    img: sushiImg,
+    image: sushiImg,
     deliveryTime: 40,
     desc: "Fresh salmon wrapped in seasoned rice and seaweed.",
     longDesc:
@@ -65,7 +65,7 @@ export const menuItems = [
     price: 199,
     rating: 3.9,
     hotel: "Mithai Bhavan",
-    img: cakeImg,
+    image: cakeImg,
     deliveryTime: 20,
     desc: "Rich and moist chocolate cake topped with ganache.",
     longDesc:
@@ -79,7 +79,7 @@ export const menuItems = [
     price: 149,
     rating: 4.0,
     hotel: "Madras Coffee House",
-    img: coffeeImg,
+    image: coffeeImg,
     deliveryTime: 15,
     desc: "Chilled coffee brewed to perfection with a splash of milk.",
     longDesc:
@@ -93,7 +93,7 @@ export const menuItems = [
     price: 800,
     rating: 4.3,
     hotel: "Grill House",
-    img: Chicken,
+    image: Chicken,
     deliveryTime: 35,
     desc: "Juicy grilled chicken seasoned with spices.",
     longDesc:
@@ -107,7 +107,7 @@ export const menuItems = [
     price: 120,
     rating: 4.0,
     hotel: "Tibetan Treats",
-    img: Momos,
+    image: Momos,
     deliveryTime: 20,
     desc: "Soft dumplings filled with vegs or chicken.",
     longDesc:
@@ -121,7 +121,7 @@ export const menuItems = [
     price: 300,
     rating: 4.6,
     hotel: "Biryani Bhavan",
-    img: Biriyani,
+    image: Biriyani,
     deliveryTime: 30,
     desc: "Flavorful rice with tender chicken pieces.",
     longDesc:
@@ -135,7 +135,7 @@ export const menuItems = [
     price: 500,
     rating: 4.1,
     hotel: "Seafood Point",
-    img: Fish,
+    image: Fish,
     deliveryTime: 28,
     desc: "Fresh fish fillet grilled to perfection.",
     longDesc:
@@ -149,7 +149,7 @@ export const menuItems = [
     price: 150,
     rating: 3.9,
     hotel: "Rice Bowl",
-    img: FriedRice,
+    image: FriedRice,
     deliveryTime: 22,
     desc: "Classic fried rice with vegetables.",
     longDesc:
@@ -163,7 +163,7 @@ export const menuItems = [
     price: 250,
     rating: 4.0,
     hotel: "Snack Shack",
-    img: Sandwich,
+    image: Sandwich,
     deliveryTime: 18,
     desc: "Triple-layer sandwich with a variety of fillings.",
     longDesc:
@@ -177,7 +177,7 @@ export const menuItems = [
     price: 280,
     rating: 4.4,
     hotel: "Biryani Bhavan",
-    img: chickenBiriyani,
+    image: chickenBiriyani,
     deliveryTime: 32,
     desc: "Spicy chicken cooked with fragrant basmati rice and herbs.",
     longDesc:
@@ -191,7 +191,7 @@ export const menuItems = [
     price: 320,
     rating: 4.5,
     hotel: "Biryani Darbar",
-    img: beefBiriyani,
+    image: beefBiriyani,
     deliveryTime: 35,
     desc: "Rich and flavorful beef layered with aromatic rice.",
     longDesc:

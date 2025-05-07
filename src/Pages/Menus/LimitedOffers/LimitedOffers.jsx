@@ -1,153 +1,32 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   FaChevronLeft,
   FaChevronRight,
   FaShoppingCart,
   FaHotel,
 } from "react-icons/fa";
-import butterChicken from "../../../assets/img/butterChicken.png";
-import paneerTikka from "../../../assets/img/paneerTikka.png";
-import masalaDosa from "../../../assets/img/masalaDosa.png";
-import chickenBiryani from "../../../assets/img/chickenBiryani.png";
-import chickenFriedRice from "../../../assets/img/chickenFriedRice.png";
-import muttonBiriyani from "../../../assets/img/muttonBiriyani.png";
-import fishCurry from "../../../assets/img/fishCurry.png";
-import falafel from "../../../assets/img/falafel.png";
-import lambShawarma from "../../../assets/img/lambShawarma.png";
-import veggieBurger from "../../../assets/img/veggieBurger.png";
-import choleBhature from "../../../assets/img/choleBhature.png";
+
 
 // Import the StarRating component
 import StarRating from "../../StarRating"; // Adjust the path if necessary
 
 // If you use CartContext:
 import { useCart } from "../../../context/CartContext";
+import { Offers } from "../Data/limitedOffersData";
 
 const LimitedOffers = () => {
-  const offers = [
-    {
-      id: 1,
-      name: "Butter Chicken",
-      price: 299,
-      oldPrice: "₹399",
-      image: butterChicken,
-      discount: "25% OFF",
-      hotelName: "Spicy Kitchen",
-      rating: 4.5,
-    },
-    {
-      id: 2,
-      name: "Paneer Tikka",
-      price: 249,
-      oldPrice: "₹349",
-      image: paneerTikka,
-      discount: "28% OFF",
-      hotelName: "The Tandoor House",
-      rating: 4.2,
-    },
-    {
-      id: 3,
-      name: "Masala Dosa",
-      price: 149,
-      oldPrice: "₹199",
-      image: masalaDosa,
-      discount: "30% OFF",
-      hotelName: "Dosa Delight",
-      rating: 3.5,
-    },
-    {
-      id: 4,
-      name: "Chicken Biryani",
-      price: 349,
-      oldPrice: "₹449",
-      image: chickenBiryani,
-      discount: "22% OFF",
-      hotelName: "Biryani Royal",
-      rating: 4.7,
-    },
-    {
-      id: 5,
-      name: "Chicken Fried Rice",
-      price: 199,
-      oldPrice: "₹279",
-      image: chickenFriedRice,
-      discount: "29% OFF",
-      hotelName: "Rice & Spice",
-      rating: 4.4,
-    },
-    {
-      id: 6,
-      name: "Mutton Biriyani",
-      price: 399,
-      oldPrice: "₹499",
-      image: muttonBiriyani,
-      discount: "20% OFF",
-      hotelName: "Royal Biryani",
-      rating: 4.6,
-    },
-    {
-      id: 7,
-      name: "Fish Curry",
-      price: 299,
-      oldPrice: "₹399",
-      image: fishCurry,
-      discount: "25% OFF",
-      hotelName: "Seafood Haven",
-      rating: 4.3,
-    },
-    {
-      id: 8,
-      name: "Falafel Plate",
-      price: 179,
-      oldPrice: "₹249",
-      image: falafel,
-      discount: "28% OFF",
-      hotelName: "Arabian Nights",
-      rating: 4.0,
-    },
-    {
-      id: 9,
-      name: "Lamb Shawarma",
-      price: 399,
-      oldPrice: "₹499",
-      image: lambShawarma,
-      discount: "20% OFF",
-      hotelName: "Shawarma King",
-      rating: 4.6,
-    },
-    {
-      id: 10,
-      name: "Veggie Burger",
-      price: 149,
-      oldPrice: "₹199",
-      image: veggieBurger,
-      discount: "25% OFF",
-      hotelName: "Veggie Delights",
-      rating: 4.3,
-    },
-    {
-      id: 11,
-      name: "Chole Bhature",
-      price: 159,
-      oldPrice: "₹219",
-      image: choleBhature,
-      discount: "30% OFF",
-      hotelName: "Bharati Bites",
-      rating: 4.2,
-    },
-  ];
 
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
   const { cartItems, addToCart, updateItemQuantity } = useCart(); // from your CartContext
 
-  const displayedOffers = offers.slice(
+  const displayedOffers = Offers.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
 
   const nextPage = () => {
-    if ((currentPage + 1) * itemsPerPage < offers.length) {
+    if ((currentPage + 1) * itemsPerPage < Offers.length) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -157,6 +36,13 @@ const LimitedOffers = () => {
       setCurrentPage(currentPage - 1);
     }
   };
+
+  const handleAddToCart = useCallback(
+    (item) => {
+      addToCart(item, 1);
+    },
+    [addToCart]
+  );
 
   const handleIncrease = (itemId) => {
     updateItemQuantity(itemId, 1); // Increase the quantity by 1
@@ -182,7 +68,7 @@ const LimitedOffers = () => {
         </button>
         <button
           onClick={nextPage}
-          disabled={(currentPage + 1) * itemsPerPage >= offers.length}
+          disabled={(currentPage + 1) * itemsPerPage >= Offers.length}
           className="flex items-center justify-center px-1 py-1 bg-orange-400 text-white rounded-full shadow-md hover:bg-orange-500 disabled:bg-gray-300"
         >
           <FaChevronRight />
@@ -224,7 +110,7 @@ const LimitedOffers = () => {
               <div className="flex flex-col items-center mt-2 space-y-1">
                 <p className="flex items-center text-sm text-gray-600 gap-1">
                   <FaHotel className="text-orange-400 text-xs" />
-                  <span className="truncate">{item.hotelName}</span>
+                  <span className="truncate">{item.hotel}</span>
                 </p>
                 <StarRating rating={item.rating} />
               </div>
@@ -238,7 +124,7 @@ const LimitedOffers = () => {
 
                   {count === 0 ? (
                     <button
-                      onClick={() => addToCart(item)}
+                      onClick={() => handleAddToCart(item)}
                       className="flex items-center gap-2 text-white bg-orange-500 hover:bg-orange-600 rounded-md px-3 py-2 transition-all font-medium"
                     >
                       <FaShoppingCart size={16} />

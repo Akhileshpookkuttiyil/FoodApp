@@ -8,7 +8,8 @@ import noResultsImg from "../../../assets/img/Noimg.gif";
 import StarRating from "../../StarRating";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../../context/CartContext";
-import { ClipLoader } from "react-spinners"; // Using react-spinners for a loading spinner
+import { ClipLoader } from "react-spinners"; // Loading spinner from react-spinners
+import { debounce } from "lodash"; // lodash for debouncing
 
 const MenuGrid = ({ items }) => {
   const navigate = useNavigate();
@@ -62,11 +63,14 @@ const MenuGrid = ({ items }) => {
     [updateItemQuantity]
   );
 
+  // Debounced search term input
+  const debouncedSearch = useMemo(() => debounce(setSearchTerm, 500), []);
+
   return (
     <div className="min-h-screen p-6 bg-white">
       {/* Controls */}
       <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 shadow-md rounded-md mb-6">
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <SearchBar searchTerm={searchTerm} setSearchTerm={debouncedSearch} />
         <div className="flex items-center space-x-2">
           <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
           <FilterButton setIsFilterOpen={setIsFilterOpen} />
@@ -84,7 +88,7 @@ const MenuGrid = ({ items }) => {
       />
 
       {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 px-4 mt-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 px-4 mt-10">
         {isLoading ? (
           <div className="col-span-full flex justify-center items-center text-gray-500 text-lg py-12">
             <ClipLoader color="#FF7F50" loading={isLoading} size={50} />
@@ -104,10 +108,11 @@ const MenuGrid = ({ items }) => {
                 <div
                   onClick={() => navigate(`/menu/${item.id}`)}
                   className="flex flex-col items-center cursor-pointer p-3 transition duration-200"
+                  aria-label={`View details of ${item.name}`}
                 >
                   <img
-                    src={item.img}
-                    alt={item.name}
+                    src={item.image}
+                    alt={`Image of ${item.name}`}
                     onError={(e) =>
                       (e.target.src = "/assets/img/default-image.png")
                     }
@@ -140,6 +145,7 @@ const MenuGrid = ({ items }) => {
                       <button
                         className="flex items-center gap-2 text-white bg-orange-400 hover:bg-orange-500 rounded-md px-3 py-2 transition font-medium"
                         onClick={() => handleAddToCart(item)}
+                        aria-label={`Add ${item.name} to cart`}
                       >
                         <FaShoppingCart size={18} />
                         <span>Add</span>
@@ -149,6 +155,7 @@ const MenuGrid = ({ items }) => {
                         <button
                           onClick={() => handleDecrease(item.id)}
                           className="text-orange-600 font-bold hover:text-orange-800 text-xl"
+                          aria-label={`Decrease quantity of ${item.name}`}
                         >
                           −
                         </button>
@@ -158,6 +165,7 @@ const MenuGrid = ({ items }) => {
                         <button
                           onClick={() => handleIncrease(item.id)}
                           className="text-orange-600 font-bold hover:text-orange-800 text-xl"
+                          aria-label={`Increase quantity of ${item.name}`}
                         >
                           +
                         </button>

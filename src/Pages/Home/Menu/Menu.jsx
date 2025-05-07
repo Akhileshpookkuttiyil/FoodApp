@@ -30,7 +30,7 @@ const Menu = () => {
           >
             <div className="relative">
               <img
-                src={data.img}
+                src={data.image}
                 alt={data.name}
                 className="w-full h-48 object-contain rounded-lg"
                 loading="lazy"

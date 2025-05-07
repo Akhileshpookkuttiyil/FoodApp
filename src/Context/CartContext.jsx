@@ -1,59 +1,70 @@
-import { createContext, useContext, useState ,useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import PropTypes from "prop-types";
+import toast from "react-hot-toast";
 
-// Create a Cart Context
 const CartContext = createContext();
 
-// Cart Provider Component
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const MAX_QUANTITY = 99;
 
-  // Helper function to update cart items array
-  const updateCartItems = (updatedItems) => {
-    setCartItems(updatedItems);
-  };
+  const findItemById = (id) => cartItems.find((item) => item.id === id);
 
-  // Add item to cart or update quantity if already exists
   const addToCart = (newItem, selectedQuantity = 1) => {
+    const validQuantity = Math.min(selectedQuantity, MAX_QUANTITY);
+
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === newItem.id);
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === newItem.id
-            ? { ...item, qty: item.qty + selectedQuantity }
-            : item
-        );
+      const existingItem = findItemById(newItem.id);
+
+      if (!existingItem) {
+        toast.success(`${newItem.name} added to cart!`);
+        return [...prevItems, { ...newItem, qty: validQuantity }];
       }
-      return [...prevItems, { ...newItem, qty: selectedQuantity }];
+
+      toast.error(`${newItem.name} is already in the cart.`);
+      return prevItems;
     });
   };
 
-  useEffect(() => {
-    console.log("Cart updated:", cartItems);
-  }, [cartItems]);
-
-  // Update item quantity (increment or decrement)
   const updateItemQuantity = (itemId, quantityChange) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === itemId
-          ? { ...item, qty: Math.max(1, item.qty + quantityChange) }
-          : item
-      )
-    );
+    setCartItems((prevItems) => {
+      const updatedItems = prevItems.map((item) => {
+        if (item.id === itemId) {
+          const newQty = Math.min(
+            Math.max(1, item.qty + quantityChange),
+            MAX_QUANTITY
+          );
+          if (newQty !== item.qty) {
+            toast.success("Cart updated");
+          }
+          return { ...item, qty: newQty };
+        }
+        return item;
+      });
+      return updatedItems;
+    });
   };
 
-  // Remove an item from the cart
   const removeItemFromCart = (itemId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+    const removedItem = findItemById(itemId);
+    if (removedItem) {
+      setCartItems((prevItems) =>
+        prevItems.filter((item) => item.id !== itemId)
+      );
+      toast.success(`${removedItem.name} removed from cart.`);
+    }
   };
 
-  // Clear all items from the cart
   const clearCart = () => {
-    updateCartItems([]);
+    const confirmClear = window.confirm(
+      "Are you sure you want to clear the cart?"
+    );
+    if (confirmClear) {
+      setCartItems([]);
+      toast.success("Cart cleared.");
+    }
   };
 
-  // Calculate total cart value
   const cartTotalAmount = cartItems.reduce(
     (total, item) => total + item.qty * item.price,
     0
@@ -76,12 +87,10 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// Prop validation for CartProvider
 CartProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-// Custom hook to use the Cart Context
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
