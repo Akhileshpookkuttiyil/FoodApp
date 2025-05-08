@@ -1,51 +1,87 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
+import ScrollToTop from "./ScrolltoTop";
+
 import Home from "./Pages/Home/Home";
 import Menus from "./Pages/Menus/Menus";
 import Locations from "./Pages/Locations/Locations";
-import ScrollToTop from "./ScrolltoTop";
 import Blogs from "./Pages/Blogs/Blogs";
 import ContactSection from "./Pages/Contact/contact";
 import About from "./Pages/About/About";
-import AuthPage from "./Pages/Auth/AuthPage";
 import CartPage from "./Pages/Cart/CartPage";
-import DishDetail from "./Pages/Detail/DishDetail";
-import { useAuthContext } from "./Context/AuthContext"; // Import the context
-import { Toaster } from "react-hot-toast";
 import AddAddressPage from "./Pages/AddAddress/AddAddressPage";
+import DishDetail from "./Pages/Detail/DishDetail";
+import AuthPage from "./Pages/Auth/AuthPage";
+import SellerLayout from "./Pages/Seller/SellerLayout";
 
-function App() {
-  // Manage the showLogin state directly in App
-  const { showLogin } = useAuthContext();
+import { useAuthContext } from "./Context/AuthContext";
+import AddProduct from "./Pages/Seller/AddProduct";
+import ViewProducts from "./Pages/Seller/viewProducts";
+import SellerLogin from "./Pages/Seller/SellerLogin";
+
+function AppContent() {
+  const { showLogin, seller } = useAuthContext();
+  const location = useLocation();
+
+  const isSellerRoute = location.pathname.startsWith("/seller");
 
   return (
-    <Router>
+    <>
       <Toaster />
+      <ScrollToTop />
 
-      <div className="w-full min-h-screen bg-neutral-100/40 flex flex-col">
-        <ScrollToTop />
-        {/* Pass setShowLogin to Navbar */}
-        <Navbar />
+      {!isSellerRoute && <Navbar />}
+
+      <div
+        className={`${
+          !isSellerRoute ? "flex flex-col min-h-screen bg-neutral-100/40" : ""
+        }`}
+      >
         <Routes>
-          <Route exact path="/" element={<Home />} />
-          <Route exact path="/menus" element={<Menus />} />
-          <Route exact path="/location" element={<Locations />} />
-          <Route exact path="/blogs" element={<Blogs />} />
-          <Route exact path="/contact" element={<ContactSection />} />
-          <Route exact path="/about" element={<About />} />
+          {/* User-Facing Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/menus" element={<Menus />} />
+          <Route path="/location" element={<Locations />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/contact" element={<ContactSection />} />
+          <Route path="/about" element={<About />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/add-address" element={<AddAddressPage />} />
           <Route path="/menu/:id" element={<DishDetail />} />
+
+          {/* Seller Routes - Protected inside layout */}
+          <Route
+            path="/seller/*"
+            element={seller ? <SellerLayout /> : <SellerLogin />}
+          >
+            <Route path="add-product" element={<AddProduct />} />
+            <Route path="view-products" element={<ViewProducts />} />
+          </Route>
         </Routes>
 
-        {/* Conditionally render AuthPage based on showLogin */}
+        {/* Auth modals */}
         {showLogin && <AuthPage />}
-
-        <Footer />
       </div>
+
+      {!isSellerRoute && <Footer />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
+
 export default App;

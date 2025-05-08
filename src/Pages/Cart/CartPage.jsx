@@ -70,7 +70,13 @@ const CartPage = () => {
       key={item.id}
       className="transition hover:shadow-md rounded-md bg-white grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr_80px] lg:gap-x-20 items-center border border-gray-200 py-6 px-6"
     >
-      <div className="flex gap-6 items-center">
+      <div
+        onClick={() => navigate(`/menu/${item.id}`)}
+        onKeyDown={(e) => e.key === "Enter" && navigate(`/menu/${item.id}`)}
+        role="button"
+        tabIndex={0}
+        className="flex gap-6 items-center cursor-pointer"
+      >
         <img
           src={item.image}
           alt={item.name}

@@ -13,7 +13,7 @@ import { useAuthContext } from "../../Context/AuthContext";
 
 const Navbar = () => {
   const { cartItems } = useCart();
-  const { user, setShowLogin, logoutHandler } = useAuthContext();
+  const { user, setShowLogin, logoutUser } = useAuthContext();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const [open, setOpen] = useState(false);
@@ -170,7 +170,7 @@ const Navbar = () => {
                     Settings
                   </li>
                   <li
-                    onClick={logoutHandler}
+                    onClick={logoutUser}
                     className="cursor-pointer text-sm text-red-500 hover:bg-gray-100 hover:underline py-2 px-4"
                   >
                     Logout

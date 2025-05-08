@@ -1,0 +1,185 @@
+import { useState } from "react";
+import { Outlet, useLocation, Link } from "react-router-dom";
+import { useAuthContext } from "../../Context/AuthContext";
+
+const SellerLayout = () => {
+  const { seller, logoutSeller } = useAuthContext();
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+
+  const sidebarLinks = [
+    { name: "Dashboard", path: "/seller", icon: dashboardIcon },
+    { name: "Add Product", path: "/seller/add-product", icon: addProductIcon },
+    {
+      name: "View Products",
+      path: "/seller/view-products",
+      icon: viewProductIcon,
+    },
+    { name: "Users", path: "/seller/view-users", icon: usersIcon },
+  ];
+
+  const SidebarContent = () => (
+    <div className="w-64 bg-white border-r border-gray-300 pt-4 h-full">
+      {sidebarLinks.map((item) => {
+        const isActive = location.pathname === item.path;
+        return (
+          <Link
+            to={item.path}
+            key={item.name}
+            className={`flex items-center py-3 px-4 gap-3 transition-all ${
+              isActive
+                ? "border-r-4 md:border-r-[6px] bg-orange-100 border-orange-500 text-orange-600 font-semibold"
+                : "hover:bg-orange-50 text-orange-700"
+            } mb-2`}
+            aria-label={item.name}
+          >
+            {item.icon}
+            <span className="hidden md:block">{item.name}</span>
+            <span className="block md:hidden">{item.name[0]}</span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col h-screen">
+      {/* Topbar */}
+      <div className="flex items-center justify-between px-6 py-4 bg-white shadow-md border-b border-gray-200 h-[72px] flex-shrink-0">
+        <div className="flex items-center gap-6">
+          <button
+            onClick={toggleSidebar}
+            className="md:hidden block text-gray-700"
+            aria-label="Toggle sidebar"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+          <Link to="/" className="text-2xl font-bold text-neutral-800">
+            <span className="text-orange-500">F</span>oodie
+            <span className="text-orange-500">M</span>ania
+          </Link>
+        </div>
+        <div className="flex items-center gap-4 text-gray-600">
+          <p className="font-medium">Hi, {seller.name}</p>
+          <button onClick={logoutSeller}
+            className="border border-gray-400 bg-gray-200 rounded-full text-sm px-3 py-1 hover:bg-gray-300 focus:outline-none"
+            aria-label="Logout"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* Layout Body */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <div className="hidden md:block w-64 bg-white border-r border-gray-300 h-full">
+          <SidebarContent />
+        </div>
+
+        {/* Main Content */}
+        <main className="flex-1 bg-gray-50 p-6 overflow-y-auto h-full">
+          <Outlet />
+        </main>
+      </div>
+
+      {/* Mobile Sidebar */}
+      {isSidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black bg-opacity-50"
+            onClick={toggleSidebar}
+            aria-hidden="true"
+          />
+          <div
+            className="fixed inset-y-0 left-0 z-50 bg-white w-64 shadow-lg h-full"
+            role="navigation"
+          >
+            <SidebarContent />
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+// SVG Icons
+const dashboardIcon = (
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"
+    />
+  </svg>
+);
+
+const addProductIcon = (
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M12 4v16m8-8H4"
+    />
+  </svg>
+);
+
+const viewProductIcon = (
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"
+    />
+  </svg>
+);
+
+const usersIcon = (
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 000 7.75"
+    />
+  </svg>
+);
+
+export default SellerLayout;

@@ -288,7 +288,7 @@ const AuthPage = () => {
               </>
             ) : (
               <>
-                Don't have an account?{" "}
+                Dont have an account?{" "}
                 <span
                   onClick={() => switchMode(true)}
                   className="text-orange-500 cursor-pointer"
