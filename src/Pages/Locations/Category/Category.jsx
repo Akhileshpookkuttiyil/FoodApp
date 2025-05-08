@@ -43,11 +43,11 @@ const Category = ({ selectedCategory, setSelectedCategory }) => {
         {categoriesData.map((category, index) => (
           <button
             key={index}
-            onClick={() =>
+            onClick={() => {
               setSelectedCategory(
                 selectedCategory === category.name ? "All" : category.name
-              )
-            }
+              );
+            }}
             className="flex flex-col items-center space-y-2 transition snap-start"
           >
             <div

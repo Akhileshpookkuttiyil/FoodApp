@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // ⬅️ Add this
 import HeroBanner from "./Banner/Banner";
 import PageHeader from "./Banner/PageHeader/PageHeader";
 import Categories from "./Categories/Categories";
@@ -14,7 +15,21 @@ import { menuItems } from "./Data/MenuData";
 const categories = ["All", ...new Set(menuItems.map((item) => item.category))];
 
 const Menus = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const location = useLocation(); // ⬅️ Get navigation state
+  const initialCategory = location.state?.category || "All";
+  console.log(initialCategory)
+
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+
+  useEffect(() => {
+    const pageHeight = document.documentElement.scrollHeight;
+    const targetScrollPosition = pageHeight * 0.045;
+
+    window.scrollTo({
+      top: targetScrollPosition,
+      behavior: "smooth",
+    });
+  }, []);
 
   const categoryItems =
     selectedCategory === "All"

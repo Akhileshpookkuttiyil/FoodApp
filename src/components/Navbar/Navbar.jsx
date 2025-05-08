@@ -13,6 +13,7 @@ import { useAuthContext } from "../../Context/AuthContext";
 
 const Navbar = () => {
   const { cartItems } = useCart();
+  const [searchQuery, setSearchQuery] = useState("");
   const { user, setShowLogin, logoutUser } = useAuthContext();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -21,12 +22,17 @@ const Navbar = () => {
   const [currentLocation, setCurrentLocation] = useState("Fetching...");
   const location = useLocation();
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      console.log("Searching for:", searchQuery);
+    }
+  };
+
   const NavLinks = useMemo(
     () => [
       { href: "/", name: "Home" },
       { href: "/menus", name: "Menus" },
       { href: "/location", name: "Locations" },
-      { href: "/blogs", name: "Blogs" },
       { href: "/contact", name: "Contact" },
       { href: "/about", name: "About" },
     ],
@@ -122,9 +128,14 @@ const Navbar = () => {
           <input
             type="text"
             placeholder="Search here..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)} // Update on input change
             className="flex-1 px-4 py-2 bg-transparent outline-none text-neutral-800 placeholder:text-neutral-400/80"
           />
-          <button className="px-4 py-2.5 text-orange-400 flex items-center justify-center bg-neutral-100 hover:bg-orange-400 hover:text-white transition-all duration-300">
+          <button
+            onClick={handleSearch}
+            className="px-4 py-2.5 text-orange-400 flex items-center justify-center bg-neutral-100 hover:bg-orange-400 hover:text-white transition-all duration-300"
+          >
             <FaSearch className="w-5 h-5" />
           </button>
         </div>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import {menuItems as menuData} from "../../Menus/Data/MenuData"; // Import menu data
+import { menuItems as menuData } from "../../Menus/Data/MenuData"; // Import menu data
 
 const Menu = () => {
   // Filter the best-rated menu items (rating >= 4.0)
@@ -13,7 +13,7 @@ const Menu = () => {
           Our Best Menus
         </h5>
         <Link
-          to={"/menu"}
+          to={"/menus"}
           className="text-sm text-neutral-500 font-medium hover:text-orange-500 ease-in-out duration-300"
         >
           View All

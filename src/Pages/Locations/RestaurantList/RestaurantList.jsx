@@ -73,6 +73,15 @@ const RestaurantList = ({ selectedCategory }) => {
     }
   }, [userLocation]);
 
+  useEffect(() => {
+    if (selectedCategory && selectedCategory !== "All") {
+      const target = document.getElementById("restaurent");
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [selectedCategory]);
+
   const applyCustomFilters = () => {
     console.log("🔍 Applying custom filters:", customFilters);
 
@@ -237,7 +246,7 @@ const RestaurantList = ({ selectedCategory }) => {
   }
 
   return (
-    <div className="px-4 py-6">
+    <div id="restaurent" className="px-4 py-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-8">
         Restaurants Near You
       </h2>
