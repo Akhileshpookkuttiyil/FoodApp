@@ -8,8 +8,10 @@ import chinese from "../../../assets/img/chinese.jpg";
 import italian from "../../../assets/img/italian.jpg";
 import mexican from "../../../assets/img/mexican.jpg";
 import bbq from "../../../assets/img/bbq.jpg";
+import { useNavigate } from "react-router-dom";
 
 const BottomLinks = () => {
+  const navigate = useNavigate();
   const categories = [
     { name: "Fast Food", image: fastFood },
     { name: "Indian", image: indian },
@@ -23,6 +25,11 @@ const BottomLinks = () => {
     { name: "BBQ", image: bbq },
   ];
 
+  const handleClick = (category) => {
+    navigate("/location", { state: { cat: category.name } });
+    // Pass the selected category to Menus page
+  };
+
   return (
     <div className="py-8 mt-3 min-h-screen w-full">
       <h2 className="text-3xl sm:text-4xl font-bold text-center mb-10 text-black">
@@ -33,7 +40,8 @@ const BottomLinks = () => {
           {categories.map((category, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:scale-105 transform transition-all duration-300 h-full flex flex-col"
+              onClick={() => handleClick(category)}
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:scale-105 transform transition-all duration-300 h-full cursor-pointer flex flex-col"
             >
               <img
                 src={category.image}

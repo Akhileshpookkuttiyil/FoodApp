@@ -6,7 +6,7 @@ import FilterDialog from "../FilterDialog";
 import { FaShoppingCart, FaHotel } from "react-icons/fa";
 import noResultsImg from "../../../assets/img/Noimg.gif";
 import StarRating from "../../StarRating";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../../../context/CartContext";
 import { ClipLoader } from "react-spinners"; // Loading spinner from react-spinners
 import { debounce } from "lodash"; // lodash for debouncing
@@ -14,7 +14,6 @@ import { debounce } from "lodash"; // lodash for debouncing
 const MenuGrid = ({ items }) => {
   const navigate = useNavigate();
   const { addToCart, updateItemQuantity, cartItems } = useCart();
-
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState(1000);
@@ -24,11 +23,13 @@ const MenuGrid = ({ items }) => {
 
   const filteredItems = useMemo(() => {
     return items
-      .filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      .filter((item) => item.price <= priceRange)
-      .filter((item) => item.rating >= minRating)
+      .filter((item) => {
+        return (
+          item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          item.price <= priceRange &&
+          item.rating >= minRating
+        );
+      })
       .sort((a, b) => {
         if (sortBy === "lowToHigh") return a.price - b.price;
         if (sortBy === "highToLow") return b.price - a.price;

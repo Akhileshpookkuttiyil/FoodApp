@@ -12,7 +12,7 @@ const Blog = () => {
           Explore Our Blog
         </h5>
         <Link
-          to={"/menu"}
+          to={"/blogs"}
           className="text-sm text-neutral-500 font-medium hover:text-orange-500 ease-in-out duration-300"
         >
           View All
