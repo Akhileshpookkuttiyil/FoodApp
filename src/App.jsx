@@ -26,6 +26,7 @@ import { useAuthContext } from "./Context/AuthContext";
 import AddProduct from "./Pages/Seller/AddProduct";
 import ViewProducts from "./Pages/Seller/viewProducts";
 import SellerLogin from "./Pages/Seller/SellerLogin";
+import MyOrders from "./Pages/Seller/MyOrders";
 
 function AppContent() {
   const { showLogin, seller } = useAuthContext();
@@ -64,6 +65,7 @@ function AppContent() {
           >
             <Route path="add-product" element={<AddProduct />} />
             <Route path="view-products" element={<ViewProducts />} />
+            <Route path="orders" element={<MyOrders />} />
           </Route>
         </Routes>
 
