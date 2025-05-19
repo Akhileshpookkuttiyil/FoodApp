@@ -37,8 +37,8 @@ const restaurantsData = [
   },
   {
     id: 3,
-    name: "Royal Biryani House",
-    category: "Biryani",
+    name: "Royal Biriyani House",
+    category: "Biriyani",
     fullAddress: "678 Charminar Road, Hyderabad, India",
     duration: "35-45 mins",
     rating: 4.8,

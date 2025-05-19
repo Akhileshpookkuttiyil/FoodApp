@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import Skeleton from "react-loading-skeleton";
 import StarRating from "../StarRating";
 import { FaHotel } from "react-icons/fa";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../Context/CartContext";
 
 const DishDetail = () => {
   const { id } = useParams();
@@ -87,14 +87,14 @@ const DishDetail = () => {
         onClick={() => navigate("/menus")}
         className="mb-8 text-orange-600 hover:text-orange-700 transition flex items-center gap-2 font-medium"
       >
-        <FaArrowLeft /> <span className="underline">Back to Menus</span>
+        <FaArrowLeft /> <span>Back</span>
       </button>
 
       {/* Dish Detail */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Main Image & Gallery */}
         <div>
-          <div className="w-full h-[420px] rounded-xl overflow-hidden shadow-md">
+          <div className="w-full h-[420px] rounded-xl overflow-hidden border">
             <img
               src={selectedImage}
               alt={dish.name}
@@ -186,7 +186,7 @@ const DishDetail = () => {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => handleAddToCart()}
-                className="border font-bold text-orange-400 hover:bg-gray-300 hover:text-orange-600 flex items-center justify-center gap-3 px-4 py-2 rounded-md transition ease-in-out transform hover:scale-105"
+                className="border font-bold text-orange-400 hover:bg-gray-100 hover:text-orange-600 flex items-center justify-center gap-3 px-4 py-2 rounded-md transition ease-in-out transform hover:scale-105"
               >
                 <FaCartPlus /> Add to Cart
               </button>

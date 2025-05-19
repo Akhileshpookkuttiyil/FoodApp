@@ -9,10 +9,12 @@ import {
 import { LiaTimesSolid } from "react-icons/lia";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../Context/AuthContext";
 
 const Navbar = () => {
   const { cartItems } = useCart();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const { user, setShowLogin, logoutUser } = useAuthContext();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -22,11 +24,11 @@ const Navbar = () => {
   const [currentLocation, setCurrentLocation] = useState("Fetching...");
   const location = useLocation();
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      console.log("Searching for:", searchQuery);
-    }
-  };
+  // const handleSearch = () => {
+  //   if (searchQuery.trim()) {
+  //     console.log("Searching for:", searchQuery);
+  //   }
+  // };
 
   const NavLinks = useMemo(
     () => [
@@ -41,6 +43,14 @@ const Navbar = () => {
 
   const handleClick = useCallback(() => setOpen((prev) => !prev), []);
   const handleClose = useCallback(() => setOpen(false), []);
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery(""); // optional: clear input after search
+      setOpen(false); // optional: close mobile menu if open
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -127,9 +137,9 @@ const Navbar = () => {
         <div className="hidden md:flex items-center border border-neutral-400/70 rounded-full bg-white overflow-hidden w-[250px] lg:w-[300px]">
           <input
             type="text"
-            placeholder="Search here..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)} // Update on input change
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search here..."
             className="flex-1 px-4 py-2 bg-transparent outline-none text-neutral-800 placeholder:text-neutral-400/80"
           />
           <button

@@ -27,6 +27,7 @@ import AddProduct from "./Pages/Seller/AddProduct";
 import ViewProducts from "./Pages/Seller/viewProducts";
 import SellerLogin from "./Pages/Seller/SellerLogin";
 import MyOrders from "./Pages/Seller/MyOrders";
+import SearchResults from "./Pages/SearchResults/SearchResults";
 
 function AppContent() {
   const { showLogin, seller } = useAuthContext();
@@ -57,6 +58,7 @@ function AppContent() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/add-address" element={<AddAddressPage />} />
           <Route path="/menu/:id" element={<DishDetail />} />
+          <Route path="/search" element={<SearchResults />} />
 
           {/* Seller Routes - Protected inside layout */}
           <Route

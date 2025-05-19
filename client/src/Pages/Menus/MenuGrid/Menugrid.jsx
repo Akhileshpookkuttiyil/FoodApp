@@ -6,7 +6,7 @@ import FilterDialog from "../FilterDialog";
 import { FaShoppingCart, FaHotel } from "react-icons/fa";
 import noResultsImg from "../../../assets/img/Noimg.gif";
 import StarRating from "../../StarRating";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../../../context/CartContext";
 import { ClipLoader } from "react-spinners"; // Loading spinner from react-spinners
 import { debounce } from "lodash"; // lodash for debouncing
