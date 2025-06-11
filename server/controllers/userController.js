@@ -1,5 +1,5 @@
-import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
 // ===================== Generate JWT Token =====================
 const generateToken = (userId) => {
@@ -13,7 +13,7 @@ const setTokenCookie = (res, token) => {
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "Strict", // CSRF protection
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "Strict",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 };
@@ -32,30 +32,41 @@ const registerUser = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     if (!firstName || !lastName || !email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields are required" });
+      return res.status(400).json({
+        success: false,
+        message: "First name, last name, email, and password are required.",
+      });
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res
-        .status(409)
-        .json({ success: false, message: "User already exists" });
+      return res.status(409).json({
+        success: false,
+        message: "User already exists with this email.",
+      });
     }
 
-    const newUser = await User.create({ firstName, lastName, email, password });
+    const newUser = await User.create({
+      firstName,
+      lastName,
+      email,
+      password,
+    });
+
     const token = generateToken(newUser._id);
     setTokenCookie(res, token);
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message: "User registered successfully.",
       user: formatUserResponse(newUser),
     });
   } catch (error) {
-    console.log("Registration error:", error.message);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Registration error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error. Please try again later.",
+    });
   }
 };
 
@@ -65,18 +76,20 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email and password are required" });
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required.",
+      });
     }
 
     const user = await User.findOne({ email }).select("+password");
 
     const isValid = user && (await user.comparePassword(password));
     if (!isValid) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials.",
+      });
     }
 
     const token = generateToken(user._id);
@@ -84,12 +97,32 @@ const loginUser = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Login successful",
+      message: "Login successful.",
       user: formatUserResponse(user),
     });
   } catch (error) {
-    console.log("Login error:", error.message);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Login error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error. Please try again later.",
+    });
+  }
+};
+// ===================== SESSION CHECK CONTROLLER =====================
+const isAuthorized = async (req, res) => {
+  try {
+    const user = req.user; // from middleware
+
+    res.status(200).json({
+      success: true,
+      user: formatUserResponse(user),
+    });
+  } catch (error) {
+    console.error("Auth check error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Authorization failed.",
+    });
   }
 };
 
@@ -103,9 +136,9 @@ const logoutUser = (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "Logged out successfully",
+    message: "Logged out successfully.",
   });
 };
 
 // ===================== EXPORT CONTROLLERS =====================
-export { registerUser, loginUser, logoutUser };
+export { registerUser, loginUser, logoutUser, isAuthorized };
