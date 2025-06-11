@@ -1,0 +1,59 @@
+import mongoose from "mongoose";
+
+const restaurantSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Restaurant name is required"],
+      trim: true,
+      maxlength: 100,
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
+    image: {
+      type: String,
+      required: [true, "Restaurant image URL is required"],
+    },
+    categories: {
+      type: [String],
+      required: true,
+    },
+    location: {
+      address: { type: String, required: true, trim: true },
+      city: { type: String, required: true, trim: true },
+      state: { type: String, required: true, trim: true },
+      pincode: { type: String, required: true, trim: true },
+    },
+    contactNumber: {
+      type: String,
+      required: [true, "Contact number is required"],
+      match: [/^\d{10}$/, "Please enter a valid 10-digit contact number"],
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    totalReviews: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Restaurant =
+  mongoose.models.Restaurant || mongoose.model("Restaurant", restaurantSchema);
+
+export default Restaurant;

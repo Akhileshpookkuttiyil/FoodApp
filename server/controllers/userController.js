@@ -1,0 +1,111 @@
+import User from "../models/User.js";
+import jwt from "jsonwebtoken";
+
+// ===================== Generate JWT Token =====================
+const generateToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+};
+
+// ===================== Set HTTP-Only Cookie =====================
+const setTokenCookie = (res, token) => {
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "Strict", // CSRF protection
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+};
+
+// ===================== Format User Response =====================
+const formatUserResponse = (user) => ({
+  id: user._id,
+  fullName: `${user.firstName} ${user.lastName}`,
+  email: user.email,
+  role: user.role,
+});
+
+// ===================== REGISTER CONTROLLER =====================
+const registerUser = async (req, res) => {
+  try {
+    const { firstName, lastName, email, password } = req.body;
+
+    if (!firstName || !lastName || !email || !password) {
+      return res
+        .status(400)
+        .json({ success: false, message: "All fields are required" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ success: false, message: "User already exists" });
+    }
+
+    const newUser = await User.create({ firstName, lastName, email, password });
+    const token = generateToken(newUser._id);
+    setTokenCookie(res, token);
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      user: formatUserResponse(newUser),
+    });
+  } catch (error) {
+    console.log("Registration error:", error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ===================== LOGIN CONTROLLER =====================
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email and password are required" });
+    }
+
+    const user = await User.findOne({ email }).select("+password");
+
+    const isValid = user && (await user.comparePassword(password));
+    if (!isValid) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
+    }
+
+    const token = generateToken(user._id);
+    setTokenCookie(res, token);
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user: formatUserResponse(user),
+    });
+  } catch (error) {
+    console.log("Login error:", error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ===================== LOGOUT CONTROLLER =====================
+const logoutUser = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "Strict",
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
+
+// ===================== EXPORT CONTROLLERS =====================
+export { registerUser, loginUser, logoutUser };
