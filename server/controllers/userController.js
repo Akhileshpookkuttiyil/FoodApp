@@ -29,7 +29,7 @@ const formatUserResponse = (user) => ({
 // ===================== REGISTER CONTROLLER =====================
 const registerUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, role, password } = req.body;
 
     if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({
@@ -50,11 +50,15 @@ const registerUser = async (req, res) => {
       firstName,
       lastName,
       email,
+      role: role || "user",
       password,
     });
 
-    const token = generateToken(newUser._id);
-    setTokenCookie(res, token);
+    // Only issue token if it's a user
+    if (newUser.role === "user") {
+      const token = generateToken(newUser._id);
+      setTokenCookie(res, token);
+    }
 
     res.status(201).json({
       success: true,
@@ -82,7 +86,9 @@ const loginUser = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email, role: "user" }).select(
+      "+password"
+    );
 
     const isValid = user && (await user.comparePassword(password));
     if (!isValid) {
@@ -108,10 +114,20 @@ const loginUser = async (req, res) => {
     });
   }
 };
-// ===================== SESSION CHECK CONTROLLER =====================
+// ===================== AUTH CHECK CONTROLLER =====================
 const isAuthorized = async (req, res) => {
   try {
-    const user = req.user; // from middleware
+    const user = req.user; // Populated from auth middleware
+
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    if (user.role !== "user") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Access denied: Not a user" });
+    }
 
     res.status(200).json({
       success: true,

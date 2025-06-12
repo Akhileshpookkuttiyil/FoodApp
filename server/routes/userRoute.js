@@ -1,16 +1,20 @@
 import express from "express";
 import {
-  isAuthorized,
+  registerUser,
   loginUser,
   logoutUser,
-  registerUser,
+  isAuthorized,
 } from "../controllers/userController.js";
 import authUser from "../middlewares/authUser.js";
+
 const userRouter = express.Router();
 
+// Public Routes
 userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
-userRouter.get("/is-Authorized", authUser, isAuthorized);
-userRouter.get("/logout", authUser, logoutUser);
+
+// Protected Routes
+userRouter.get("/checkAuth", authUser, isAuthorized);
+userRouter.post("/logout", authUser, logoutUser);
 
 export default userRouter;
