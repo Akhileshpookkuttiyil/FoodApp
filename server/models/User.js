@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
       {
         item: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Dish",
+          ref: "Product",
           required: true,
         },
         quantity: {
