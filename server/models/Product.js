@@ -81,15 +81,29 @@ const productSchema = new mongoose.Schema(
       max: [180, "Delivery time seems too long"],
     },
 
+    stock: {
+      type: Number,
+      required: true,
+      min: [0, "Stock cannot be negative"],
+      default: 0,
+    },
+
     inStock: {
       type: Boolean,
-      default: true,
+      default: false,
+      index: true,
     },
   },
   {
     timestamps: true, // Automatically manage createdAt & updatedAt
   }
 );
+
+// Pre-save hook to set inStock based on stock value
+productSchema.pre("save", function (next) {
+  this.inStock = this.stock > 0;
+  next();
+});
 
 const Product =
   mongoose.models.Product || mongoose.model("Product", productSchema);
