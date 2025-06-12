@@ -24,6 +24,32 @@ const productSchema = new mongoose.Schema(
       min: [0, "Price cannot be negative"],
     },
 
+    offerPrice: {
+      type: Number,
+      min: [0, "Offer price cannot be negative"],
+      validate: {
+        validator: function (v) {
+          // Offer price should not exceed the original price
+          return v === undefined || v <= this.price;
+        },
+        message: "Offer price must be less than or equal to the original price",
+      },
+    },
+
+    shortDescription: {
+      type: String,
+      required: [true, "Short description is required"],
+      trim: true,
+      maxlength: [150, "Short description can't exceed 150 characters"],
+    },
+
+    longDescription: {
+      type: String,
+      trim: true,
+      maxlength: [2000, "Long description can't exceed 2000 characters"],
+      default: "",
+    },
+
     rating: {
       type: Number,
       default: 0,
@@ -53,20 +79,6 @@ const productSchema = new mongoose.Schema(
       required: [true, "Delivery time is required"],
       min: [1, "Delivery time must be at least 1 minute"],
       max: [180, "Delivery time seems too long"],
-    },
-
-    shortDescription: {
-      type: String,
-      required: [true, "Short description is required"],
-      trim: true,
-      maxlength: [150, "Short description can't exceed 150 characters"],
-    },
-
-    longDescription: {
-      type: String,
-      trim: true,
-      maxlength: [2000, "Long description can't exceed 2000 characters"],
-      default: "",
     },
 
     inStock: {
