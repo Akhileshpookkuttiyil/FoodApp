@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
-const dishSchema = new mongoose.Schema(
+const productSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Dish name is required"],
+      required: [true, "Product name is required"],
       trim: true,
-      maxlength: [100, "Dish name cannot exceed 100 characters"],
+      maxlength: [100, "Product name cannot exceed 100 characters"],
       index: true,
     },
     category: {
@@ -39,7 +39,7 @@ const dishSchema = new mongoose.Schema(
       required: [true, "At least one image is required"],
       validate: {
         validator: (arr) => arr.length > 0,
-        message: "Dish must have at least one image",
+        message: "Product must have at least one image",
       },
     },
     deliveryTime: {
@@ -70,7 +70,7 @@ const dishSchema = new mongoose.Schema(
   }
 );
 
-const Dish = mongoose.models.Dish || mongoose.model("Dish", dishSchema);
+const Product = mongoose.models.Product || mongoose.model("Product", productSchema);
 
-export default Dish;
-// This schema defines a Dish model with various fields such as name, category, price, rating, restaurant association, images, delivery time, descriptions, and stock status. It includes validation for required fields and constraints on values (like price and delivery time). The timestamps option automatically manages createdAt and updatedAt fields.
+export default Product;
+// This schema defines a Product model with various fields such as name, category, price, rating, restaurant association, images, delivery time, descriptions, and stock status. It includes validation for required fields and constraints on values (like price and delivery time). The timestamps option automatically manages createdAt and updatedAt fields.
