@@ -7,6 +7,7 @@ import connectDB from "./configs/db.js";
 import connectCloudinary from "./configs/cloudinary.js";
 import userRouter from "./routes/userRoute.js";
 import sellerRouter from "./routes/sellerRoutes.js";
+import productRouter from "./routes/productRoutes.js";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ const startServer = async () => {
     // Routes
     app.use("/api/user", userRouter);
     app.use("/api/seller", sellerRouter);
+    app.use("/api/product", productRouter);
 
     app.get("/", (req, res) => {
       res.send("API is running");
