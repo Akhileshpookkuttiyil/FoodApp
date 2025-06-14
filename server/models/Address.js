@@ -68,4 +68,3 @@ const Address =
   mongoose.models.Address || mongoose.model("Address", addressSchema);
 
 export default Address;
-// Compare this snippet from server/models/User.js:

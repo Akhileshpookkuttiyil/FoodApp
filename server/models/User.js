@@ -56,12 +56,6 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
-    addresses: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Address",
-      },
-    ],
   },
   {
     timestamps: true,
