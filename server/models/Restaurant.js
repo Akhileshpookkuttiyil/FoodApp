@@ -20,12 +20,18 @@ const restaurantSchema = new mongoose.Schema(
     categories: {
       type: [String],
       required: true,
+      default: [],
     },
     location: {
       address: { type: String, required: true, trim: true },
       city: { type: String, required: true, trim: true },
       state: { type: String, required: true, trim: true },
-      pincode: { type: String, required: true, trim: true },
+      pincode: {
+        type: String,
+        required: true,
+        trim: true,
+        match: [/^\d{6}$/, "Enter a valid 6-digit pincode"],
+      },
     },
     contactNumber: {
       type: String,
@@ -49,7 +55,9 @@ const restaurantSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // adds createdAt & updatedAt
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 

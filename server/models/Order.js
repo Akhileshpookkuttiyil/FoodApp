@@ -24,6 +24,11 @@ const orderSchema = new mongoose.Schema(
           required: true,
           min: 1,
         },
+        price: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
       },
     ],
     shippingAddress: {
@@ -46,6 +51,10 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "paid", "failed"],
       default: "pending",
     },
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
     orderStatus: {
       type: String,
       enum: [
@@ -58,17 +67,21 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "placed",
     },
-    deliveredAt: {
-      type: Date,
+    notes: {
+      type: String,
+      trim: true,
     },
-    cancelledAt: {
-      type: Date,
-    },
+    deliveredAt: Date,
+    cancelledAt: Date,
   },
   {
-    timestamps: true, // adds createdAt & updatedAt
+    timestamps: true, // Automatically adds createdAt and updatedAt
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+// Optional: Virtuals, indexes, or hooks can go here if needed
 
 const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
 export default Order;
