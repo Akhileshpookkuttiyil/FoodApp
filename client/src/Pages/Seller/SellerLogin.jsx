@@ -2,91 +2,113 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../../Context/AuthContext";
-
-import { EyeIcon } from "@heroicons/react/24/solid"; // Heroicons
+import { EyeIcon } from "@heroicons/react/24/solid";
 import { EyeOffIcon } from "lucide-react";
 
 const SellerLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const { loginSeller, isSeller } = useAuthContext();
+
+  const { seller, loginSeller, loading } = useAuthContext();
   const navigate = useNavigate();
 
-  // If already logged in, redirect to seller dashboard
+  // Redirect to dashboard after auth check
   useEffect(() => {
-    if (isSeller) {
+    if (!loading && seller) {
       navigate("/seller");
     }
-  }, [isSeller, navigate]);
+  }, [seller, loading, navigate]);
 
-  const handleLogin = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
+    const { email, password } = formData;
+
+    if (!email.trim() || !password.trim()) {
       toast.error("Please enter both email and password.");
       return;
     }
 
-    const success = loginSeller({ email, password });
+    const result = await loginSeller({ email, password });
 
-    if (success) {
+    if (result.success) {
       toast.success("Login successful!");
       navigate("/seller");
+      return null;
     } else {
-      toast.error("Invalid email or password.");
+      toast.error(result.message || "Invalid credentials.");
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-orange-500" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-100">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-100 px-4">
       <form
         onSubmit={handleLogin}
-        className="flex flex-col gap-4 p-6 py-8 w-80 sm:w-[320px] rounded-lg shadow-md border border-gray-200 bg-white"
+        className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md border border-gray-200"
       >
-        <p className="text-xl font-semibold text-center mb-4">
+        <h1 className="text-2xl font-semibold text-center mb-6">
           <span className="text-orange-500">Seller</span> Login
-        </p>
+        </h1>
 
-        <div className="w-full">
-          <label htmlFor="email" className="text-sm text-gray-600">
+        {/* Email Field */}
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-sm text-gray-600 mb-1">
             Email
           </label>
           <input
-            id="email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
             placeholder="Enter your email"
-            className="w-full p-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             required
           />
         </div>
 
-        <div className="w-full">
-          <label htmlFor="password" className="text-sm text-gray-600">
+        {/* Password Field */}
+        <div className="mb-4">
+          <label
+            htmlFor="password"
+            className="block text-sm text-gray-600 mb-1"
+          >
             Password
           </label>
           <div className="relative">
             <input
-              id="password"
               type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               placeholder="Enter your password"
-              className="w-full p-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               required
             />
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10 mt-1"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <EyeOffIcon className="h-4 w-4 text-gray-500" />
+                <EyeOffIcon className="w-5 h-5 text-gray-500" />
               ) : (
-                <EyeIcon className="h-4 w-4 text-gray-500" />
+                <EyeIcon className="w-5 h-5 text-gray-500" />
               )}
             </button>
           </div>
@@ -94,12 +116,12 @@ const SellerLogin = () => {
 
         <button
           type="submit"
-          className="bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-md transition-all duration-200 mt-4"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-md transition duration-200"
         >
           Login
         </button>
 
-        <p className="text-sm text-center text-gray-600 mt-3">
+        <p className="text-sm text-center text-gray-600 mt-4">
           <a
             href="/seller/forgot-password"
             className="text-orange-500 hover:underline"
