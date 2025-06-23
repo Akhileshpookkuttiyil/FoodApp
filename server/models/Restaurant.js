@@ -53,6 +53,12 @@ const restaurantSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Assuming your user/seller model is called 'User'
+      required: true,
+      index: true,
+    },
   },
   {
     timestamps: true, // adds createdAt & updatedAt

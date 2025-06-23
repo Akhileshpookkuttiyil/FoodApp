@@ -19,7 +19,7 @@ productRouter.post(
 );
 
 // Get all products
-productRouter.get("/list", authRole("seller"), productList);
+productRouter.get("/list", productList);
 
 // Get product by ID (pass id as query or param based on your frontend setup)
 productRouter.get("/:id", authRole("seller"), productById);

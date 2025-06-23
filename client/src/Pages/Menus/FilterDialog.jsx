@@ -19,7 +19,7 @@ const FilterDialog = ({
 
   const resetHandler = () => {
     setPriceRange(1000); // Default max price
-    setMinRating(3); // Default min rating
+    setMinRating(0); // Default min rating
     setIsFilterOpen(false); // Close modal
   };
 

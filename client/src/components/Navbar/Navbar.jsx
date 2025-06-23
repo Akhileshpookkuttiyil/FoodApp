@@ -47,8 +47,8 @@ const Navbar = () => {
   const handleSearch = () => {
     if (searchQuery.trim()) {
       navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery(""); // optional: clear input after search
-      setOpen(false); // optional: close mobile menu if open
+      setSearchQuery(""); // clear input after search
+      setOpen(false); // close mobile menu if open
     }
   };
 

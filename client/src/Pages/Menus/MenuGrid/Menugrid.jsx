@@ -9,15 +9,15 @@ import StarRating from "../../StarRating";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../../context/CartContext";
 import { ClipLoader } from "react-spinners"; // Loading spinner from react-spinners
-import { debounce } from "lodash"; // lodash for debouncing
 
 const MenuGrid = ({ items }) => {
   const navigate = useNavigate();
   const { addToCart, updateItemQuantity, cartItems } = useCart();
+  const [inputTerm, setInputTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState(1000);
-  const [minRating, setMinRating] = useState(3);
+  const [minRating, setMinRating] = useState(0);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -64,14 +64,19 @@ const MenuGrid = ({ items }) => {
     [updateItemQuantity]
   );
 
-  // Debounced search term input
-  const debouncedSearch = useMemo(() => debounce(setSearchTerm, 500), []);
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      setSearchTerm(inputTerm);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(delay); // clear previous timer
+  }, [inputTerm]);
 
   return (
     <div className="min-h-screen p-6 bg-white">
       {/* Controls */}
       <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 shadow-md rounded-md mb-6">
-        <SearchBar searchTerm={searchTerm} setSearchTerm={debouncedSearch} />
+        <SearchBar searchTerm={inputTerm} setSearchTerm={setInputTerm} />
         <div className="flex items-center space-x-2">
           <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
           <FilterButton setIsFilterOpen={setIsFilterOpen} />

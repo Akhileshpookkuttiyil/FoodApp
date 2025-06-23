@@ -109,7 +109,7 @@ export const addProduct = async (req, res) => {
 
 export const productList = async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().populate("restaurant", "name");
 
     res.status(200).json({
       success: true,
