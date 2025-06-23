@@ -12,23 +12,50 @@ export const addProduct = async (req, res) => {
       shortDescription,
       longDescription,
       rating,
-      restaurant,
       deliveryTime,
       stock,
     } = req.body;
+
+    const restaurant = req.seller;
 
     if (
       !name ||
       !category ||
       price === undefined ||
       !shortDescription ||
-      !restaurant ||
       deliveryTime === undefined ||
       stock === undefined
     ) {
       return res.status(400).json({
         success: false,
         message: "Missing required product fields",
+      });
+    }
+
+    // Removed category validation here
+
+    if (
+      offerPrice !== undefined &&
+      offerPrice !== "" &&
+      Number(offerPrice) > Number(price)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer price must be less than or equal to the product price",
+      });
+    }
+
+    if (deliveryTime < 1 || deliveryTime > 180) {
+      return res.status(400).json({
+        success: false,
+        message: "Delivery time must be between 1 and 180 minutes",
+      });
+    }
+
+    if (stock < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Stock cannot be negative",
       });
     }
 
@@ -44,24 +71,23 @@ export const addProduct = async (req, res) => {
         const result = await cloudinary.uploader.upload(file.path, {
           folder: "products",
         });
-        // Delete the local file after upload
         fs.unlinkSync(file.path);
         return result.secure_url;
       })
     );
 
     const product = new Product({
-      name,
+      name: name.trim(),
       category,
-      price,
-      offerPrice,
-      shortDescription,
-      longDescription,
-      rating,
+      price: Number(price),
+      offerPrice: offerPrice === "" ? undefined : Number(offerPrice),
+      shortDescription: shortDescription.trim(),
+      longDescription: longDescription ? longDescription.trim() : "",
+      rating: rating !== undefined ? Number(rating) : 0,
       restaurant,
       images: uploadedImages,
-      deliveryTime,
-      stock,
+      deliveryTime: Number(deliveryTime),
+      stock: Number(stock),
     });
 
     const savedProduct = await product.save();
@@ -72,6 +98,7 @@ export const addProduct = async (req, res) => {
       data: savedProduct,
     });
   } catch (error) {
+    console.error("Error in addProduct:", error);
     res.status(500).json({
       success: false,
       message: "Server error",

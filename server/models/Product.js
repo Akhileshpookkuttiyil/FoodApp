@@ -24,6 +24,7 @@ const productSchema = new mongoose.Schema(
     offerPrice: {
       type: Number,
       min: 0,
+      default: undefined,
       validate: {
         validator(v) {
           return v === undefined || v <= this.price;
