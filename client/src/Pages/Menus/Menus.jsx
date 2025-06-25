@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import { fetchProducts } from "../../utils/api"; // ✅ Import the reusable function
 
 import HeroBanner from "./Banner/Banner";
 import PageHeader from "./Banner/PageHeader/PageHeader";
@@ -23,39 +23,17 @@ const Menus = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        const res = await axios.get("/api/product/list"); // Adjust your API URL
-        const data = res.data.data || [];
-        console.log(data);
+    const loadData = async () => {
+      const products = await fetchProducts({ inStockOnly: true });
+      setMenuItems(products);
 
-        // Filter only in-stock items initially
-        const inStockItems = data.filter((item) => item.inStock);
+      const categorySet = new Set(products.map((item) => item.category));
+      setCategories(["All", ...categorySet]);
 
-        const formattedItems = inStockItems.map((item) => ({
-          id: item._id,
-          name: item.name,
-          category: item.category,
-          price: item.offerPrice || item.price,
-          rating: item.rating || 0,
-          image: item.images?.[0] || "/assets/img/default-image.png",
-          hotel: item.restaurant?.name || "Restaurant",
-          deliveryTime: item.deliveryTime || 30,
-          inStock: item.inStock,
-        }));
-
-        setMenuItems(formattedItems);
-
-        const categorySet = new Set(inStockItems.map((item) => item.category));
-        setCategories(["All", ...categorySet]);
-      } catch (err) {
-        console.error("Error fetching menu items:", err);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(false);
     };
 
-    fetchMenuItems();
+    loadData();
   }, []);
 
   useEffect(() => {

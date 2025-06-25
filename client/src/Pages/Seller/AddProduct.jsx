@@ -5,8 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 const AddProduct = () => {
   const [images, setImages] = useState(Array(4).fill(null));
   const [productName, setProductName] = useState("");
-  const [shortDescription, setShortDescription] = useState("");
-  const [longDescription, setLongDescription] = useState("");
+  const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [productPrice, setProductPrice] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
@@ -17,6 +16,12 @@ const AddProduct = () => {
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
     if (file) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Only JPG, PNG, and WEBP files are allowed.");
+        return;
+      }
+
       const updatedImages = [...images];
       updatedImages[index] = file;
       setImages(updatedImages);
@@ -32,8 +37,7 @@ const AddProduct = () => {
   const resetForm = () => {
     setImages(Array(4).fill(null));
     setProductName("");
-    setShortDescription("");
-    setLongDescription("");
+    setDescription("");
     setCategory("");
     setProductPrice("");
     setOfferPrice("");
@@ -45,38 +49,33 @@ const AddProduct = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Validations
+    // Validation
+    if (!productName || !category || !productPrice || !deliveryTime || !stock) {
+      toast.error("Please fill all required fields.");
+      setIsSubmitting(false);
+      return;
+    }
+
     if (offerPrice && parseFloat(offerPrice) > parseFloat(productPrice)) {
-      toast.error("Offer Price cannot be greater than Product Price.");
+      toast.error("Offer Price cannot exceed Product Price.");
       setIsSubmitting(false);
       return;
     }
-    if (
-      parseFloat(productPrice) < 0 ||
-      parseFloat(offerPrice) < 0 ||
-      parseInt(stock) < 0
-    ) {
-      toast.error("Price and Stock values must be non-negative.");
-      setIsSubmitting(false);
-      return;
-    }
+
+    const formData = new FormData();
+    images.forEach((img) => {
+      if (img) formData.append("images", img);
+    });
+
+    formData.append("name", productName);
+    formData.append("description", description);
+    formData.append("category", category);
+    formData.append("price", parseFloat(productPrice));
+    if (offerPrice) formData.append("offerPrice", parseFloat(offerPrice));
+    formData.append("deliveryTime", parseInt(deliveryTime));
+    formData.append("stock", parseInt(stock));
 
     try {
-      const formData = new FormData();
-
-      images.forEach((img) => {
-        if (img) formData.append("images", img);
-      });
-
-      formData.append("name", productName);
-      formData.append("shortDescription", shortDescription);
-      formData.append("longDescription", longDescription || "");
-      formData.append("category", category);
-      formData.append("price", parseFloat(productPrice));
-      formData.append("offerPrice", offerPrice ? parseFloat(offerPrice) : "");
-      formData.append("deliveryTime", parseInt(deliveryTime));
-      formData.append("stock", parseInt(stock));
-
       const res = await axios.post("/api/product/add", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -96,159 +95,132 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen p-4 md:p-10">
       <Toaster />
       <form
-        className="md:p-10 p-4 space-y-5 max-w-lg bg-white shadow-md rounded"
+        className="space-y-6 max-w-lg bg-white shadow-lg rounded p-6"
         onSubmit={handleSubmit}
       >
-        {/* Product Images */}
+        {/* Images */}
         <div>
-          <p className="text-lg font-medium mb-2">Product Images</p>
-          <div className="flex flex-wrap items-center gap-4">
-            {Array(4)
-              .fill("")
-              .map((_, index) => (
-                <label
-                  key={index}
-                  htmlFor={`image${index}`}
-                  className="cursor-pointer border border-gray-300 rounded overflow-hidden w-24 h-24 flex items-center justify-center bg-gray-100 relative"
-                >
-                  <input
-                    accept="image/*"
-                    type="file"
-                    id={`image${index}`}
-                    hidden
-                    onChange={(e) => handleImageChange(e, index)}
-                  />
-                  {images[index] ? (
-                    <>
-                      <img
-                        src={URL.createObjectURL(images[index])}
-                        alt={`upload-${index}`}
-                        className="w-full h-full object-cover"
-                        onLoad={(e) => URL.revokeObjectURL(e.target.src)}
-                      />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeImage(index);
-                        }}
-                        className="absolute top-0 right-0 bg-black bg-opacity-50 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
-                      >
-                        ×
-                      </button>
-                    </>
-                  ) : (
-                    <span className="text-gray-400 text-xs">Upload</span>
-                  )}
-                </label>
-              ))}
+          <p className="text-lg font-semibold mb-2">Product Images</p>
+          <div className="flex gap-4 flex-wrap">
+            {images.map((img, i) => (
+              <label
+                key={i}
+                htmlFor={`image-${i}`}
+                className="cursor-pointer w-24 h-24 border border-gray-300 rounded flex items-center justify-center relative bg-gray-100 overflow-hidden"
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  id={`image-${i}`}
+                  onChange={(e) => handleImageChange(e, i)}
+                />
+                {img ? (
+                  <>
+                    <img
+                      src={URL.createObjectURL(img)}
+                      alt="preview"
+                      className="w-full h-full object-cover"
+                      onLoad={(e) => URL.revokeObjectURL(e.target.src)}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeImage(i);
+                      }}
+                      className="absolute top-0 right-0 bg-black bg-opacity-50 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </>
+                ) : (
+                  <span className="text-gray-400 text-xs">Upload</span>
+                )}
+              </label>
+            ))}
           </div>
         </div>
 
         {/* Product Name */}
-        <div className="flex flex-col gap-1">
-          <label className="text-lg font-medium" htmlFor="product-name">
-            Product Name
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Product Name <span className="text-red-500">*</span>
           </label>
           <input
-            id="product-name"
             type="text"
-            placeholder="Enter product name"
-            className="outline-none py-2 px-3 rounded border border-gray-400"
-            required
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            placeholder="E.g. Double Cheese Burger"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
+            required
           />
         </div>
 
-        {/* Short Description */}
-        <div className="flex flex-col gap-1">
-          <label className="text-lg font-medium" htmlFor="short-description">
-            Short Description
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Description <span className="text-red-500">*</span>
           </label>
           <textarea
-            id="short-description"
-            rows={3}
-            className="outline-none py-2 px-3 rounded border border-gray-400 resize-none"
-            placeholder="Enter a short description (max 150 chars)"
-            maxLength={150}
-            required
-            value={shortDescription}
-            onChange={(e) => setShortDescription(e.target.value)}
-          ></textarea>
-        </div>
-
-        {/* Long Description */}
-        <div className="flex flex-col gap-1">
-          <label className="text-lg font-medium" htmlFor="long-description">
-            Long Description (optional)
-          </label>
-          <textarea
-            id="long-description"
-            rows={5}
-            className="outline-none py-2 px-3 rounded border border-gray-400 resize-none"
-            placeholder="Enter detailed description (max 2000 chars)"
+            rows={4}
             maxLength={2000}
-            value={longDescription}
-            onChange={(e) => setLongDescription(e.target.value)}
-          ></textarea>
+            placeholder="Enter product description"
+            className="w-full border border-gray-300 rounded px-3 py-2 resize-none"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
         </div>
 
         {/* Category */}
-        <div className="flex flex-col gap-1">
-          <label className="text-lg font-medium" htmlFor="category">
-            Category
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Category <span className="text-red-500">*</span>
           </label>
           <select
-            id="category"
-            className="outline-none py-2 px-3 rounded border border-gray-400"
+            className="w-full border border-gray-300 rounded px-3 py-2"
             value={category}
-            required
             onChange={(e) => setCategory(e.target.value)}
+            required
           >
-            <option value="" disabled>
-              Select Category
-            </option>
+            <option value="">-- Select Category --</option>
             {["Burgers", "Pizza", "Desserts", "Drinks", "Salads", "Other"].map(
-              (item) => (
-                <option key={item} value={item}>
-                  {item}
+              (cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
                 </option>
               )
             )}
           </select>
         </div>
 
-        {/* Price and Offer Price */}
-        <div className="flex gap-6 flex-wrap">
-          <div className="flex-1 flex flex-col gap-1 min-w-[140px]">
-            <label className="text-md font-medium" htmlFor="product-price">
-              Product Price
+        {/* Price Fields */}
+        <div className="flex gap-4 flex-wrap">
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">
+              Price (₹) <span className="text-red-500">*</span>
             </label>
             <input
-              id="product-price"
               type="number"
-              placeholder="0.00"
-              className="outline-none py-2 px-3 rounded border border-gray-400"
+              className="w-full border border-gray-300 rounded px-3 py-2"
               min={0}
               step="0.01"
-              required
               value={productPrice}
               onChange={(e) => setProductPrice(e.target.value)}
+              required
             />
           </div>
-          <div className="flex-1 flex flex-col gap-1 min-w-[140px]">
-            <label className="text-md font-medium" htmlFor="offer-price">
-              Offer Price (optional)
+
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">
+              Offer Price (₹)
             </label>
             <input
-              id="offer-price"
               type="number"
-              placeholder="0.00"
-              className="outline-none py-2 px-3 rounded border border-gray-400"
+              className="w-full border border-gray-300 rounded px-3 py-2"
               min={0}
               step="0.01"
               value={offerPrice}
@@ -257,46 +229,43 @@ const AddProduct = () => {
           </div>
         </div>
 
-        {/* Delivery Time and Stock */}
-        <div className="flex gap-6 flex-wrap">
-          <div className="flex-1 flex flex-col gap-1 min-w-[140px]">
-            <label className="text-md font-medium" htmlFor="delivery-time">
-              Delivery Time (minutes)
+        {/* Delivery Time & Stock */}
+        <div className="flex gap-4 flex-wrap">
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">
+              Delivery Time (min) <span className="text-red-500">*</span>
             </label>
             <input
-              id="delivery-time"
               type="number"
-              placeholder="e.g. 30"
-              className="outline-none py-2 px-3 rounded border border-gray-400"
+              className="w-full border border-gray-300 rounded px-3 py-2"
               min={1}
               max={180}
-              required
               value={deliveryTime}
               onChange={(e) => setDeliveryTime(e.target.value)}
+              required
             />
           </div>
-          <div className="flex-1 flex flex-col gap-1 min-w-[140px]">
-            <label className="text-md font-medium" htmlFor="stock">
-              Stock
+
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">
+              Stock <span className="text-red-500">*</span>
             </label>
             <input
-              id="stock"
               type="number"
-              placeholder="e.g. 100"
-              className="outline-none py-2 px-3 rounded border border-gray-400"
+              className="w-full border border-gray-300 rounded px-3 py-2"
               min={0}
-              required
               value={stock}
               onChange={(e) => setStock(e.target.value)}
+              required
             />
           </div>
         </div>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full py-3 rounded font-medium text-white ${
+          className={`w-full py-3 text-white rounded font-semibold ${
             isSubmitting
               ? "bg-indigo-300 cursor-not-allowed"
               : "bg-indigo-600 hover:bg-indigo-700"

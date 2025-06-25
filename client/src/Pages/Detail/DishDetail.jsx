@@ -143,7 +143,7 @@ const DishDetail = () => {
           </div>
 
           <p className="text-gray-600 text-[17px] max-w-lg leading-relaxed mt-4">
-            {dish.longDesc ||
+            {dish.description ||
               "Deliciously crafted dish with the finest ingredients to delight your taste buds."}
           </p>
 

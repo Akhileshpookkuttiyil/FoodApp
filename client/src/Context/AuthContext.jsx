@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
         error.response?.data?.message || "Logout failed. Please try again."
       );
     } finally {
-      setSeller(null); // Ensure state is cleared even if request fails
+      setSeller(null); 
     }
   };
 
