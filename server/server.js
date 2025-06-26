@@ -26,25 +26,13 @@ const startServer = async () => {
     await connectDB();
 
     // Middleware
-    app.use(express.json());
+    app.use(express.json({ limit: "10mb" }));
     app.use(cookieParser());
     app.use(morgan("dev"));
 
-    const allowedOrigins = [process.env.CLIENT_URL || "http://localhost:5173"];
+    const allowOrigin = ["http://localhost:5173"];
 
-    app.use(
-      cors({
-        origin: (origin, callback) => {
-          // Allow requests with no origin (like mobile apps or curl)
-          if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-          } else {
-            callback(new Error("Not allowed by CORS"));
-          }
-        },
-        credentials: true,
-      })
-    );
+    app.use(cors({ origin: allowOrigin, credentials: true }));
 
     // Routes
     app.use("/api/user", userRouter);

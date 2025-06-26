@@ -32,13 +32,7 @@ const productSchema = new mongoose.Schema(
         message: "Offer price must be less than or equal to the original price",
       },
     },
-    shortDescription: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 150,
-    },
-    longDescription: {
+    description: {
       type: String,
       trim: true,
       maxlength: 2000,
@@ -60,6 +54,7 @@ const productSchema = new mongoose.Schema(
     images: {
       type: [String],
       required: true,
+      set: (arr) => arr.map((s) => s.trim()), // Trims URLs safely
       validate: {
         validator: (arr) => Array.isArray(arr) && arr.length > 0,
         message: "At least one image is required",
@@ -85,12 +80,28 @@ const productSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
-// Auto update inStock before save
+// Ensure `inStock` stays in sync during save and update operations
+function updateInStock(doc) {
+  if (doc && typeof doc.stock === "number") {
+    doc.inStock = doc.stock > 0;
+  }
+}
+
 productSchema.pre("save", function (next) {
-  this.inStock = this.stock > 0;
+  updateInStock(this);
+  next();
+});
+
+productSchema.pre("findOneAndUpdate", function (next) {
+  const update = this.getUpdate();
+  if (update && Object.prototype.hasOwnProperty.call(update, "stock")) {
+    update.inStock = update.stock > 0;
+  }
   next();
 });
 

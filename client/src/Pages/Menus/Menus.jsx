@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { fetchProducts } from "../../utils/api"; // ✅ Import the reusable function
+import { fetchProducts } from "../../utils/api";
 
 import HeroBanner from "./Banner/Banner";
 import PageHeader from "./Banner/PageHeader/PageHeader";

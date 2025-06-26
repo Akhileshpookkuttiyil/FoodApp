@@ -33,3 +33,14 @@ export const fetchProducts = async ({ inStockOnly = false } = {}) => {
     return [];
   }
 };
+
+// ===================== Fetch Products By id =====================
+export const fetchProductById = async (id) => {
+  try {
+    const res = await axios.get(`/api/product/${id}`);
+    return res.data?.data || null;
+  } catch (err) {
+    console.error("Error fetching product:", err);
+    return null;
+  }
+};

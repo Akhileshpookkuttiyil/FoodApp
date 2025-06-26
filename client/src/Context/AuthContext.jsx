@@ -16,16 +16,6 @@ export const AuthProvider = ({ children }) => {
   const [showLogin, setShowLogin] = useState(false); // Modal toggle (if applicable)
   const [loading, setLoading] = useState(true); // Auth check loading state
 
-  // ===================== Dummy User Login =====================
-  const loginUser = () => {
-    setUser({
-      name: "John Doe",
-      email: "john@example.com",
-      avatar: null,
-    });
-    setShowLogin(false);
-  };
-
   // ===================== Seller Login =====================
   const loginSeller = async ({ email, password }) => {
     try {
@@ -67,11 +57,49 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ===================== Logout =====================
-  const logoutUser = () => {
-    setUser(null);
-    // Optionally call backend logout route
+  // ===================== Check User Session =====================
+
+  const fetchUser = async () => {
+    try {
+      const { data } = await axios.get("/api/user/checkAuth");
+      if (data.success) {
+        setUser(data.user);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.log(error);
+      setUser(null);
+    }
   };
+
+  // ===================== Logout =====================
+  const logoutUser = async () => {
+    try {
+      const { data } = await axios.post(
+        "/api/user/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      if (data.success) {
+        toast.success("Logged out successfully.");
+      } else {
+        toast.error(data.message || "Logout response was not successful.");
+      }
+
+      setUser(null); // Clear user from context
+    } catch (error) {
+      console.error("User logout failed:", error);
+      toast.error(
+        error.response?.data?.message || "Logout failed. Please try again."
+      );
+    } finally {
+      setUser(null);
+    }
+  };
+
+  // ===================== Logout Seller =====================
 
   const logoutSeller = async () => {
     try {
@@ -90,13 +118,14 @@ export const AuthProvider = ({ children }) => {
         error.response?.data?.message || "Logout failed. Please try again."
       );
     } finally {
-      setSeller(null); 
+      setSeller(null);
     }
   };
 
   // Auto-check seller auth on mount
   useEffect(() => {
     fetchSeller();
+    fetchUser();
   }, []);
 
   return (
@@ -109,11 +138,11 @@ export const AuthProvider = ({ children }) => {
         setUser,
         setSeller,
         setShowLogin,
-        loginUser,
         loginSeller,
         logoutUser,
         logoutSeller,
         fetchSeller,
+        fetchUser,
       }}
     >
       {children}

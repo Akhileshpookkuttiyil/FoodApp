@@ -1,69 +1,111 @@
-import { FaArrowLeft, FaCartPlus, FaShoppingCart } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaCartPlus,
+  FaShoppingCart,
+  FaHotel,
+} from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
-import { menuItems } from "../Menus/Data/MenuData";
-import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import { useState, useEffect, useCallback } from "react";
+import toast from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
 import StarRating from "../StarRating";
-import { FaHotel } from "react-icons/fa";
 import { useCart } from "../../Context/CartContext";
+import axios from "axios";
 
 const DishDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart, updateItemQuantity, cartItems } = useCart();
+
   const [dish, setDish] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadingRelated, setLoadingRelated] = useState(true);
 
   useEffect(() => {
-    const foundDish = menuItems.find(
-      (item) => item.id === id || item.id === Number(id)
-    );
-    if (foundDish) {
-      setDish(foundDish);
-      setSelectedImage(foundDish?.image);
-    } else {
-      toast.error("Dish not found.");
-    }
-    setLoading(false);
-    window.scrollTo(0, 0);
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        const [dishRes, menuRes] = await Promise.all([
+          axios.get(`/api/product/${id}`),
+          axios.get("/api/product/list"),
+        ]);
+
+        const fetchedDish = dishRes.data?.data;
+        const allItems = menuRes.data?.data;
+
+        if (isMounted) {
+          if (fetchedDish) {
+            setDish(fetchedDish);
+            setSelectedImage(
+              Array.isArray(fetchedDish.images) && fetchedDish.images.length > 0
+                ? fetchedDish.images[0]
+                : "/assets/img/default-image.png"
+            );
+          } else {
+            toast.error("Dish not found.");
+          }
+          setMenuItems(allItems || []);
+        }
+      } catch (error) {
+        if (isMounted) {
+          toast.error("Error loading dish details.");
+          console.error("Fetch error:", error);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+          setLoadingRelated(false);
+          window.scrollTo(0, 0);
+        }
+      }
+    };
+
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
-  const handleAddToCart = (item = null, qty = null) => {
-    // Fallback to default dish and quantity from current page state
-    const selectedItem = item || dish;
-    const selectedQuantity = qty ?? quantity;
+  const handleAddToCart = useCallback(
+    (item = null, qty = null) => {
+      const selectedItem = item || dish;
+      const selectedQuantity = qty ?? quantity;
 
-    if (!selectedItem || selectedQuantity < 1) {
-      toast.error("Invalid dish or quantity.");
-      return;
-    }
+      if (!selectedItem || selectedQuantity < 1) {
+        toast.error("Invalid dish or quantity.");
+        return;
+      }
 
-    const existingItem = cartItems.find(
-      (cartItem) => cartItem.id === selectedItem.id
-    );
+      const existingItem = cartItems.find(
+        (cartItem) => cartItem.id === selectedItem.id
+      );
 
-    if (existingItem) {
-      updateItemQuantity(selectedItem.id, selectedQuantity); // Update quantity
-    } else {
-      addToCart(selectedItem, selectedQuantity); // Add new item
-    }
-  };
+      if (existingItem) {
+        updateItemQuantity(
+          selectedItem.id,
+          existingItem.qty + selectedQuantity
+        );
+      } else {
+        addToCart(selectedItem, selectedQuantity);
+      }
+    },
+    [dish, quantity, cartItems, addToCart, updateItemQuantity]
+  );
 
-  const handleIncrease = (itemId) => {
-    updateItemQuantity(itemId, 1); // Increase the quantity by 1
-  };
-
-  const handleDecrease = (itemId) => {
-    updateItemQuantity(itemId, -1); // Decrease the quantity by 1
-  };
+  const handleIncrease = (itemId) => updateItemQuantity(itemId, 1);
+  const handleDecrease = (itemId) => updateItemQuantity(itemId, -1);
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-20">
-        <Skeleton height={400} />
+      <div className="flex items-center justify-center h-[400px]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-10 h-10 border-4 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-gray-500">Loading dish details...</p>
+        </div>
       </div>
     );
   }
@@ -76,36 +118,40 @@ const DishDetail = () => {
     );
   }
 
+  const discountPercentage = dish.oldPrice
+    ? Math.round(((dish.oldPrice - dish.price) / dish.oldPrice) * 100)
+    : 30;
+
   const relatedDishes = menuItems.filter(
-    (item) => item.category === dish.category && item.id !== dish.id
+    (item) =>
+      item.id !== dish.id &&
+      item.category?.toLowerCase() === dish.category?.toLowerCase()
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 mt-8">
-      {/* Back Button */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 mt-5">
       <button
         onClick={() => navigate("/menus")}
-        className="mb-8 text-orange-600 hover:text-orange-700 transition flex items-center gap-2 font-medium"
+        className="mb-8 text-orange-600 hover:text-orange-700 transition flex items-center gap-2 font-medium mt-4"
       >
         <FaArrowLeft /> <span>Back</span>
       </button>
 
-      {/* Dish Detail */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Main Image & Gallery */}
+        {/* Image Gallery */}
         <div>
           <div className="w-full h-[420px] rounded-xl overflow-hidden border">
             <img
               src={selectedImage}
-              alt={dish.name}
+              alt={dish.name || "Dish image"}
               onError={(e) => (e.target.src = "/assets/img/default-image.png")}
-              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
             />
           </div>
 
-          {dish.gallery?.length > 0 && (
-            <div className="flex gap-3 mt-5 overflow-x-auto pb-2">
-              {[dish.image, ...dish.gallery].map((image, idx) => (
+          {dish.images && dish.images.length > 1 && (
+            <div className="flex gap-1 mt-5 overflow-x-auto pb-2">
+              {dish.images.map((image, idx) => (
                 <img
                   key={idx}
                   src={image}
@@ -114,7 +160,7 @@ const DishDetail = () => {
                   onError={(e) =>
                     (e.target.src = "/assets/img/default-image.png")
                   }
-                  className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 transition transform ${
+                  className={`w-14 h-14 object-contain cursor-pointer rounded-md border-2 m-3 transition transform ${
                     selectedImage === image
                       ? "border-orange-500 scale-105"
                       : "border-transparent"
@@ -125,15 +171,13 @@ const DishDetail = () => {
           )}
         </div>
 
-        {/* Info Section */}
-        <div className="space-y-4">
-          <p className="text-orange-500 uppercase font-semibold tracking-wider">
+        {/* Dish Info */}
+        <div className="space-y-3 max-w-lg">
+          <p className="text-orange-500 uppercase font-semibold tracking-wide text-sm">
             {dish.category}
           </p>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
-            {dish.name}
-          </h1>
+          <h1 className="text-2xl font-semibold text-gray-900">{dish.name}</h1>
 
           <div className="flex items-center gap-2 mt-2">
             <StarRating rating={dish.rating || 0} />
@@ -142,58 +186,55 @@ const DishDetail = () => {
             </span>
           </div>
 
-          <p className="text-gray-600 text-[17px] max-w-lg leading-relaxed mt-4">
+          <p className="text-gray-600 text-sm leading-relaxed mt-4">
             {dish.description ||
               "Deliciously crafted dish with the finest ingredients to delight your taste buds."}
           </p>
 
-          {/* Pricing */}
-          <div className="flex items-center gap-5 mt-6">
-            <span className="text-3xl font-bold text-gray-900">
+          {/* Price */}
+          <div className="flex items-center gap-4 mt-6">
+            <span className="text-2xl font-semibold text-gray-900">
               ₹{dish.price}
             </span>
-            <span className="text-sm px-2 py-1 bg-orange-100 text-orange-600 font-medium rounded-md">
-              {dish.discount || "30% OFF"}
+            <span className="text-xs px-2 py-1 bg-orange-100 text-orange-600 font-medium rounded-md">
+              {discountPercentage}% OFF
             </span>
-            <span className="line-through text-gray-400 text-lg">
+            <span className="line-through text-gray-400 text-sm">
               ₹{dish.oldPrice || Math.round(dish.price * 1.3)}
             </span>
           </div>
 
-          {/* Quantity & Buttons */}
-          <div className="mt-8 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:gap-6">
-            {/* Quantity Selector */}
-            <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-1.5">
+          {/* Quantity & Cart Buttons */}
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:gap-6 space-y-4 sm:space-y-0">
+            <div className="flex items-center gap-3 border border-gray-300 rounded-md px-3 py-1.5 max-w-fit">
               <button
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="text-xl text-orange-500 font-bold px-2"
-                aria-label="Decrease quantity"
-                disabled={quantity === 1} // Disable if quantity is 1
+                className="text-lg text-orange-500 font-semibold px-2 hover:text-orange-600 transition"
+                disabled={quantity === 1}
               >
                 –
               </button>
-              <span className="text-lg font-semibold">{quantity}</span>
+              <span className="text-base font-medium text-gray-900 text-center min-w-[24px]">
+                {quantity}
+              </span>
               <button
                 onClick={() => setQuantity((q) => q + 1)}
-                className="text-xl text-orange-500 font-bold px-2"
-                aria-label="Increase quantity"
+                className="text-lg text-orange-500 font-semibold px-2 hover:text-orange-600 transition"
               >
                 +
               </button>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => handleAddToCart()}
-                className="border font-bold text-orange-400 hover:bg-gray-100 hover:text-orange-600 flex items-center justify-center gap-3 px-4 py-2 rounded-md transition ease-in-out transform hover:scale-105"
+                className="flex items-center gap-2 border border-orange-400 text-orange-500 font-semibold rounded-md px-5 py-2 hover:bg-orange-50 transition"
               >
-                <FaCartPlus /> Add to Cart
+                <FaCartPlus size={18} /> Add to Cart
               </button>
-
               <button
                 onClick={() => navigate("/checkout")}
-                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-md transition ease-in-out transform hover:scale-105"
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-md px-5 py-2 transition"
               >
                 Order Now
               </button>
@@ -201,12 +242,16 @@ const DishDetail = () => {
           </div>
         </div>
       </div>
+
       {/* Related Dishes */}
-      {relatedDishes.length > 0 && (
-        <div className="mt-20">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-800">
-            You Might Also Like
-          </h2>
+      <div className="mt-20">
+        <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+          You Might Also Like
+        </h2>
+
+        {loadingRelated ? (
+          <Skeleton height={200} count={1} />
+        ) : relatedDishes.length > 0 ? (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {relatedDishes.map((item) => {
               const existingItem = cartItems.find(
@@ -217,13 +262,11 @@ const DishDetail = () => {
               return (
                 <div
                   key={item.id}
-                  className="bg-white p-4 shadow-lg rounded-lg w-full text-center border transform transition-all duration-300 hover:scale-105 hover:shadow-orange-200 hover:border-orange-300 flex flex-col items-center justify-between"
+                  className="bg-white p-4 shadow-lg rounded-lg text-center border hover:shadow-orange-200 hover:border-orange-300 transform transition hover:scale-105"
                 >
-                  {/* Clickable Dish Detail */}
                   <div
                     onClick={() => navigate(`/menu/${item.id}`)}
-                    aria-label={`View details for ${item.name}`}
-                    className="flex flex-col items-center justify-center text-center cursor-pointer space-y-1 w-full"
+                    className="cursor-pointer space-y-1"
                   >
                     <img
                       src={item.image}
@@ -232,57 +275,45 @@ const DishDetail = () => {
                         (e.target.src = "/assets/img/default-image.png")
                       }
                       className="w-full aspect-[4/3] object-cover rounded-md mb-3"
-                      loading="lazy"
                     />
-                    <h2
-                      className="text-lg font-semibold text-gray-800"
-                      title={item.name}
-                    >
-                      {item.name}
-                    </h2>
-                    <p
-                      className="text-xs text-gray-500 flex items-center"
-                      title={item.hotel}
-                    >
+                    <h2 className="text-lg font-semibold">{item.name}</h2>
+                    <p className="text-xs text-gray-500 flex items-center justify-center">
                       <FaHotel className="mr-1 text-orange-400" /> {item.hotel}
                     </p>
-                    <div className="mt-2 flex text-sm items-center justify-center">
-                      <StarRating rating={item.rating} />
-                    </div>
+                    <StarRating rating={item.rating} />
                     <p className="text-sm text-gray-500 mt-1">
                       Delivery: {item.deliveryTime} mins
                     </p>
                   </div>
 
-                  {/* Cart Controls */}
-                  <div className="mt-4 w-full">
-                    <div className="flex justify-between items-center w-full">
-                      <div className="text-lg font-bold text-gray-800">
+                  <div className="mt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-bold text-gray-800">
                         ₹{item.price}
-                      </div>
+                      </span>
 
                       {count === 0 ? (
                         <button
-                          className="flex items-center gap-2 text-white bg-orange-400 hover:bg-orange-500 rounded-md px-3 py-2 transition font-medium"
+                          className="flex items-center gap-2 text-white bg-orange-400 hover:bg-orange-500 rounded-md px-3 py-2 transition"
                           onClick={() => handleAddToCart(item, 1)}
                         >
                           <FaShoppingCart size={18} />
-                          <span>Add</span>
+                          Add
                         </button>
                       ) : (
-                        <div className="flex items-center gap-4 bg-orange-100 border border-orange-300 rounded-md py-2 px-4 w-fit select-none">
+                        <div className="flex items-center gap-4 bg-orange-100 border border-orange-300 rounded-md py-2 px-4">
                           <button
                             onClick={() => handleDecrease(item.id)}
-                            className="text-orange-600 font-bold hover:text-orange-800 text-xl"
+                            className="text-orange-600 font-bold text-xl hover:text-orange-800"
                           >
                             −
                           </button>
-                          <span className="text-sm font-medium text-gray-800">
+                          <span className="text-orange-600 font-semibold text-lg">
                             {count}
                           </span>
                           <button
                             onClick={() => handleIncrease(item.id)}
-                            className="text-orange-600 font-bold hover:text-orange-800 text-xl"
+                            className="text-orange-600 font-bold text-xl hover:text-orange-800"
                           >
                             +
                           </button>
@@ -294,8 +325,10 @@ const DishDetail = () => {
               );
             })}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="text-gray-600 text-center">No related dishes found.</p>
+        )}
+      </div>
     </div>
   );
 };

@@ -53,6 +53,10 @@ const Navbar = () => {
   };
 
   useEffect(() => {
+    setDropdownOpen(false);
+  }, [user]);
+
+  useEffect(() => {
     let isMounted = true;
 
     const fetchLocation = async (lat, lon) => {
