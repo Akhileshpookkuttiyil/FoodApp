@@ -117,11 +117,19 @@ const loginUser = async (req, res) => {
 // ===================== AUTH CHECK CONTROLLER =====================
 const isAuthorized = async (req, res) => {
   try {
-    const user = req.user; // Populated from auth middleware
+    // Fetch the user and populate cartItems.item with the product details
+    const user = await User.findById(req.user._id)
+      .populate("cartItems.item") // Populate the 'item' reference in cartItems
+      .select("-password");
 
     if (!user) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
+
+    // Log the populated cartItems (now contains full product data)
+    console.log({
+      AuthUserCartItems: user.cartItems.map((cartItem) => cartItem.item),
+    });
 
     if (user.role !== "user") {
       return res
@@ -131,7 +139,7 @@ const isAuthorized = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      user: formatUserResponse(user),
+      user: { ...formatUserResponse(user), cartItems: user.cartItems || [] },
     });
   } catch (error) {
     console.error("Auth check error:", error.message);

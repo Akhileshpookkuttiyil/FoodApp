@@ -9,8 +9,8 @@ const categories = [
     icon: <FaPizzaSlice className="w-5 h-5 text-orange-500" />,
   },
   {
-    label: "Burger",
-    value: "Burger",
+    label: "Burgers",
+    value: "Burgers",
     icon: <FaHamburger className="w-5 h-5 text-orange-500" />,
   },
   {

@@ -1,11 +1,11 @@
-import User from "../models/User.js";
+import User from "../models/User.js"; 
 
 export const updateCart = async (req, res) => {
   try {
-    const userId = req.user._id; // pulled from JWT middleware
+    const userId = req.user._id;
     const { cartItems } = req.body;
+    console.log({ cartItems });
 
-    // Validate input
     if (!Array.isArray(cartItems)) {
       return res.status(400).json({
         success: false,
@@ -30,7 +30,16 @@ export const updateCart = async (req, res) => {
       userId,
       { cartItems },
       { new: true }
-    ).populate("cartItems.item"); //return product details
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    await updatedUser.populate("cartItems.item");
 
     res.status(200).json({
       success: true,
