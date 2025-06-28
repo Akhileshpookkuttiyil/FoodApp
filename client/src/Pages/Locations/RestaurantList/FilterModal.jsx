@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 
 const FilterModal = ({ isOpen, onClose, onApply, filters, setFilters }) => {
   const [activeTab, setActiveTab] = useState("sort");

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useAuthContext } from "../../Context/AuthContext";
+import { useAppContext } from "../../Context/AppContext";
 import { EyeIcon } from "@heroicons/react/24/solid";
 import { EyeOffIcon } from "lucide-react";
 
@@ -9,7 +9,7 @@ const SellerLogin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
 
-  const { seller, loginSeller, loading } = useAuthContext();
+  const { seller, loginSeller, loading } = useAppContext();
   const navigate = useNavigate();
 
   // Redirect to dashboard after auth check

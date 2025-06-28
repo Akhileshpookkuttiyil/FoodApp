@@ -1,20 +1,43 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
-import { useCart } from "../../context/CartContext";
-import { Link } from "react-router-dom";
+import { useAppContext } from "../../Context/AppContext";
+import { Link, useNavigate } from "react-router-dom";
 import emptyCart from "../../assets/img/empty-cart.svg";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
 import removeIcon from "../../assets/img/remove_icon.svg";
-import { useNavigate } from "react-router-dom";
+
+// Loading Spinner Component
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center h-40">
+    <div
+      className="spinner-border animate-spin inline-block w-8 h-8 border-4 border-solid border-orange-500 border-t-transparent rounded-full"
+      role="status"
+    >
+      <span className="sr-only">Loading...</span>
+    </div>
+  </div>
+);
 
 const CartPage = () => {
   const navigate = useNavigate();
   const { cartItems, updateItemQuantity, removeItemFromCart, clearCart } =
-    useCart();
+    useAppContext();
   const [showAddress, setShowAddress] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [isCouponApplied, setIsCouponApplied] = useState(false);
+  const [loading, setLoading] = useState(true); // Track loading state
+
+  // Simulating loading of cart data with a timeout (remove in production)
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false); // Mock loading complete after 2 seconds
+      }, 700);
+    };
+    loadData();
+  }, []);
 
   const updateQuantity = (id, changeBy) => {
     const item = cartItems.find((item) => item.id === id);
@@ -45,13 +68,11 @@ const CartPage = () => {
     if (trimmedCode === "DISCOUNT10") {
       setIsCouponApplied(true);
       toast.success("🎉 Coupon applied! You received 10% off.");
-
-      // Trigger confetti without sound
       confetti({
-        particleCount: 300, // More particles for a bigger effect
-        spread: 100, // Wider spread
-        origin: { y: 0.6 }, // Origin point
-        colors: ["#ff6347", "#ffeb3b", "#4caf50"], // Festive colors
+        particleCount: 300,
+        spread: 100,
+        origin: { y: 0.6 },
+        colors: ["#ff6347", "#ffeb3b", "#4caf50"],
       });
     } else {
       setIsCouponApplied(false);
@@ -62,7 +83,8 @@ const CartPage = () => {
   const handlePlaceOrder = () => {
     if (cartItems.length === 0) return;
     toast.success("Order placed successfully!");
-    // clear cart
+    // You can clear cart here if needed:
+    // clearCart();
   };
 
   const renderCartItem = (item) => (
@@ -75,16 +97,18 @@ const CartPage = () => {
         onKeyDown={(e) => e.key === "Enter" && navigate(`/menu/${item.id}`)}
         role="button"
         tabIndex={0}
-        className="flex gap-6 items-center cursor-pointer"
+        className="flex gap-4 sm:gap-6 items-center cursor-pointer"
       >
         <img
           src={item.image}
           alt={item.name}
-          className="w-24 h-24 object-contain rounded-lg"
+          className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain rounded-lg"
         />
         <div>
-          <p className="text-base text-gray-800 font-semibold">{item.name}</p>
-          <p className="text-sm text-gray-500">{item.hotel}</p>
+          <p className="text-base sm:text-lg text-gray-800 font-semibold">
+            {item.name}
+          </p>
+          <p className="text-xs sm:text-sm text-gray-500">{item.hotel}</p>
         </div>
       </div>
 
@@ -118,9 +142,7 @@ const CartPage = () => {
 
       <div className="flex justify-center mt-4 lg:mt-0">
         <button
-          onClick={() => {
-            removeItemFromCart(item.id);
-          }}
+          onClick={() => removeItemFromCart(item.id)}
           aria-label={`Remove ${item.name} from cart`}
           className="text-gray-500 hover:text-red-600 transition"
         >
@@ -131,14 +153,20 @@ const CartPage = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-16 mt-10">
-      {cartItems.length === 0 ? (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mt-10">
+      {loading ? (
+        <LoadingSpinner /> // Show spinner while loading
+      ) : cartItems.length === 0 ? (
         <section className="text-center p-10 flex flex-col items-center justify-center min-h-[50vh]">
-          <img src={emptyCart} alt="Empty Cart" className="w-40 h-40 mb-6" />
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+          <img
+            src={emptyCart}
+            alt="Empty Cart"
+            className="w-32 sm:w-40 h-32 sm:h-40 mb-6"
+          />
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-2">
             Your cart is empty
           </h2>
-          <p className="text-gray-500 mb-6">
+          <p className="text-gray-500 mb-6 max-w-xs sm:max-w-md">
             Looks like you haven’t added anything yet.
           </p>
           <Link
@@ -150,23 +178,29 @@ const CartPage = () => {
         </section>
       ) : (
         <div className="flex flex-col lg:flex-row gap-12">
+          {/* Left Content */}
           <div className="w-full max-w-4xl space-y-8">
             <div className="flex justify-between items-center">
-              <h2 className="text-3xl font-semibold text-black flex items-center gap-2">
-                Food <span className="border-b-2 border-orange-500">Cart</span>{" "}
-                <span className="text-sm text-orange-500 flex items-center gap-2">
+              <h2 className="text-2xl sm:text-3xl font-semibold text-black flex items-center gap-2">
+                Food <span className="border-b-2 border-orange-500">Cart</span>
+                <span className="text-sm sm:text-base text-orange-500 flex items-center gap-2">
                   ({cartItems.length} items)
                   <button
                     onClick={clearCart}
                     aria-label="Clear all items from the cart"
                     title="Clear Cart"
                   >
-                    <img src={removeIcon} alt="Clear Cart" />
+                    <img
+                      src={removeIcon}
+                      alt="Clear Cart"
+                      className="w-5 h-5 ml-1"
+                    />
                   </button>
                 </span>
               </h2>
             </div>
 
+            {/* Table Header - only on large screens */}
             <div className="hidden lg:grid grid-cols-[2fr_1fr_1fr_80px] lg:gap-x-20 items-center border-b py-6 px-6 text-base font-semibold text-gray-600">
               <span>Product</span>
               <span className="text-center">Quantity</span>
@@ -174,8 +208,10 @@ const CartPage = () => {
               <span className="text-center">Action</span>
             </div>
 
+            {/* Cart Items */}
             {cartItems.map(renderCartItem)}
 
+            {/* Coupon code input */}
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
               <input
                 type="text"
@@ -193,7 +229,8 @@ const CartPage = () => {
             </div>
           </div>
 
-          <aside className="max-w-[380px] w-full bg-gray-50 p-8 border border-gray-300 shadow-md rounded-md space-y-6 sticky top-20 self-start">
+          {/* Sidebar */}
+          <aside className="w-full max-w-[380px] bg-gray-50 p-6 sm:p-8 border border-gray-300 shadow-md rounded-md space-y-6 lg:sticky lg:top-20 self-start">
             <h2 className="text-2xl font-semibold">Order Summary</h2>
             <hr className="border-gray-300 my-5" />
 

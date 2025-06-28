@@ -1,4 +1,3 @@
-import React from "react";
 import blogData from "./BlogData";
 import BlogCard from "./BlogCard/BlogCard";
 import { motion } from "framer-motion";

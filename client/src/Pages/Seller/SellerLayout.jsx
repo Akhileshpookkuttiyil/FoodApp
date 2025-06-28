@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Outlet, useLocation, Link } from "react-router-dom";
-import { useAuthContext } from "../../Context/AuthContext";
+import { useAppContext } from "../../Context/AppContext";
 
 const SellerLayout = () => {
-  const { seller, logoutSeller } = useAuthContext();
+  const { seller, logoutSeller } = useAppContext();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 

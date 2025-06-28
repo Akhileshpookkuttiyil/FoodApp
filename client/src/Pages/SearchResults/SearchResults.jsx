@@ -4,11 +4,11 @@ import { FaHotel, FaShoppingCart } from "react-icons/fa";
 import { menuItems } from "../Menus/Data/MenuData.js";
 import restaurantsData from "../Locations/RestaurantList/restaurantsData.js";
 import StarRating from "../StarRating.jsx";
-import { useCart } from "../../Context/CartContext.jsx";
+import { useAppContext } from "../../Context/AppContext.jsx";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
-  const { addToCart, updateItemQuantity, cartItems } = useCart();
+  const { addToCart, updateItemQuantity, cartItems } = useAppContext();
   const [matchedDishes, setMatchedDishes] = useState([]);
   const [matchedHotels, setMatchedHotels] = useState([]);
   const query = searchParams.get("query")?.toLowerCase().trim() || "";

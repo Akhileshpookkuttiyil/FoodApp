@@ -6,19 +6,17 @@ import {
   FaHotel,
 } from "react-icons/fa";
 
-
 // Import the StarRating component
 import StarRating from "../../StarRating"; // Adjust the path if necessary
 
 // If you use CartContext:
-import { useCart } from "../../../context/CartContext";
+import { useAppContext } from "../../../context/AppContext";
 import { Offers } from "../Data/limitedOffersData";
 
 const LimitedOffers = () => {
-
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
-  const { cartItems, addToCart, updateItemQuantity } = useCart(); // from your CartContext
+  const { cartItems, addToCart, updateItemQuantity } = useAppContext(); // from your CartContext
 
   const displayedOffers = Offers.slice(
     currentPage * itemsPerPage,

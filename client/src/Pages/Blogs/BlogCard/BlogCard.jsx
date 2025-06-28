@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
+//eslint
 const BlogCard = ({ blog }) => {
   return (
     <motion.div

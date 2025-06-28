@@ -6,17 +6,18 @@ import {
   FaUser,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import axios from "axios";
+import toast from "react-hot-toast";
 import { LiaTimesSolid } from "react-icons/lia";
 import { Link, useLocation } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../../Context/AuthContext";
+import { useAppContext } from "../../Context/AppContext";
 
 const Navbar = () => {
-  const { cartItems } = useCart();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const { user, setShowLogin, logoutUser } = useAuthContext();
+  const { cartItems, user,setUser, setShowLogin} = useAppContext();
+  const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const [open, setOpen] = useState(false);
@@ -52,9 +53,48 @@ const Navbar = () => {
     }
   };
 
+    const logoutUser = async () => {
+    try {
+      const { data } = await axios.post(
+        "/api/user/logout",
+        {},
+        { withCredentials: true }
+      );
+      if (data.success) {
+        navigate("/")
+        toast.success("Logged out successfully.");
+      } else {
+        toast.error(data.message || "Logout response was not successful.");
+      }
+      setUser(null);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Logout failed. Please try again."
+      );
+    } finally {
+      setUser(null);
+    }
+  };
+
+  const handleRoute = (e) => {
+    e.preventDefault();
+    if (user) {
+      navigate("/cart");
+    } else {
+      setShowLogin(true);
+    }
+  };
+
   useEffect(() => {
     setDropdownOpen(false);
   }, [user]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -156,16 +196,24 @@ const Navbar = () => {
         <div className="flex items-center gap-8 menu-range:hidden xsm:hidden">
           {/* Cart */}
           <Link
-            to="/cart"
+            onClick={handleRoute}
             className={`relative text-neutral-800 hover:text-orange-400 transition-all duration-300 ${
               location.pathname === "/cart" ? "text-orange-500" : ""
             }`}
           >
             <FaShoppingCart className="text-xl lg:text-2xl" />
-            {totalQty > 0 && (
-              <span className="absolute -top-2 -right-2 bg-orange-300 text-white text-xs px-1.5 py-0.5 rounded-full">
-                {totalQty}
-              </span>
+
+            {isLoading ? (
+              // Show spinner while loading
+              <div className="absolute -top-2 -right-2 w-3 h-3 border-4 border-t-transparent border-orange-300 border-solid rounded-full animate-spin"></div>
+            ) : (
+              // Show cart count only if the user is logged in
+              user &&
+              totalQty > 0 && (
+                <span className="absolute -top-2 -right-2 bg-orange-300 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  {totalQty}
+                </span>
+              )
             )}
           </Link>
 
@@ -293,9 +341,11 @@ const Navbar = () => {
           >
             <span className="relative inline-block">
               <FaShoppingCart className="text-xl lg:text-2xl" />
-              <span className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full z-50">
-                3
-              </span>
+              {totalQty > 0 && (
+                <span className="absolute -top-2 -right-2 bg-orange-300 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  {totalQty}
+                </span>
+              )}
             </span>
           </Link>
 

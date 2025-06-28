@@ -22,7 +22,7 @@ import DishDetail from "./Pages/Detail/DishDetail";
 import AuthPage from "./Pages/Auth/AuthPage";
 import SellerLayout from "./Pages/Seller/SellerLayout";
 
-import { useAuthContext } from "./Context/AuthContext";
+import { useAppContext } from "./Context/AppContext";
 import AddProduct from "./Pages/Seller/AddProduct";
 import ViewProducts from "./Pages/Seller/viewProducts";
 import SellerLogin from "./Pages/Seller/SellerLogin";
@@ -30,7 +30,7 @@ import MyOrders from "./Pages/Seller/MyOrders";
 import SearchResults from "./Pages/SearchResults/SearchResults";
 
 function AppContent() {
-  const { showLogin, seller } = useAuthContext();
+  const { showLogin, seller } = useAppContext();
   const location = useLocation();
 
   const isSellerRoute = location.pathname.startsWith("/seller");

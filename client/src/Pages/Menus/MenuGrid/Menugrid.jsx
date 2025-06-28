@@ -7,12 +7,13 @@ import { FaShoppingCart, FaHotel } from "react-icons/fa";
 import noResultsImg from "../../../assets/img/Noimg.gif";
 import StarRating from "../../StarRating";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../../../context/CartContext";
+import { useAppContext } from "../../../Context/AppContext";
 import { ClipLoader } from "react-spinners"; // Loading spinner from react-spinners
 
+// eslint-disable-next-line
 const MenuGrid = ({ items }) => {
   const navigate = useNavigate();
-  const { addToCart, updateItemQuantity, cartItems } = useCart();
+  const { addToCart, updateItemQuantity, cartItems } = useAppContext();
   const [inputTerm, setInputTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("default");
@@ -22,19 +23,22 @@ const MenuGrid = ({ items }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const filteredItems = useMemo(() => {
-    return items
-      .filter((item) => {
-        return (
-          item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          item.price <= priceRange &&
-          item.rating >= minRating
-        );
-      })
-      .sort((a, b) => {
-        if (sortBy === "lowToHigh") return a.price - b.price;
-        if (sortBy === "highToLow") return b.price - a.price;
-        return a.name.localeCompare(b.name);
-      });
+    return (
+      items
+        // eslint-disable-next-line
+        .filter((item) => {
+          return (
+            item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            item.price <= priceRange &&
+            item.rating >= minRating
+          );
+        })
+        .sort((a, b) => {
+          if (sortBy === "lowToHigh") return a.price - b.price;
+          if (sortBy === "highToLow") return b.price - a.price;
+          return a.name.localeCompare(b.name);
+        })
+    );
   }, [items, searchTerm, priceRange, minRating, sortBy]);
 
   useEffect(() => {

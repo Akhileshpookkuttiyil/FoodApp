@@ -3,12 +3,12 @@ import toast from "react-hot-toast";
 import { X, Eye, EyeOff } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import loginImage from "../../assets/img/login.jpg";
-import { useAuthContext } from "../../Context/AuthContext";
+import { useAppContext } from "../../Context/AppContext";
 import axios from "axios";
 
 const AuthPage = () => {
   // Context
-  const { setShowLogin, setUser } = useAuthContext();
+  const { setShowLogin, setUser } = useAppContext();
 
   // State
   const [isSignup, setIsSignup] = useState(false);
@@ -327,7 +327,7 @@ const AuthPage = () => {
               </>
             ) : (
               <>
-                Don't have an account?{" "}
+                Dont have an account?{" "}
                 <span
                   onClick={() => switchMode(true)}
                   className="text-orange-500 cursor-pointer"
