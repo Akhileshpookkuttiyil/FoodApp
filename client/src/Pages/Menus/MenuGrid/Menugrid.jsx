@@ -13,7 +13,7 @@ import { ClipLoader } from "react-spinners"; // Loading spinner from react-spinn
 // eslint-disable-next-line
 const MenuGrid = ({ items }) => {
   const navigate = useNavigate();
-  const { addToCart, updateItemQuantity, cartItems } = useAppContext();
+  const { user, addToCart, updateItemQuantity, cartItems } = useAppContext();
   const [inputTerm, setInputTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("default");
@@ -105,9 +105,8 @@ const MenuGrid = ({ items }) => {
           </div>
         ) : filteredItems.length > 0 ? (
           filteredItems.map((item) => {
-            const existingItem = cartItems.find(
-              (cartItem) => cartItem.id === item.id
-            );
+            const existingItem =
+              user && cartItems.find((cartItem) => cartItem.id === item.id);
             const count = existingItem ? existingItem.qty : 0;
 
             return (

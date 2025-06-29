@@ -16,7 +16,7 @@ import { useAppContext } from "../../Context/AppContext";
 const Navbar = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const { cartItems, user,setUser, setShowLogin} = useAppContext();
+  const { cartItems, user, setUser, setShowLogin } = useAppContext();
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -53,7 +53,7 @@ const Navbar = () => {
     }
   };
 
-    const logoutUser = async () => {
+  const logoutUser = async () => {
     try {
       const { data } = await axios.post(
         "/api/user/logout",
@@ -61,7 +61,7 @@ const Navbar = () => {
         { withCredentials: true }
       );
       if (data.success) {
-        navigate("/")
+        navigate("/");
         toast.success("Logged out successfully.");
       } else {
         toast.error(data.message || "Logout response was not successful.");
@@ -77,6 +77,7 @@ const Navbar = () => {
   };
 
   const handleRoute = (e) => {
+    setOpen(false);
     e.preventDefault();
     if (user) {
       navigate("/cart");
@@ -335,30 +336,79 @@ const Navbar = () => {
         <div className="hidden xsm:flex menu-range:flex items-center justify-between mt-4 px-1 text-neutral-800">
           {/* Cart */}
           <Link
-            to="/cart"
-            onClick={() => setOpen(false)}
-            className="relative inline-block text-black"
+            onClick={handleRoute}
+            className={`relative text-neutral-800 hover:text-orange-400 transition-all duration-300 ${
+              location.pathname === "/cart" ? "text-orange-500" : ""
+            }`}
           >
-            <span className="relative inline-block">
-              <FaShoppingCart className="text-xl lg:text-2xl" />
-              {totalQty > 0 && (
+            <FaShoppingCart className="text-xl lg:text-2xl" />
+
+            {isLoading ? (
+              // Show spinner while loading
+              <div className="absolute -top-2 -right-2 w-3 h-3 border-4 border-t-transparent border-orange-300 border-solid rounded-full animate-spin"></div>
+            ) : (
+              // Show cart count only if the user is logged in
+              user &&
+              totalQty > 0 && (
                 <span className="absolute -top-2 -right-2 bg-orange-300 text-white text-xs px-1.5 py-0.5 rounded-full">
                   {totalQty}
                 </span>
-              )}
-            </span>
+              )
+            )}
           </Link>
 
           {/* User Login */}
-          <button
-            onClick={() => {
-              setShowLogin(true);
-              setOpen(false);
-            }}
-            className="hover:text-orange-400 transition-all duration-300"
-          >
-            <FaUser className="text-xl lg:text-2xl" />
-          </button>
+          {user ? (
+            <div className="relative">
+              <button
+                className="flex items-center gap-2 hover:text-orange-400 transition"
+                onClick={() => setDropdownOpen(!dropdownOpen)} // Toggle dropdown visibility
+              >
+                <FaUser className="text-xl" />
+              </button>
+
+              {/* Dropdown menu using <ul> and <li> */}
+              {dropdownOpen && (
+                <ul className="absolute mt-4 bg-white text-black shadow-md rounded-md w-48">
+                  <li
+                    onClick={() => {
+                      setOpen(false);
+                    }}
+                    className="cursor-pointer text-sm text-black hover:bg-gray-100 py-2 px-4"
+                  >
+                    Profile
+                  </li>
+                  <li
+                    onClick={() => {
+                      setOpen(false);
+                    }}
+                    className="cursor-pointer text-sm text-black hover:bg-gray-100 py-2 px-4"
+                  >
+                    Settings
+                  </li>
+                  <li
+                    onClick={() => {
+                      logoutUser();
+                      setOpen(false);
+                    }}
+                    className="cursor-pointer text-sm text-red-500 hover:bg-red-100 py-2 px-4"
+                  >
+                    Logout
+                  </li>
+                </ul>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setShowLogin(true);
+                setOpen(false);
+              }}
+              className="hover:text-orange-400"
+            >
+              <FaUser className="text-xl" />
+            </button>
+          )}
 
           {/* Location */}
           <div className="relative">
