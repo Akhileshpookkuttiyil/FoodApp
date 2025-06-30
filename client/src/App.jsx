@@ -28,6 +28,7 @@ import ViewProducts from "./Pages/Seller/viewProducts";
 import SellerLogin from "./Pages/Seller/SellerLogin";
 import MyOrders from "./Pages/Seller/MyOrders";
 import SearchResults from "./Pages/SearchResults/SearchResults";
+import DashboardOverview from "./Pages/Seller/dashboard";
 
 function AppContent() {
   const { showLogin, seller } = useAppContext();
@@ -66,6 +67,7 @@ function AppContent() {
             element={seller ? <SellerLayout /> : <SellerLogin />}
           >
             <Route path="add-product" element={<AddProduct />} />
+            <Route path="dashboard" element={<DashboardOverview />} />
             <Route path="view-products" element={<ViewProducts />} />
             <Route path="orders" element={<MyOrders />} />
           </Route>

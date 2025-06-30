@@ -2,19 +2,24 @@ import { useState } from "react";
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { useAppContext } from "../../Context/AppContext";
 
+// ================== Seller Layout ==================
 const SellerLayout = () => {
   const { seller, logoutSeller } = useAppContext();
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
-  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [loadingLogout, setLoadingLogout] = useState(false);
+
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   const handleLogout = async () => {
+    setLoadingLogout(true);
     await logoutSeller();
+    setLoadingLogout(false);
   };
 
   const sidebarLinks = [
-    { name: "Dashboard", path: "/seller", icon: dashboardIcon },
+    { name: "Dashboard", path: "/seller/dashboard", icon: dashboardIcon },
     { name: "Add Product", path: "/seller/add-product", icon: addProductIcon },
     {
       name: "View Products",
@@ -26,23 +31,30 @@ const SellerLayout = () => {
   ];
 
   const SidebarContent = () => (
-    <div className="w-64 bg-white border-r border-gray-300 pt-4 h-full">
-      {sidebarLinks.map((item) => {
-        const isActive = location.pathname === item.path;
+    <div className="w-64 bg-white border-r border-gray-300 h-full">
+      <div className="md:hidden flex justify-between items-center px-4 py-3 border-b">
+        <span className="font-semibold text-lg">Menu</span>
+        <button onClick={toggleSidebar} aria-label="Close sidebar">
+          ✕
+        </button>
+      </div>
+      {sidebarLinks.map(({ name, path, icon }) => {
+        const isActive =
+          location.pathname === path ||
+          location.pathname.startsWith(path + "/");
         return (
           <Link
-            to={item.path}
-            key={item.name}
+            to={path}
+            key={name}
             className={`flex items-center py-3 px-4 gap-3 transition-all ${
               isActive
                 ? "border-r-4 md:border-r-[6px] bg-orange-100 border-orange-500 text-orange-600 font-semibold"
                 : "hover:bg-orange-50 text-orange-700"
             } mb-2`}
-            aria-label={item.name}
+            aria-label={name}
           >
-            {item.icon}
-            <span className="hidden md:block">{item.name}</span>
-            <span className="block md:hidden">{item.name[0]}</span>
+            {icon}
+            <span>{name}</span>
           </Link>
         );
       })}
@@ -52,7 +64,7 @@ const SellerLayout = () => {
   return (
     <div className="flex flex-col h-screen">
       {/* Topbar */}
-      <div className="flex items-center justify-between px-6 py-4 bg-white shadow-md border-b border-gray-200 h-[72px] flex-shrink-0">
+      <header className="flex items-center justify-between px-6 py-4 bg-white shadow-md border-b border-gray-200 h-[72px] flex-shrink-0">
         <div className="flex items-center gap-6">
           <button
             onClick={toggleSidebar}
@@ -66,7 +78,7 @@ const SellerLayout = () => {
               viewBox="0 0 24 24"
             >
               <path
-                strokeWidth={2}
+                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 d="M4 6h16M4 12h16M4 18h16"
@@ -79,31 +91,39 @@ const SellerLayout = () => {
           </Link>
         </div>
         <div className="flex items-center gap-4 text-gray-600">
-          <p className="font-medium">Hi, {seller?.name || "Seller"}</p>
+          <>
+            <p className="font-medium lg:block md:block hidden">
+              Hi, {seller?.name || "Seller"}
+            </p>
+          </>
+
           <button
             onClick={handleLogout}
-            className="border border-gray-400 bg-gray-200 rounded-full text-sm px-3 py-1 hover:bg-gray-300 focus:outline-none"
+            disabled={loadingLogout}
+            className={`border border-gray-400 bg-gray-200 rounded-full text-sm px-3 py-1 hover:bg-gray-300 focus:outline-none ${
+              loadingLogout ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             aria-label="Logout"
           >
-            Logout
+            {loadingLogout ? "Logging out..." : "Logout"}
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Layout Body */}
+      {/* Main layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="hidden md:block w-64 bg-white border-r border-gray-300 h-full">
+        {/* Sidebar (Desktop) */}
+        <aside className="hidden md:block w-64 bg-white border-r border-gray-300 h-full">
           <SidebarContent />
-        </div>
+        </aside>
 
-        {/* Main Content */}
+        {/* Main content */}
         <main className="flex-1 bg-gray-50 p-6 overflow-y-auto h-full">
           <Outlet />
         </main>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* Sidebar (Mobile) */}
       {isSidebarOpen && (
         <>
           <div
@@ -123,10 +143,12 @@ const SellerLayout = () => {
   );
 };
 
-// SVG Icons
+// ================== Icons ==================
+const iconClass = "w-6 h-6";
+
 const dashboardIcon = (
   <svg
-    className="w-6 h-6"
+    className={iconClass}
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -142,7 +164,7 @@ const dashboardIcon = (
 
 const addProductIcon = (
   <svg
-    className="w-6 h-6"
+    className={iconClass}
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -158,7 +180,7 @@ const addProductIcon = (
 
 const viewProductIcon = (
   <svg
-    className="w-6 h-6"
+    className={iconClass}
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -174,7 +196,7 @@ const viewProductIcon = (
 
 const usersIcon = (
   <svg
-    className="w-6 h-6"
+    className={iconClass}
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -190,7 +212,7 @@ const usersIcon = (
 
 const ordersIcon = (
   <svg
-    className="w-6 h-6"
+    className={iconClass}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 640 512"
     fill="currentColor"
