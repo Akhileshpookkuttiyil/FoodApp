@@ -49,7 +49,7 @@ export const AppProvider = ({ children }) => {
         setSeller(null);
       }
     } catch (error) {
-      console.warn("Seller session check failed:", error.message);
+      console.log("Seller session check failed:", error.message);
       setSeller(null);
     } finally {
       setLoading(false);

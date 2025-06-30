@@ -103,43 +103,46 @@ const Navbar = () => {
     const fetchLocation = async (lat, lon) => {
       try {
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+          `http://localhost:5000/api/location/get?lat=${lat}&lon=${lon}`
         );
-        const data = await response.json();
 
-        if (isMounted) {
-          const address = data?.address;
-          const localName =
-            address?.village ||
-            address?.hamlet ||
-            address?.town ||
-            address?.suburb ||
-            address?.city ||
-            address?.county ||
-            address?.state_district ||
-            address?.state ||
-            "Unknown";
-
-          setCurrentLocation(localName);
+        if (!response.ok) {
+          throw new Error("Failed to fetch location from backend");
         }
-      } catch (error) {
-        console.error("Error fetching location:", error);
-        if (isMounted) setCurrentLocation("Unknown");
+
+        const data = await response.json();
+        console.log("Reverse Geocode Data:", data);
+
+        const address = data?.address;
+        const localName =
+          address?.village ||
+          address?.hamlet ||
+          address?.town ||
+          address?.suburb ||
+          address?.city ||
+          address?.county ||
+          address?.state_district ||
+          address?.state ||
+          "Unknown";
+        setCurrentLocation(localName);
+      } catch (err) {
+        console.error(err);
+        setCurrentLocation("Unknown");
       }
     };
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
-          fetchLocation(coords.latitude, coords.longitude);
+          if (isMounted) fetchLocation(coords.latitude, coords.longitude);
         },
         (error) => {
-          console.error("Geolocation error:", error.message);
+          console.log(error);
           if (isMounted) setCurrentLocation("not found");
         }
       );
     } else {
-      setCurrentLocation("Geolocation not supported");
+      if (isMounted) setCurrentLocation("Geolocation not supported");
     }
 
     return () => {
@@ -204,7 +207,7 @@ const Navbar = () => {
           >
             <FaShoppingCart className="text-xl lg:text-2xl" />
 
-            {isLoading ? (
+            {user && isLoading ? (
               // Show spinner while loading
               <div className="absolute -top-2 -right-2 w-3 h-3 border-4 border-t-transparent border-orange-300 border-solid rounded-full animate-spin"></div>
             ) : (
@@ -343,7 +346,7 @@ const Navbar = () => {
           >
             <FaShoppingCart className="text-xl lg:text-2xl" />
 
-            {isLoading ? (
+            {user && isLoading ? (
               // Show spinner while loading
               <div className="absolute -top-2 -right-2 w-3 h-3 border-4 border-t-transparent border-orange-300 border-solid rounded-full animate-spin"></div>
             ) : (

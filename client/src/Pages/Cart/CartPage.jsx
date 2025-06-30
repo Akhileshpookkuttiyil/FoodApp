@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import { useAppContext } from "../../Context/AppContext";
 import { Link, useNavigate } from "react-router-dom";
 import emptyCart from "../../assets/img/empty-cart.svg";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
 import removeIcon from "../../assets/img/remove_icon.svg";
+import axios from "axios";
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
@@ -24,6 +26,8 @@ const CartPage = () => {
   const { cartItems, updateItemQuantity, removeItemFromCart, clearCart } =
     useAppContext();
   const [showAddress, setShowAddress] = useState(false);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [couponCode, setCouponCode] = useState("");
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [loading, setLoading] = useState(true); // Track loading state
@@ -34,7 +38,7 @@ const CartPage = () => {
       setLoading(true);
       setTimeout(() => {
         setLoading(false); // Mock loading complete after 2 seconds
-      }, 700);
+      }, 1000);
     };
     loadData();
   }, []);
@@ -86,6 +90,24 @@ const CartPage = () => {
     // You can clear cart here if needed:
     // clearCart();
   };
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const response = await axios.get("/api/address/getAddress"); // adjust URL if needed
+        const data = response.data?.data || [];
+
+        setAddresses(data);
+
+        const defaultAddress = data.find((addr) => addr.isDefault);
+        setSelectedAddress(defaultAddress || null);
+      } catch (error) {
+        toast.error(error.message);
+      }
+    };
+
+    fetchAddresses();
+  }, []);
 
   const renderCartItem = (item) => (
     <div
@@ -230,7 +252,7 @@ const CartPage = () => {
           </div>
 
           {/* Sidebar */}
-          <aside className="w-full max-w-[380px] bg-gray-50 p-6 sm:p-8 border border-gray-300 shadow-md rounded-md space-y-6 lg:sticky lg:top-20 self-start">
+          <aside className="w-full max-w-[380px] bg-gray-50 p-6 sm:p-7 border border-gray-300 shadow-md rounded-md space-y-6 lg:sticky lg:top-20 self-start">
             <h2 className="text-2xl font-semibold">Order Summary</h2>
             <hr className="border-gray-300 my-5" />
 
@@ -240,7 +262,36 @@ const CartPage = () => {
               </p>
               <div className="relative">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">No address selected</span>
+                  <div className="flex items-start gap-2 text-sm text-gray-700">
+                    <span className="mt-0.2 text-orange-500">
+                      <FaMapMarkerAlt className="text-orange-500 mt-1 text-lg w-[10px]" />
+                    </span>
+                    <div className="leading-relaxed">
+                      {selectedAddress ? (
+                        <>
+                          <div className="font-medium text-base">
+                            {selectedAddress.fullName}
+                          </div>
+                          <div>
+                            {selectedAddress.street} {""}
+                            {selectedAddress.houseNumber}
+                          </div>
+                          <div>
+                            {selectedAddress.city}, {selectedAddress.state}{" "}
+                            {selectedAddress.pincode}
+                          </div>
+                          {selectedAddress.addressType && (
+                            <div className="text-xs text-gray-500 mt-1 italic capitalize">
+                              {selectedAddress.addressType} Address
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <span>No address selected</span>
+                      )}
+                    </div>
+                  </div>
+
                   <button
                     onClick={() => setShowAddress(!showAddress)}
                     className="text-orange-500 hover:underline text-sm"
@@ -248,17 +299,37 @@ const CartPage = () => {
                     Change
                   </button>
                 </div>
+
                 {showAddress && (
-                  <div className="absolute z-20 mt-2 w-full bg-white border rounded shadow-lg animate-fade-in transition-all">
-                    <button
-                      onClick={() => setShowAddress(false)}
-                      className="block w-full text-left p-3 hover:bg-gray-100"
-                    >
-                      New York, USA
-                    </button>
+                  <div className="absolute z-20 mt-2 w-full bg-white border rounded shadow-lg animate-fade-in transition-all max-h-60 overflow-auto">
+                    {addresses.length === 0 && (
+                      <div className="p-3 text-sm text-gray-500">
+                        No addresses found
+                      </div>
+                    )}
+
+                    {addresses.map((address) => (
+                      <button
+                        key={address._id}
+                        onClick={() => {
+                          setSelectedAddress(address);
+                          setShowAddress(false);
+                        }}
+                        className="block w-full text-left p-3 hover:bg-gray-100 text-sm"
+                      >
+                        {address.fullName}, {address.houseNumber},{" "}
+                        {address.city}
+                        {address.isDefault && (
+                          <span className="ml-2 text-xs text-gray-600 font-medium">
+                            (Default)
+                          </span>
+                        )}
+                      </button>
+                    ))}
+
                     <button
                       onClick={() => navigate("/add-address")}
-                      className="block w-full text-left p-3 text-indigo-600 hover:bg-indigo-100 transition rounded"
+                      className="block w-full text-left p-3 text-indigo-600 hover:bg-indigo-100 transition rounded text-sm"
                     >
                       ➕ Add Address
                     </button>
