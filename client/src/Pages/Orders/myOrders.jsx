@@ -1,0 +1,178 @@
+import { useEffect, useState } from "react";
+import { useAppContext } from "../../Context/AppContext";
+import { useNavigate } from "react-router-dom";
+
+const MyOrders = () => {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { axios, user, currency } = useAppContext();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) return;
+    axios
+      .get("/api/order/user")
+      .then(({ data }) => data.success && setOrders(data.orders))
+      .catch((err) => setError(err.message || "Failed to load orders."))
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  const getStatusColor = (status) => {
+    const base = "font-semibold";
+    const map = {
+      placed: "text-blue-600",
+      accepted: "text-indigo-600",
+      preparing: "text-yellow-600",
+      "on the way": "text-orange-600",
+      delivered: "text-green-600",
+      cancelled: "text-red-600",
+    };
+    return `${base} ${map[status?.toLowerCase()] || "text-gray-500"}`;
+  };
+
+  if (loading)
+    return <p className="text-center mt-20 text-gray-600">Loading orders...</p>;
+
+  if (error)
+    return (
+      <p className="text-center mt-20 text-red-500 font-medium">{error}</p>
+    );
+
+  if (!orders.length)
+    return (
+      <div className="text-center mt-20">
+        <p className="text-2xl font-semibold text-gray-800">
+          No orders found 🛒
+        </p>
+      </div>
+    );
+
+  return (
+    <div className="pt-24 pb-16 px-6 md:px-20">
+      <div className="relative inline-block ml-2 mb-8">
+        <h1 className="text-2xl font-bold text-gray-600">My Orders</h1>
+        <span className="absolute -bottom-1 left-0 w-20 h-[3px] bg-orange-400 rounded"></span>
+      </div>
+
+      {orders.map((order) => (
+        <div
+          key={order._id}
+          className="w-full bg-white border rounded-lg shadow-sm mb-10 p-6"
+        >
+          {/* Order Info */}
+          <div className="mb-4 flex flex-wrap justify-between text-sm text-gray-700">
+            <p>
+              <span className="font-medium">Order ID:</span> {order._id}
+            </p>
+            <p>Placed: {new Date(order.createdAt).toLocaleDateString()}</p>
+          </div>
+
+          {/* Address */}
+          {order.shippingAddress && (
+            <div className="text-sm text-gray-600 mb-4">
+              <p className="font-medium text-gray-800 mb-1">
+                Shipping Address:
+              </p>
+              <p>{order.shippingAddress.fullName}</p>
+              <p>
+                {order.shippingAddress.houseNumber},{" "}
+                {order.shippingAddress.street}
+              </p>
+              <p>
+                {order.shippingAddress.city}, {order.shippingAddress.state} -{" "}
+                {order.shippingAddress.pincode}
+              </p>
+            </div>
+          )}
+          {/* Table Head */}
+          <div className="hidden md:grid grid-cols-[3fr_2fr_1fr_1fr_1fr] text-xs font-semibold text-gray-500 uppercase px-1 pb-2">
+            <div>Product</div>
+            <div className="flex justify-center">Restaurant</div>
+            <div className="flex justify-center">Payment</div>
+            <div className="flex justify-center">Status</div>
+            <div className="flex justify-center">Price</div>
+            
+          </div>
+
+          {/* Order Items */}
+          <div className="overflow-x-auto">
+            {order.items.map(({ product, quantity }, i) => {
+              if (!product) return null;
+              const price =
+                product.offerPrice > 0 ? product.offerPrice : product.price;
+
+              return (
+                <div
+                  key={i}
+                  className="py-4 grid grid-cols-[3fr_2fr_1fr_1fr_1fr] items-center border-t min-w-[900px]"
+                >
+                  {/* Product */}
+                  <div
+                    className="flex items-center gap-4 cursor-pointer"
+                    onClick={() => navigate(`/products/food/${product._id}`)}
+                  >
+                    <img
+                      src={product.images?.[0] || "/placeholder.jpg"}
+                      alt={product.name}
+                      className="w-14 h-14 rounded object-cover"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {product.name}
+                      </p>
+                      <p className="text-sm text-gray-500">Qty: {quantity}</p>
+                    </div>
+                  </div>
+
+                  {/* Restaurant */}
+                  <div className="text-sm text-gray-700 flex justify-center truncate">
+                    {order.restaurant?.name}
+                  </div>
+
+                  {/* Payment */}
+                  <div className="text-sm flex justify-center">
+                    {order.paymentMethod}{" "}
+                    <span
+                      className={
+                        order.isPaid ? "text-green-600" : "text-yellow-600"
+                      }
+                    >
+                      ({order.isPaid ? "Paid" : "Pending"})
+                    </span>
+                  </div>
+
+                  {/* Status */}
+                  <div
+                    className={`text-sm flex justify-center ${getStatusColor(
+                      order.orderStatus
+                    )}`}
+                  >
+                    {order.orderStatus}
+                  </div>
+
+                  {/* Price */}
+                  <div className="text-sm flex justify-center font-semibold text-gray-800">
+                    {currency}
+                    {(price * quantity).toFixed(2)}
+                  </div>
+                  {/* Total */}
+                </div>
+              );
+            })}
+            {/* Order Total Row */}
+            <div className="py-4 grid grid-cols-[3fr_2fr_1fr_1fr_1fr_1.3fr] items-center font-semibold text-sm gap-6 border-t text-orange-600 min-w-[900px]">
+              <div className="col-span-5 text-right pr-4">Total:</div>
+              <div className="flex justify-center">
+                {currency}
+                {order.totalAmount.toFixed(2)}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default MyOrders;

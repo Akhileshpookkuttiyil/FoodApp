@@ -11,6 +11,7 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   // Auth states
   const [user, setUser] = useState(null);
+  const currency = "₹";
   const [seller, setSeller] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -221,6 +222,8 @@ export const AppProvider = ({ children }) => {
       value={{
         // Auth
         user,
+        axios,
+        currency,
         seller,
         showLogin,
         loading,

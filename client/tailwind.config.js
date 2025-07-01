@@ -6,11 +6,12 @@ export default {
     extend: {
       fontFamily: {
         playfair: ['"Playfair Display"', "serif"],
+        roboto: ["Roboto", "sans-serif"],
       },
       screens: {
         "menu-range": { min: "1024px", max: "1260px" },
-        'xsm': { max: '410px' },
-        'x-small':{min:'411px',max:"640"},
+        xsm: { max: "410px" },
+        "x-small": { min: "411px", max: "640" },
       },
       keyframes: {
         fadeIn: {

@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap");
+@import "@fontsource/roboto/index.css";
 
 @tailwind base;
 @tailwind components;
@@ -42,7 +43,8 @@
 
 /* Float animation (gentle up-down movement) */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -72,10 +74,12 @@
 
 /* Focus outline for accessibility */
 :focus-visible {
-  outline: 2px solid #FF7F50; /* Add a focus style for better accessibility */
+  outline: 2px solid #ff7f50; /* Add a focus style for better accessibility */
 }
 
 /* Remove the default focus outline for elements that do not need it */
-button, input, select {
+button,
+input,
+select {
   outline: none;
 }

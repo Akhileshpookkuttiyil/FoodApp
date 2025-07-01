@@ -3,7 +3,7 @@ import paneerTikka from "../../assets/img/paneerTikka.png";
 import masalaDosa from "../../assets/img/masalaDosa.png";
 import chickenBiryani from "../../assets/img/chickenBiryani.png";
 
-const MyOrders = () => {
+const GetOrders = () => {
   const orders = [
     {
       id: 15,
@@ -143,4 +143,4 @@ const MyOrders = () => {
   );
 };
 
-export default MyOrders;
+export default GetOrders;

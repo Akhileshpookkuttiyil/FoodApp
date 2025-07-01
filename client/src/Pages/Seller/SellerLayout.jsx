@@ -27,7 +27,7 @@ const SellerLayout = () => {
       icon: viewProductIcon,
     },
     { name: "Users", path: "/seller/view-users", icon: usersIcon },
-    { name: "Orders", path: "/seller/orders", icon: ordersIcon },
+    { name: "Orders", path: "/seller/getOrders", icon: ordersIcon },
   ];
 
   const SidebarContent = () => (

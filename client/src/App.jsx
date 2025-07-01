@@ -26,9 +26,10 @@ import { useAppContext } from "./Context/AppContext";
 import AddProduct from "./Pages/Seller/AddProduct";
 import ViewProducts from "./Pages/Seller/viewProducts";
 import SellerLogin from "./Pages/Seller/SellerLogin";
-import MyOrders from "./Pages/Seller/MyOrders";
 import SearchResults from "./Pages/SearchResults/SearchResults";
 import DashboardOverview from "./Pages/Seller/dashboard";
+import GetOrders from "./Pages/Seller/getOrders";
+import MyOrders from "./Pages/Orders/myOrders";
 
 function AppContent() {
   const { showLogin, seller } = useAppContext();
@@ -56,6 +57,7 @@ function AppContent() {
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/contact" element={<ContactSection />} />
           <Route path="/about" element={<About />} />
+          <Route path="/orders" element={<MyOrders />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/add-address" element={<AddAddressPage />} />
           <Route path="/menu/:id" element={<DishDetail />} />
@@ -69,7 +71,7 @@ function AppContent() {
             <Route path="add-product" element={<AddProduct />} />
             <Route path="dashboard" element={<DashboardOverview />} />
             <Route path="view-products" element={<ViewProducts />} />
-            <Route path="orders" element={<MyOrders />} />
+            <Route path="get-orders" element={<GetOrders />} />
           </Route>
         </Routes>
 

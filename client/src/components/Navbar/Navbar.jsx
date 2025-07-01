@@ -234,16 +234,18 @@ const Navbar = () => {
               {/* Dropdown menu using <ul> and <li> */}
               {dropdownOpen && (
                 <ul className="absolute top-full right-0 mt-2 bg-white border shadow-md rounded-md w-48 z-50">
-                  <li
-                    // Add your function to navigate to profile
-                    className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
-                  >
+                  <li className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4">
                     Profile
                   </li>
                   <li
-                    // Add your function to navigate to settings
+                    onClick={() => {
+                      navigate("/orders");
+                    }}
                     className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
                   >
+                    My Orders
+                  </li>
+                  <li className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4">
                     Settings
                   </li>
                   <li
