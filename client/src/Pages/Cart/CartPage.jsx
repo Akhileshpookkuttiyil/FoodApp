@@ -28,6 +28,8 @@ const CartPage = () => {
   const [showAddress, setShowAddress] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [loading, setLoading] = useState(true); // Track loading state
@@ -84,17 +86,57 @@ const CartPage = () => {
     }
   };
 
-  const handlePlaceOrder = () => {
-    if (cartItems.length === 0) return;
-    toast.success("Order placed successfully!");
-    // You can clear cart here if needed:
-    // clearCart();
+  const handlePlaceOrder = async () => {
+    if (cartItems.length === 0) {
+      toast.error("Cart is empty");
+      return;
+    }
+    if (!selectedAddress) {
+      toast.error("No address selected");
+      return;
+    }
+    if (!paymentMethod) {
+      toast.error("Please select payment method");
+      return;
+    }
+
+    setPlacingOrder(true);
+
+    if (paymentMethod === "COD") {
+      try {
+        const orderPayload = {
+          items: cartItems.map(({ id, qty }) => ({
+            productId: id,
+            quantity: qty,
+          })),
+          addressId: selectedAddress._id,
+          notes: "",
+        };
+
+        const { data } = await axios.post("/api/order/cod", orderPayload);
+        toast.success(data.message || "Order placed successfully!");
+        clearCart();
+        navigate("/orders");
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message || "Failed to place order. Try again."
+        );
+      }
+    } else if (paymentMethod === "Online") {
+      toast.error("Online payment");
+    }
+
+    setPlacingOrder(false);
+  };
+
+  const handlePaymentChange = (e) => {
+    setPaymentMethod(e.target.value);
   };
 
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        const response = await axios.get("/api/address/getAddress"); // adjust URL if needed
+        const response = await axios.get("/api/address/getAddress");
         const data = response.data?.data || [];
 
         setAddresses(data);
@@ -337,10 +379,12 @@ const CartPage = () => {
                 )}
               </div>
 
-              <label className="block text-sm font-medium uppercase mt-6 mb-2">
-                Payment Method
-              </label>
-              <select className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm">
+              <select
+                value={paymentMethod}
+                onChange={handlePaymentChange}
+                className="w-full px-4 py-2 mt-2 text-gray-500 border border-gray-300 rounded-md shadow-sm"
+              >
+                <option value="">Select Payment Method</option>
                 <option value="COD">Cash On Delivery</option>
                 <option value="Online">Online Payment</option>
               </select>
@@ -375,14 +419,18 @@ const CartPage = () => {
 
             <button
               onClick={handlePlaceOrder}
-              disabled={cartItems.length === 0}
+              disabled={cartItems.length === 0 || placingOrder}
               className={`w-full py-3 font-semibold rounded-md transition ${
-                cartItems.length === 0
+                cartItems.length === 0 || placingOrder
                   ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                   : "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:shadow-lg"
               }`}
             >
-              {cartItems.length === 0 ? "Cart is Empty" : "Place Order"}
+              {placingOrder
+                ? "Placing Order..."
+                : paymentMethod === "Online"
+                ? "Proceed to Checkout"
+                : "Place Order"}
             </button>
           </aside>
         </div>

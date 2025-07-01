@@ -98,6 +98,7 @@ export const AppProvider = ({ children }) => {
       name: cartItem.item.name,
       price: cartItem.item.price,
       qty: cartItem.quantity,
+      hotel: cartItem.restaurant,
       image: cartItem.item.images[0], // first image
     }));
 
@@ -198,7 +199,6 @@ export const AppProvider = ({ children }) => {
     }
 
     setCartItems([]);
-    toast.success("Cart cleared.");
   };
 
   // Cart total price
