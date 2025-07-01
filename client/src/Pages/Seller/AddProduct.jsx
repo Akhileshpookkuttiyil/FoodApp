@@ -1,8 +1,9 @@
 import { useState } from "react";
-import axios from "axios";
+import { useAppContext } from "../../Context/AppContext";
 import toast, { Toaster } from "react-hot-toast";
 
 const AddProduct = () => {
+  const { axios } = useAppContext();
   const [images, setImages] = useState(Array(4).fill(null));
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");

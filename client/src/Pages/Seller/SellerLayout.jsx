@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { useAppContext } from "../../Context/AppContext";
+import {
+  FaTachometerAlt,
+  FaPlusCircle,
+  FaBoxOpen,
+  FaUtensils,
+  FaStar,
+  FaShoppingCart,
+} from "react-icons/fa";
 
 // ================== Seller Layout ==================
 const SellerLayout = () => {
@@ -19,15 +27,36 @@ const SellerLayout = () => {
   };
 
   const sidebarLinks = [
-    { name: "Dashboard", path: "/seller/dashboard", icon: dashboardIcon },
-    { name: "Add Product", path: "/seller/add-product", icon: addProductIcon },
+    {
+      name: "Dashboard",
+      path: "/seller/dashboard",
+      icon: <FaTachometerAlt className="w-5 h-5" />,
+    },
+    {
+      name: "Add Product",
+      path: "/seller/add-product",
+      icon: <FaPlusCircle className="w-5 h-5" />,
+    },
     {
       name: "View Products",
       path: "/seller/view-products",
-      icon: viewProductIcon,
+      icon: <FaBoxOpen className="w-5 h-5" />,
     },
-    { name: "Users", path: "/seller/view-users", icon: usersIcon },
-    { name: "Orders", path: "/seller/getOrders", icon: ordersIcon },
+    {
+      name: "Restaurant",
+      path: "/seller/get-restaurants",
+      icon: <FaUtensils className="w-5 h-5" />,
+    },
+    {
+      name: "Reviews",
+      path: "/seller/view-reviews",
+      icon: <FaStar className="w-5 h-5" />,
+    },
+    {
+      name: "Orders",
+      path: "/seller/get-orders",
+      icon: <FaShoppingCart className="w-5 h-5" />,
+    },
   ];
 
   const SidebarContent = () => (
@@ -142,83 +171,5 @@ const SellerLayout = () => {
     </div>
   );
 };
-
-// ================== Icons ==================
-const iconClass = "w-6 h-6";
-
-const dashboardIcon = (
-  <svg
-    className={iconClass}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"
-    />
-  </svg>
-);
-
-const addProductIcon = (
-  <svg
-    className={iconClass}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 4v16m8-8H4"
-    />
-  </svg>
-);
-
-const viewProductIcon = (
-  <svg
-    className={iconClass}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"
-    />
-  </svg>
-);
-
-const usersIcon = (
-  <svg
-    className={iconClass}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 000 7.75"
-    />
-  </svg>
-);
-
-const ordersIcon = (
-  <svg
-    className={iconClass}
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 640 512"
-    fill="currentColor"
-  >
-    <path d="M58.9 42.1c3-6.1 9.6-9.6 16.3-8.7L320 64 564.8 33.4c6.7-.8 13.3 2.7 16.3 8.7l41.7 83.4c9 17.9-.6 39.6-19.8 45.1L439.6 217.3c-13.9 4-28.8-1.9-36.2-14.3L320 64 236.6 203c-7.4 12.4-22.3 18.3-36.2 14.3L37.1 170.6c-19.3-5.5-28.8-27.2-19.8-45.1L58.9 42.1zM321.1 128l54.9 91.4c14.9 24.8 44.6 36.6 72.5 28.6L576 211.6v167c0 22-15 41.2-36.4 46.6l-204.1 51c-10.2 2.6-20.9 2.6-31 0l-204.1-51C79 419.7 64 400.5 64 378.5v-167L191.6 248c27.8 8 57.6-3.8 72.5-28.6L318.9 128l2.2 0z" />
-  </svg>
-);
 
 export default SellerLayout;

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { FaHotel } from "react-icons/fa6";
-import { fetchProducts } from "../../utils/api";
 import toast from "react-hot-toast";
+import { useAppContext } from "../../Context/AppContext";
 
 const ViewProducts = () => {
+  const { axios } = useAppContext();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -13,8 +13,8 @@ const ViewProducts = () => {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const data = await fetchProducts();
-      setProducts(data);
+      const res = await axios.get("/api/product/getByRestaurant");
+      setProducts(res.data.data); // ← array of products
     } catch (err) {
       console.error(err.message);
       toast.error("Failed to load products.");
@@ -141,7 +141,7 @@ const ViewProducts = () => {
                           }}
                         >
                           <img
-                            src={item.image}
+                            src={item.images[0]}
                             alt={item.name}
                             className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded"
                           />
@@ -156,8 +156,8 @@ const ViewProducts = () => {
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell text-gray-700">
                         <div className="flex items-center gap-1">
-                          <FaHotel className="text-gray-500" />
-                          <span>{item.hotel}</span>
+                          <FaHotel className="text-orange-500" />
+                          <span>{item.restaurant.name}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 w-44">

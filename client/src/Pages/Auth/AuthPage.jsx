@@ -4,11 +4,10 @@ import { X, Eye, EyeOff } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import loginImage from "../../assets/img/login.jpg";
 import { useAppContext } from "../../Context/AppContext";
-import axios from "axios";
 
 const AuthPage = () => {
   // Context
-  const { setShowLogin, setUser } = useAppContext();
+  const { setShowLogin, setUser, axios } = useAppContext();
 
   // State
   const [isSignup, setIsSignup] = useState(false);

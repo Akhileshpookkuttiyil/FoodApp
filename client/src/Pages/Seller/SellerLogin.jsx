@@ -15,7 +15,7 @@ const SellerLogin = () => {
   // Redirect to dashboard after auth check
   useEffect(() => {
     if (!loading && seller) {
-      navigate("/seller");
+      navigate("/seller/dashboard");
     }
   }, [seller, loading, navigate]);
 

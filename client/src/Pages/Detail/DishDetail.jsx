@@ -10,12 +10,11 @@ import toast from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
 import StarRating from "../StarRating";
 import { useAppContext } from "../../Context/AppContext";
-import axios from "axios";
 
 const DishDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart, updateItemQuantity, cartItems } = useAppContext();
+  const { addToCart, updateItemQuantity, cartItems, axios } = useAppContext();
 
   const [dish, setDish] = useState(null);
   const [menuItems, setMenuItems] = useState([]);

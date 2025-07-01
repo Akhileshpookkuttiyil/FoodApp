@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../../Context/AppContext";
 import toast from "react-hot-toast";
-import axios from "axios";
 import addressIllustration from "../../assets/img/location.jpg";
 
 const initialFormState = {
@@ -19,7 +19,7 @@ const initialFormState = {
 
 const AddAddressPage = () => {
   const navigate = useNavigate();
-
+  const { axios } = useAppContext();
   const [formData, setFormData] = useState(initialFormState);
   const [loading, setLoading] = useState(false);
 

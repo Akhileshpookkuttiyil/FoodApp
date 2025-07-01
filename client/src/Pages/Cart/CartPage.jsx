@@ -7,7 +7,6 @@ import emptyCart from "../../assets/img/empty-cart.svg";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
 import removeIcon from "../../assets/img/remove_icon.svg";
-import axios from "axios";
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
@@ -23,8 +22,13 @@ const LoadingSpinner = () => (
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { cartItems, updateItemQuantity, removeItemFromCart, clearCart } =
-    useAppContext();
+  const {
+    cartItems,
+    updateItemQuantity,
+    removeItemFromCart,
+    clearCart,
+    axios,
+  } = useAppContext();
   const [showAddress, setShowAddress] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);

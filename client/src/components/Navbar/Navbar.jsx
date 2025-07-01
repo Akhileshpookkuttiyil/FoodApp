@@ -6,7 +6,6 @@ import {
   FaUser,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { LiaTimesSolid } from "react-icons/lia";
 import { Link, useLocation } from "react-router-dom";
@@ -16,7 +15,7 @@ import { useAppContext } from "../../Context/AppContext";
 const Navbar = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const { cartItems, user, setUser, setShowLogin } = useAppContext();
+  const { cartItems, user, setUser, setShowLogin, axios } = useAppContext();
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
