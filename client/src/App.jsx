@@ -30,6 +30,7 @@ import SearchResults from "./Pages/SearchResults/SearchResults";
 import DashboardOverview from "./Pages/Seller/dashboard";
 import GetOrders from "./Pages/Seller/getOrders";
 import MyOrders from "./Pages/Orders/myOrders";
+import EditProfile from "./Pages/EditProfile/EditProfile";
 
 function AppContent() {
   const location = useLocation();
@@ -61,6 +62,7 @@ function AppContent() {
           <Route path="/add-address" element={<AddAddressPage />} />
           <Route path="/menu/:id" element={<DishDetail />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/user/edit-profile" element={<EditProfile />} />
 
           {/* Seller Routes - Protected inside layout */}
           <Route

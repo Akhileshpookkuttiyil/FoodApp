@@ -231,45 +231,70 @@ const Navbar = () => {
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
-                className="flex items-center gap-2 hover:text-orange-400 transition"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2 hover:text-orange-400 transition"
               >
                 <FaUser className="text-xl" />
               </button>
 
               {dropdownOpen && (
-                <ul className="absolute top-full right-0 mt-2 bg-white border shadow-md rounded-md w-48 z-50">
-                  <li
-                    onClick={() => setDropdownOpen(false)}
-                    className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
-                  >
-                    Profile
-                  </li>
-                  <li
-                    onClick={() => {
-                      navigate("/orders");
-                      setDropdownOpen(false);
-                    }}
-                    className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
-                  >
-                    My Orders
-                  </li>
-                  <li
-                    onClick={() => setDropdownOpen(false)}
-                    className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
-                  >
-                    Settings
-                  </li>
-                  <li
-                    onClick={() => {
-                      logoutUser();
-                      setDropdownOpen(false);
-                    }}
-                    className="cursor-pointer text-sm text-red-500 hover:bg-gray-100 hover:underline py-2 px-4"
-                  >
-                    Logout
-                  </li>
-                </ul>
+                <div
+                  className="fixed right-4 top-[72px] bg-neutral-50 p-3 shadow-lg z-50 w-64"
+                  style={{ maxWidth: "90vw" }} // optional for smaller screens
+                >
+                  {/* User Info */}
+                  <div className="flex gap-4 items-start mb-4">
+                    <div
+                      className="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-20 w-25"
+                      style={{
+                        backgroundImage: `url('${user.profileImage}')`,
+                      }}
+                    ></div>
+                    <div className="flex flex-col justify-center">
+                      <p className="text-[#141414] text-[14px] font-bold">
+                        {user.fullName}
+                      </p>
+                      <p className="text-[#757575] text-[12px]">{user.email}</p>
+                    </div>
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => {
+                        navigate("/user/edit-profile");
+                        setDropdownOpen(false);
+                      }}
+                      className="flex items-center gap-4 px-4 py-3 bg-white hover:bg-gray-100 rounded"
+                    >
+                      <span className="text-[#141414] text-base">Profile</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        navigate("/orders");
+                        setDropdownOpen(false);
+                      }}
+                      className="flex items-center gap-4 px-4 py-3 bg-white hover:bg-gray-100 rounded"
+                    >
+                      <span className="text-[#141414] text-base">
+                        My Orders
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        logoutUser();
+                        setDropdownOpen(false);
+                      }}
+                      className="flex items-center gap-4 px-4 py-3 bg-white hover:bg-gray-100 rounded text-red-500"
+                    >
+                      <span className="material-icons text-red-500">
+                        logout
+                      </span>
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           ) : (
