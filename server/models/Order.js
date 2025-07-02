@@ -43,9 +43,13 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["COD", "Card", "UPI", "NetBanking"],
-      required: true,
+      enum: {
+        values: ["COD", "Online"],
+        message: "{VALUE} is not a supported payment method",
+      },
+      required: [true, "Payment method is required"],
     },
+
     paymentStatus: {
       type: String,
       enum: ["pending", "paid", "failed"],
@@ -81,7 +85,14 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-// Optional: Virtuals, indexes, or hooks can go here if needed
+orderSchema.pre("save", function (next) {
+  if (this.paymentMethod === "Online" && this.paymentStatus === "paid") {
+    this.isPaid = true;
+  } else {
+    this.isPaid = false;
+  }
+  next();
+});
 
 const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
 export default Order;

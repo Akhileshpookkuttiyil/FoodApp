@@ -2,6 +2,7 @@ import Address from "../models/Address.js";
 
 // ===================== ADD ADDRESS =====================
 export const addAddress = async (req, res) => {
+  console.log("address");
   try {
     const userId = req.user._id;
     const addressData = req.body;
@@ -26,7 +27,7 @@ export const addAddress = async (req, res) => {
     console.error("➤ Add Address Error:", error.message);
     res.status(500).json({
       success: false,
-      message: "Failed to add address. Please try again later.",
+      message: error.message,
     });
   }
 };
@@ -36,7 +37,9 @@ export const getAddresses = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const addresses = await Address.find({ user: userId }).sort({ createdAt: -1 });
+    const addresses = await Address.find({ user: userId }).sort({
+      createdAt: -1,
+    });
 
     res.status(200).json({
       success: true,

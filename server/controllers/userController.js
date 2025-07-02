@@ -117,19 +117,30 @@ const loginUser = async (req, res) => {
 // ===================== AUTH CHECK CONTROLLER =====================
 const isAuthorized = async (req, res) => {
   try {
-    // Fetch the user and populate cartItems.item with the product details
+    if (!req.user || !req.user._id) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized: No user info" });
+    }
+
     const user = await User.findById(req.user._id)
-      .populate("cartItems.item") // Populate the 'item' reference in cartItems
+      .populate({
+        path: "cartItems.item",
+        populate: {
+          path: "restaurant",
+          select: "name",
+        },
+      })
       .select("-password");
 
     if (!user) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized: User not found" });
     }
 
-    // Log the populated cartItems (now contains full product data)
-    console.log({
-      AuthUserCartItems: user.cartItems.map((cartItem) => cartItem.item),
-    });
+    if (process.env.NODE_ENV !== "production") {
+    }
 
     if (user.role !== "user") {
       return res
@@ -142,7 +153,10 @@ const isAuthorized = async (req, res) => {
       user: { ...formatUserResponse(user), cartItems: user.cartItems || [] },
     });
   } catch (error) {
-    console.error("Auth check error:", error.message);
+    console.error(
+      `Auth check error for user ${req.user?._id || "unknown"}:`,
+      error
+    );
     res.status(500).json({
       success: false,
       message: "Authorization failed.",

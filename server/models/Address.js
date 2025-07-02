@@ -64,6 +64,16 @@ const addressSchema = new mongoose.Schema(
   }
 );
 
+addressSchema.pre("save", async function (next) {
+  if (this.isDefault) {
+    await mongoose.models.Address.updateMany(
+      { user: this.user, _id: { $ne: this._id } },
+      { $set: { isDefault: false } }
+    );
+  }
+  next();
+});
+
 const Address =
   mongoose.models.Address || mongoose.model("Address", addressSchema);
 

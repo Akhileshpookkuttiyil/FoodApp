@@ -152,6 +152,34 @@ export const productById = async (req, res) => {
   }
 };
 
+export const productByRestaurant = async (req, res) => {
+  try {
+    const restaurantIds = req.restaurants?.map((r) => r._id);
+
+    if (!restaurantIds || !restaurantIds.length) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid restaurants associated with this seller",
+      });
+    }
+
+    const data = await Product.find({
+      restaurant: { $in: restaurantIds },
+    }).populate("restaurant", "name");
+
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    console.error("Failed to get products by restaurant:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching products",
+    });
+  }
+};
+
 export const toggleStock = async (req, res) => {
   try {
     const { id, inStock } = req.body;

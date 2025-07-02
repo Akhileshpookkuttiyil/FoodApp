@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Restaurant from "../models/Restaurant.js";
 
 const authRole = (...allowedRoles) => {
   return async (req, res, next) => {
@@ -32,8 +33,16 @@ const authRole = (...allowedRoles) => {
           user = await User.findById(decoded.id).select("-password");
 
           if (user && allowedRoles.includes(user.role)) {
+            const restaurants = await Restaurant.find({ owner: user._id });
+            if (!restaurants.length) {
+              return res.status(403).json({
+                success: false,
+                message: "Access denied: no associated restaurants found",
+              });
+            }
             req.user = user;
             req.seller = user;
+            req.restaurants = restaurants;
             return next();
           }
         } catch (err) {

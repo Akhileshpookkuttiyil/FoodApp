@@ -7,6 +7,7 @@ import {
   productById,
   toggleStock,
   updateProduct,
+  productByRestaurant,
 } from "../controllers/productController.js";
 import authUser from "../middlewares/authUser.js";
 
@@ -23,6 +24,8 @@ productRouter.post(
 // Get all products
 productRouter.get("/list", productList);
 
+// Get product by Restaurant
+productRouter.get("/getByRestaurant", authRole("seller"), productByRestaurant);
 // Get product by ID (pass id as query or param based on your frontend setup)
 productRouter.get("/:id", productById);
 

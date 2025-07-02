@@ -13,8 +13,6 @@ const authUser = async (req, res, next) => {
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log({ decoded: decoded });
-    console.log({ decoded_id: decoded.id });
 
     // Find the user to ensure they still exist (optional but safer)
     const user = await User.findById(decoded.id).select("-password");

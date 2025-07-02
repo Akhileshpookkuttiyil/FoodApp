@@ -12,6 +12,7 @@ import cartRouter from "./routes/cartRoutes.js";
 import addressRouter from "./routes/addressRoutes.js";
 import orderRouter from "./routes/orderRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
+import locationRouter from "./routes/locationRoutes.js";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ const startServer = async () => {
     app.use("/api/address", addressRouter);
     app.use("/api/order", orderRouter);
     app.use("/api/admin", adminRouter);
+    app.use("/api/location", locationRouter);
 
     app.get("/", (req, res) => {
       res.send("API is running");
