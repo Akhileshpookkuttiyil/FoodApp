@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   FaBars,
   FaSearch,
@@ -19,6 +19,7 @@ const Navbar = () => {
     useAppContext();
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const [open, setOpen] = useState(false);
   const [showLocation, setShowLocation] = useState(false);
@@ -86,6 +87,20 @@ const Navbar = () => {
       setIsLoading(false);
     }, 3000);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Close if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -214,33 +229,42 @@ const Navbar = () => {
 
           {/* User Login / Logout */}
           {user ? (
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               <button
                 className="flex items-center gap-2 hover:text-orange-400 transition"
-                onClick={() => setDropdownOpen(!dropdownOpen)} // Toggle dropdown visibility
+                onClick={() => setDropdownOpen(!dropdownOpen)}
               >
                 <FaUser className="text-xl" />
               </button>
 
-              {/* Dropdown menu using <ul> and <li> */}
               {dropdownOpen && (
                 <ul className="absolute top-full right-0 mt-2 bg-white border shadow-md rounded-md w-48 z-50">
-                  <li className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4">
+                  <li
+                    onClick={() => setDropdownOpen(false)}
+                    className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
+                  >
                     Profile
                   </li>
                   <li
                     onClick={() => {
                       navigate("/orders");
+                      setDropdownOpen(false);
                     }}
                     className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
                   >
                     My Orders
                   </li>
-                  <li className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4">
+                  <li
+                    onClick={() => setDropdownOpen(false)}
+                    className="cursor-pointer text-sm text-gray-800 hover:bg-gray-100 hover:underline py-2 px-4"
+                  >
                     Settings
                   </li>
                   <li
-                    onClick={logoutUser}
+                    onClick={() => {
+                      logoutUser();
+                      setDropdownOpen(false);
+                    }}
                     className="cursor-pointer text-sm text-red-500 hover:bg-gray-100 hover:underline py-2 px-4"
                   >
                     Logout
@@ -259,7 +283,6 @@ const Navbar = () => {
               <FaUser className="text-xl" />
             </button>
           )}
-
           {/* Location */}
           <div className="relative">
             <button
