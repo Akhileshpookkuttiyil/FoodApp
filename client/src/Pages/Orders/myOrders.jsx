@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../Context/AppContext";
 import { useNavigate } from "react-router-dom";
+import emptyOrdersImg from "../../assets/img/no-order.png";
+
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -41,10 +43,13 @@ const MyOrders = () => {
 
   if (!orders.length)
     return (
-      <div className="text-center mt-20">
-        <p className="text-2xl font-semibold text-gray-800">
-          No orders found 🛒
-        </p>
+      <div className="text-center mt-60">
+        <img
+          src={emptyOrdersImg}
+          alt="No orders"
+          className="mx-auto mb-4 w-32 h-32"
+        />
+        <p className="text-2xl text-gray-500">No orders found</p>
       </div>
     );
 
@@ -92,7 +97,6 @@ const MyOrders = () => {
             <div className="flex justify-center">Payment</div>
             <div className="flex justify-center">Status</div>
             <div className="flex justify-center">Price</div>
-            
           </div>
 
           {/* Order Items */}
