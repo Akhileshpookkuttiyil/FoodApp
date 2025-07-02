@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useAppContext } from "../../Context/AppContext";
@@ -156,68 +156,133 @@ const CartPage = () => {
   }, []);
 
   const renderCartItem = (item) => (
-    <div
-      key={item.id}
-      className="transition hover:shadow-md rounded-md bg-white grid grid-cols-1 lg:grid-cols-[2fr_1fr_1fr_80px] lg:gap-x-20 items-center border border-gray-200 py-6 px-6"
-    >
-      <div
-        onClick={() => navigate(`/menu/${item.id}`)}
-        onKeyDown={(e) => e.key === "Enter" && navigate(`/menu/${item.id}`)}
-        role="button"
-        tabIndex={0}
-        className="flex gap-4 sm:gap-6 items-center cursor-pointer"
-      >
-        <img
-          src={item.image}
-          alt={item.name}
-          className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain rounded-lg"
-        />
-        <div>
-          <p className="text-base sm:text-lg text-gray-800 font-semibold">
-            {item.name}
-          </p>
-          <p className="text-xs sm:text-sm text-gray-500">{item.hotel}</p>
+    <>
+      <React.Fragment key={item.id}>
+        {/* Mobile Layout (small screens) */}
+        <div
+          key={`${item.id}-mobile`}
+          className="block lg:hidden w-full transition hover:shadow-md rounded-md bg-white border border-gray-200 py-4 px-4 sm:px-6 space-y-4"
+        >
+          <div
+            onClick={() => navigate(`/menu/${item.id}`)}
+            onKeyDown={(e) => e.key === "Enter" && navigate(`/menu/${item.id}`)}
+            role="button"
+            tabIndex={0}
+            className="flex gap-4 sm:gap-6 items-center cursor-pointer"
+          >
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-20 h-20 sm:w-24 sm:h-24 object-contain rounded-lg"
+            />
+            <div className="flex-1">
+              <p className="text-base sm:text-lg text-gray-800 font-semibold">
+                {item.name}
+              </p>
+              <p className="text-xs sm:text-sm text-gray-500">{item.hotel}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => updateQuantity(item.id, -1)}
+                className="w-7 h-7 border rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 font-bold"
+                disabled={item.qty === 1}
+                aria-label={`Decrease quantity of ${item.name}`}
+              >
+                -
+              </button>
+              <span className="w-8 text-center text-sm text-gray-800">
+                {item.qty}
+              </span>
+              <button
+                onClick={() => updateQuantity(item.id, 1)}
+                className="w-7 h-7 border rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 font-bold"
+                disabled={item.qty === 5}
+                aria-label={`Increase quantity of ${item.name}`}
+              >
+                +
+              </button>
+            </div>
+            <p className="text-lg font-semibold text-gray-700">
+              ₹{(item.price * item.qty).toFixed(2)}
+            </p>
+            <button
+              onClick={() => removeItemFromCart(item.id)}
+              aria-label={`Remove ${item.name} from cart`}
+              className="text-gray-500 hover:text-red-600 transition"
+            >
+              <FaTrash className="text-xl" />
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center justify-center mt-4 lg:mt-0">
-        <button
-          onClick={() => updateQuantity(item.id, -1)}
-          className="w-8 h-8 border rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 text-lg font-bold"
-          disabled={item.qty === 1}
-          aria-label={`Decrease quantity of ${item.name}`}
+        {/* Desktop Layout (large screens) */}
+        <div
+          key={`${item.id}-desktop`}
+          className="hidden lg:grid transition hover:shadow-md rounded-md bg-white grid-cols-[2fr_1fr_1fr_80px] lg:gap-x-20 items-center border border-gray-200 py-6 px-6"
         >
-          -
-        </button>
-        <span className="w-8 text-center text-sm text-gray-800">
-          {item.qty}
-        </span>
-        <button
-          onClick={() => updateQuantity(item.id, 1)}
-          className="w-8 h-8 border rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 text-lg font-bold"
-          disabled={item.qty === 5}
-          aria-label={`Increase quantity of ${item.name}`}
-        >
-          +
-        </button>
-      </div>
+          <div
+            onClick={() => navigate(`/menu/${item.id}`)}
+            onKeyDown={(e) => e.key === "Enter" && navigate(`/menu/${item.id}`)}
+            role="button"
+            tabIndex={0}
+            className="flex gap-4 sm:gap-6 items-center cursor-pointer"
+          >
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain rounded-lg"
+            />
+            <div>
+              <p className="text-base sm:text-lg text-gray-800 font-semibold">
+                {item.name}
+              </p>
+              <p className="text-xs sm:text-sm text-gray-500">{item.hotel}</p>
+            </div>
+          </div>
 
-      <div className="text-right mt-4 lg:mt-0">
-        <p className="text-lg font-semibold text-gray-700">
-          ₹{(item.price * item.qty).toFixed(2)}
-        </p>
-      </div>
+          <div className="flex items-center justify-center mt-4 lg:mt-0">
+            <button
+              onClick={() => updateQuantity(item.id, -1)}
+              className="w-8 h-8 border rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 text-lg font-bold"
+              disabled={item.qty === 1}
+              aria-label={`Decrease quantity of ${item.name}`}
+            >
+              -
+            </button>
+            <span className="w-8 text-center text-sm text-gray-800">
+              {item.qty}
+            </span>
+            <button
+              onClick={() => updateQuantity(item.id, 1)}
+              className="w-8 h-8 border rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 text-lg font-bold"
+              disabled={item.qty === 5}
+              aria-label={`Increase quantity of ${item.name}`}
+            >
+              +
+            </button>
+          </div>
 
-      <div className="flex justify-center mt-4 lg:mt-0">
-        <button
-          onClick={() => removeItemFromCart(item.id)}
-          aria-label={`Remove ${item.name} from cart`}
-          className="text-gray-500 hover:text-red-600 transition"
-        >
-          <FaTrash className="text-2xl" />
-        </button>
-      </div>
-    </div>
+          <div className="text-right mt-4 lg:mt-0">
+            <p className="text-lg font-semibold text-gray-700">
+              ₹{(item.price * item.qty).toFixed(2)}
+            </p>
+          </div>
+
+          <div className="flex justify-center mt-4 lg:mt-0">
+            <button
+              onClick={() => removeItemFromCart(item.id)}
+              aria-label={`Remove ${item.name} from cart`}
+              className="text-gray-500 hover:text-red-600 transition"
+            >
+              <FaTrash className="text-2xl" />
+            </button>
+          </div>
+        </div>
+      </React.Fragment>
+    </>
   );
 
   return (
@@ -272,7 +337,7 @@ const CartPage = () => {
             <div className="hidden lg:grid grid-cols-[2fr_1fr_1fr_80px] lg:gap-x-20 items-center border-b py-6 px-6 text-base font-semibold text-gray-600">
               <span>Product</span>
               <span className="text-center">Quantity</span>
-              <span className="text-right">Price</span>
+              <span className="text-center">Price</span>
               <span className="text-center">Action</span>
             </div>
 

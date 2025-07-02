@@ -15,7 +15,8 @@ import { useAppContext } from "../../Context/AppContext";
 const Navbar = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const { cartItems, user, setUser, setShowLogin, axios } = useAppContext();
+  const { cartItems, clearCart, user, setUser, setShowLogin, axios } =
+    useAppContext();
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -23,12 +24,6 @@ const Navbar = () => {
   const [showLocation, setShowLocation] = useState(false);
   const [currentLocation, setCurrentLocation] = useState("Fetching...");
   const location = useLocation();
-
-  // const handleSearch = () => {
-  //   if (searchQuery.trim()) {
-  //     console.log("Searching for:", searchQuery);
-  //   }
-  // };
 
   const NavLinks = useMemo(
     () => [
@@ -54,23 +49,20 @@ const Navbar = () => {
 
   const logoutUser = async () => {
     try {
-      const { data } = await axios.post(
-        "/api/user/logout",
-        {},
-        { withCredentials: true }
-      );
+      const { data } = await axios.post("/api/user/logout");
+
       if (data.success) {
         navigate("/");
         toast.success("Logged out successfully.");
       } else {
         toast.error(data.message || "Logout response was not successful.");
       }
-      setUser(null);
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Logout failed. Please try again."
       );
     } finally {
+      clearCart();
       setUser(null);
     }
   };

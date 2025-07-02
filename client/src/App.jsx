@@ -32,9 +32,8 @@ import GetOrders from "./Pages/Seller/getOrders";
 import MyOrders from "./Pages/Orders/myOrders";
 
 function AppContent() {
-  const { showLogin, seller } = useAppContext();
   const location = useLocation();
-
+  const { showLogin, seller } = useAppContext();
   const isSellerRoute = location.pathname.startsWith("/seller");
 
   return (

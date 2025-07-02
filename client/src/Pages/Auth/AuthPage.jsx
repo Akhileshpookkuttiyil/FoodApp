@@ -7,7 +7,7 @@ import { useAppContext } from "../../Context/AppContext";
 
 const AuthPage = () => {
   // Context
-  const { setShowLogin, setUser, axios } = useAppContext();
+  const { setShowLogin, setUser, axios,fetchUser } = useAppContext();
 
   // State
   const [isSignup, setIsSignup] = useState(false);
@@ -105,13 +105,16 @@ const AuthPage = () => {
             password: data.password,
           };
 
-      const res = await axios.post(url, payload, { withCredentials: true });
+      const res = await axios.post(url, payload);
 
       setUser(res.data.user);
+      await fetchUser();
       toast.success(res.data.message);
 
       // Reset form and close modal
       setData({ firstName: "", lastName: "", email: "", password: "" });
+      setTouched({});
+      setErrors({});
       setShowLogin(false);
     } catch (error) {
       toast.error(

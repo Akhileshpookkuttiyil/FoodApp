@@ -62,12 +62,15 @@ export const AppProvider = ({ children }) => {
       const { data } = await axios.get("/api/user/checkAuth");
       if (data.success) {
         setUser(data.user);
-        loadCartItems(data.user.cartItems);
       } else {
         setUser(null);
       }
     } catch (error) {
-      console.log(error.message);
+      console.error(
+        "Auth check failed:",
+        error.response?.data || error.message
+      );
+
       setUser(null);
     }
   };
@@ -99,7 +102,7 @@ export const AppProvider = ({ children }) => {
       name: cartItem.item.name,
       price: cartItem.item.price,
       qty: cartItem.quantity,
-      hotel: cartItem.restaurant,
+      hotel: cartItem.item.restaurant?.name || "Unknown Restaurant",
       image: cartItem.item.images[0], // first image
     }));
 
@@ -108,10 +111,9 @@ export const AppProvider = ({ children }) => {
 
   // Sync cart with backend
   useEffect(() => {
-    const updateCart = async () => {
-      if (!user) return;
+    if (!user || cartItems.length === 0) return;
 
-      // Transform cartItems to match backend schema
+    const updateCart = async () => {
       const formattedCartItems = cartItems.map((item) => ({
         item: item.id,
         quantity: item.qty,
@@ -129,9 +131,7 @@ export const AppProvider = ({ children }) => {
       }
     };
 
-    if (user) {
-      updateCart();
-    }
+    updateCart();
   }, [cartItems]);
 
   // Cart operations helpers
@@ -140,7 +140,7 @@ export const AppProvider = ({ children }) => {
   const addToCart = (newItem, selectedQuantity = 1) => {
     if (!user) {
       toast.error("You need to be logged in to add items to the cart.");
-      return; // Prevent adding to cart if not authorized
+      return;
     }
 
     const validQuantity = Math.min(selectedQuantity, MAX_QUANTITY);
@@ -158,7 +158,7 @@ export const AppProvider = ({ children }) => {
   const updateItemQuantity = (itemId, quantityChange) => {
     if (!user) {
       toast.error("You need to be logged in to update the cart.");
-      return; // Prevent updating the cart if not authorized
+      return;
     }
 
     setCartItems((prevItems) =>
@@ -181,7 +181,7 @@ export const AppProvider = ({ children }) => {
   const removeItemFromCart = (itemId) => {
     if (!user) {
       toast.error("You need to be logged in to remove items from the cart.");
-      return; // Prevent removing from cart if not authorized
+      return;
     }
 
     const removedItem = findItemById(itemId);
@@ -196,7 +196,7 @@ export const AppProvider = ({ children }) => {
   const clearCart = () => {
     if (!user) {
       toast.error("You need to be logged in to clear the cart.");
-      return; // Prevent clearing the cart if not authorized
+      return;
     }
 
     setCartItems([]);
@@ -214,6 +214,13 @@ export const AppProvider = ({ children }) => {
     fetchSeller();
     fetchUser();
   }, []);
+
+  // Load cart items when user.cartItems changes
+  useEffect(() => {
+    if (user?.cartItems) {
+      loadCartItems(user.cartItems);
+    }
+  }, [user?.cartItems]);
 
   // ================= PROVIDER VALUE =================
 
