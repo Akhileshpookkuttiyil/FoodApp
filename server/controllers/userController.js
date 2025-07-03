@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 // ===================== Generate JWT Token =====================
 const generateToken = (userId) => {
@@ -21,6 +23,10 @@ const setTokenCookie = (res, token) => {
 // ===================== Format User Response =====================
 const formatUserResponse = (user) => ({
   id: user._id,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  profileImage: user.profileImage,
+  phoneNumber: user.phoneNumber,
   fullName: `${user.firstName} ${user.lastName}`,
   email: user.email,
   role: user.role,
@@ -71,6 +77,59 @@ const registerUser = async (req, res) => {
       success: false,
       message: "Server error. Please try again later.",
     });
+  }
+};
+
+// ===================== UPDATE CONTROLLER =====================
+
+export const updateUser = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { firstName, lastName, email, phoneNumber, profileImage } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    if (email && email !== user.email) {
+      const exists = await User.findOne({ email });
+      if (exists) {
+        return res
+          .status(409)
+          .json({ success: false, message: "Email already in use" });
+      }
+      user.email = email;
+    }
+
+    if (firstName?.trim()) user.firstName = firstName.trim();
+    if (lastName?.trim()) user.lastName = lastName.trim();
+    if (phoneNumber?.trim()) user.phoneNumber = phoneNumber.trim();
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "users",
+      });
+      fs.unlinkSync(req.file.path);
+      user.profileImage = result.secure_url;
+    } else if (profileImage?.startsWith("http")) {
+      user.profileImage = profileImage;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated",
+      user: formatUserResponse(user),
+    });
+  } catch (error) {
+    console.error("Update user error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Server error while updating user" });
   }
 };
 
@@ -137,9 +196,6 @@ const isAuthorized = async (req, res) => {
       return res
         .status(401)
         .json({ success: false, message: "Unauthorized: User not found" });
-    }
-
-    if (process.env.NODE_ENV !== "production") {
     }
 
     if (user.role !== "user") {

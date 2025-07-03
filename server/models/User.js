@@ -22,6 +22,12 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: [/\S+@\S+\.\S+/, "Please use a valid email address"],
     },
+    phoneNumber: {
+      type: String,
+      required: false,
+      trim: true,
+      match: [/^\+?[\d\s\-()]{7,15}$/, "Please enter a valid phone number"],
+    },
     role: {
       type: String,
       enum: ["user", "seller", "admin"],
@@ -39,7 +45,7 @@ const userSchema = new mongoose.Schema(
     },
     profileImage: {
       type: String,
-      default: "", // optionally use a default avatar image URL
+      default: "https://www.gravatar.com/avatar/?d=mp",
     },
     cartItems: [
       {

@@ -29,9 +29,12 @@ const authUser = async (req, res, next) => {
     next();
   } catch (error) {
     console.error("authUser error:", error.message);
-    return res
-      .status(401)
-      .json({ success: false, message: "Unauthorized: Invalid token" });
+    const message =
+      error.name === "TokenExpiredError"
+        ? "Session expired. Please log in again."
+        : "Unauthorized: Invalid token";
+
+    return res.status(401).json({ success: false, message });
   }
 };
 

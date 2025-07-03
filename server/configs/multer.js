@@ -4,19 +4,17 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
-// Get current file and directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Upload directory
+// Upload
 const uploadDir = join(__dirname, "../uploads");
 
-// Ensure the directory exists
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure Multer storage
+// Multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
@@ -29,7 +27,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// Basic file filter (optional)
+//file filter
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
   if (allowedTypes.includes(file.mimetype)) {
@@ -39,7 +37,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Export the upload middleware
 export const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max

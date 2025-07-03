@@ -20,7 +20,8 @@ const Navbar = () => {
     useAppContext();
   const [isLoading, setIsLoading] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const dropdownRef = useRef(null);
+  const desktopDropdownRef = useRef(null);
+  const mobileDropdownRef = useRef(null);
   const userButtonRef = useRef(null);
   const userMobileButtonRef = useRef(null);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -96,10 +97,12 @@ const Navbar = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
+        desktopDropdownRef.current &&
+        !desktopDropdownRef.current.contains(event.target) &&
         userButtonRef.current &&
         !userButtonRef.current.contains(event.target) &&
+        mobileDropdownRef.current &&
+        !mobileDropdownRef.current.contains(event.target) &&
         userMobileButtonRef.current &&
         !userMobileButtonRef.current.contains(event.target)
       ) {
@@ -237,7 +240,7 @@ const Navbar = () => {
 
           {/* User Login / Logout */}
           {user ? (
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative" ref={desktopDropdownRef}>
               <button
                 ref={userButtonRef}
                 onClick={() =>
@@ -428,8 +431,9 @@ const Navbar = () => {
             )}
           </Link>
 
+          {/* User Login / Logout - Mobile */}
           {user ? (
-            <div className="flex flex-col" ref={dropdownRef}>
+            <div className="flex flex-col" ref={mobileDropdownRef}>
               <button
                 ref={userMobileButtonRef}
                 onClick={() =>
@@ -447,18 +451,16 @@ const Navbar = () => {
 
               {activeDropdown === "mobile" && (
                 <ul
-                  id="user-menu"
-                  className="absolute right-0 mt-9 bg-neutral-100 text-black shadow-lg w-48 max-w-[90vw] border border-gray-200 z-50
-        divide-y divide-gray-100
-        transition-opacity duration-200 ease-in-out"
+                  id="user-menu-mobile"
+                  className="absolute right-0 mt-9 bg-neutral-100 text-black shadow-lg w-48 max-w-[90vw] border border-gray-200 z-50 divide-y divide-gray-100 transition-opacity duration-200 ease-in-out"
                   role="menu"
                   aria-label="User menu"
                 >
                   <li
                     onClick={() => {
                       navigate("/user/edit-profile");
-                      handleClose();
                       setActiveDropdown(null);
+                      handleClose();
                     }}
                     className="cursor-pointer text-sm text-black hover:bg-gray-100 py-3 px-4"
                     role="menuitem"
@@ -469,8 +471,8 @@ const Navbar = () => {
                   <li
                     onClick={() => {
                       navigate("/orders");
-                      handleClose();
                       setActiveDropdown(null);
+                      handleClose();
                     }}
                     className="cursor-pointer text-sm text-black hover:bg-gray-100 py-3 px-4"
                     role="menuitem"
@@ -492,8 +494,8 @@ const Navbar = () => {
                   <li
                     onClick={() => {
                       logoutUser();
-                      handleClose();
                       setActiveDropdown(null);
+                      handleClose();
                     }}
                     className="cursor-pointer text-sm text-red-600 hover:bg-red-100 py-3 px-4"
                     role="menuitem"
