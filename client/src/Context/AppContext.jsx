@@ -242,6 +242,7 @@ export const AppProvider = ({ children }) => {
         fetchUser,
         // Cart
         cartItems,
+        setCartItems,
         addToCart,
         updateItemQuantity,
         removeItemFromCart,

@@ -24,6 +24,7 @@ const CartPage = () => {
   const navigate = useNavigate();
   const {
     cartItems,
+    setCartItems,
     updateItemQuantity,
     removeItemFromCart,
     clearCart,
@@ -59,6 +60,21 @@ const CartPage = () => {
     }
   };
 
+  const clearMyCart = async () => {
+    try {
+      const { data } = await axios.post("/api/cart/clear");
+
+      if (data.success) {
+        setCartItems(data.cart);
+        toast.success("Cart cleared successfully");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
   const { subtotal, tax, discount, total } = useMemo(() => {
     const sub = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
     const taxAmount = sub * 0.02;
@@ -86,7 +102,7 @@ const CartPage = () => {
       });
     } else {
       setIsCouponApplied(false);
-      toast.error("🚫 Invalid coupon code.");
+      toast.error("Invalid coupon code.");
     }
   };
 
@@ -324,7 +340,7 @@ const CartPage = () => {
                 <span className="text-sm sm:text-base text-orange-500 flex items-center gap-2">
                   ({cartItems.length} items)
                   <button
-                    onClick={clearCart}
+                    onClick={clearMyCart}
                     aria-label="Clear all items from the cart"
                     title="Clear Cart"
                   >
