@@ -1,26 +1,26 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+// Axios global config
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  // Auth states
+  // ======== States ========
   const [user, setUser] = useState(null);
-  const currency = "₹";
   const [seller, setSeller] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  // Cart states
   const [cartItems, setCartItems] = useState([]);
+
+  const currency = "₹";
   const MAX_QUANTITY = 99;
 
-  // ================= AUTH METHODS =================
+  // ======== Auth Functions ========
 
   const loginSeller = async ({ email, password }) => {
     try {
@@ -70,7 +70,6 @@ export const AppProvider = ({ children }) => {
         "Auth check failed:",
         error.response?.data || error.message
       );
-
       setUser(null);
     }
   };
@@ -93,48 +92,8 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // ================= CART METHODS =================
+  // ======== Cart Helpers ========
 
-  // Load cart from backend/user data
-  const loadCartItems = (items) => {
-    const normalized = items.map((cartItem) => ({
-      id: cartItem.item._id,
-      name: cartItem.item.name,
-      price: cartItem.item.price,
-      qty: cartItem.quantity,
-      hotel: cartItem.item.restaurant?.name || "Unknown Restaurant",
-      image: cartItem.item.images[0], // first image
-    }));
-
-    setCartItems(normalized);
-  };
-
-  // Sync cart with backend
-  useEffect(() => {
-    if (!user || cartItems.length === 0) return;
-
-    const updateCart = async () => {
-      const formattedCartItems = cartItems.map((item) => ({
-        item: item.id,
-        quantity: item.qty,
-      }));
-
-      try {
-        const { data } = await axios.post("/api/cart/update", {
-          cartItems: formattedCartItems,
-        });
-        if (!data.success) {
-          toast.error(data.message || "Cart sync failed.");
-        }
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Error syncing cart.");
-      }
-    };
-
-    updateCart();
-  }, [cartItems]);
-
-  // Cart operations helpers
   const findItemById = (id) => cartItems.find((item) => item.id === id);
 
   const addToCart = (newItem, selectedQuantity = 1) => {
@@ -198,32 +157,72 @@ export const AppProvider = ({ children }) => {
       toast.error("You need to be logged in to clear the cart.");
       return;
     }
-
     setCartItems([]);
   };
 
-  // Cart total price
   const cartTotalAmount = cartItems.reduce(
     (total, item) => total + item.qty * item.price,
     0
   );
 
-  // ================= INITIAL FETCH =================
+  const loadCartItems = (items) => {
+    const normalized = items.map((cartItem) => ({
+      id: cartItem.item._id,
+      name: cartItem.item.name,
+      price: cartItem.item.price,
+      qty: cartItem.quantity,
+      hotel: cartItem.item.restaurant?.name || "Unknown Restaurant",
+      image: cartItem.item.images[0],
+    }));
+    setCartItems(normalized);
+  };
+
+  // ======== Effects ========
 
   useEffect(() => {
     fetchSeller();
     fetchUser();
   }, []);
 
-  // Load cart items when user.cartItems changes
+  // Load cart items from user data when available
   useEffect(() => {
     if (user?.cartItems) {
       loadCartItems(user.cartItems);
     }
   }, [user?.cartItems]);
 
-  // ================= PROVIDER VALUE =================
+  // Sync cart with backend — skip first render
+  const hasMountedCartSync = useRef(false);
+  useEffect(() => {
+    if (!user || cartItems.length === 0) return;
 
+    if (!hasMountedCartSync.current) {
+      hasMountedCartSync.current = true;
+      return;
+    }
+
+    const updateCart = async () => {
+      const formattedCartItems = cartItems.map((item) => ({
+        item: item.id,
+        quantity: item.qty,
+      }));
+
+      try {
+        const { data } = await axios.post("/api/cart/update", {
+          cartItems: formattedCartItems,
+        });
+        if (!data.success) {
+          toast.error(data.message || "Cart sync failed.");
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Error syncing cart.");
+      }
+    };
+
+    updateCart();
+  }, [cartItems, user]);
+
+  // ======== Context Value ========
   return (
     <AppContext.Provider
       value={{
