@@ -19,8 +19,10 @@ const Navbar = () => {
   const { cartItems, clearCart, user, setUser, setShowLogin, axios } =
     useAppContext();
   const [isLoading, setIsLoading] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const dropdownRef = useRef(null);
+  const userButtonRef = useRef(null);
+  const userMobileButtonRef = useRef(null);
   const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const [open, setOpen] = useState(false);
   const [showLocation, setShowLocation] = useState(false);
@@ -80,7 +82,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    setDropdownOpen(false);
+    setActiveDropdown(null);
   }, [user]);
 
   useEffect(() => {
@@ -93,15 +95,20 @@ const Navbar = () => {
   // Close if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        userButtonRef.current &&
+        !userButtonRef.current.contains(event.target) &&
+        userMobileButtonRef.current &&
+        !userMobileButtonRef.current.contains(event.target)
+      ) {
+        setActiveDropdown(null);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -215,10 +222,10 @@ const Navbar = () => {
             <FaShoppingCart className="text-xl lg:text-2xl" />
 
             {user && isLoading ? (
-              // Show spinner while loading
+              //spinner
               <div className="absolute -top-2 -right-2 w-3 h-3 border-4 border-t-transparent border-orange-300 border-solid rounded-full animate-spin"></div>
             ) : (
-              // Show cart count only if the user is logged in
+              // cart count
               user &&
               totalQty > 0 && (
                 <span className="absolute -top-2 -right-2 bg-orange-300 text-white text-xs px-1.5 py-0.5 rounded-full">
@@ -232,84 +239,90 @@ const Navbar = () => {
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                ref={userButtonRef}
+                onClick={() =>
+                  setActiveDropdown((prev) =>
+                    prev === "desktop" ? null : "desktop"
+                  )
+                }
                 className="flex items-center gap-2 hover:text-orange-400 transition"
+                aria-haspopup="true"
+                aria-expanded={activeDropdown === "desktop"}
+                aria-controls="user-menu-desktop"
               >
                 <FaUser className="text-xl" />
               </button>
 
-              {dropdownOpen && (
-                <div
-                  className="fixed right-4 top-[72px] bg-neutral-50 p-3 shadow-lg z-50 w-64 border-2 border-gray-100"
-                  style={{ maxWidth: "90vw" }} // optional for smaller screens
-                >
-                  {/* User Info */}
-                  <div className="flex gap-2 items-start mb-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors duration-200">
-                    <div
-                      className="bg-center bg-no-repeat bg-cover aspect-square min-h-20 w-25 rounded-tl-md rounded-bl-md rounded-tr-none rounded-br-none"
-                      style={{
-                        backgroundImage: `url('${user.profileImage}')`,
-                      }}
-                    ></div>
-
-                    {/* Limit width and allow truncation */}
-                    <div className="flex flex-col justify-center min-h-20 max-w-[200px] overflow-hidden gap-2">
-                      <p
-                        className="text-[#757575] text-xs font-bold flex items-center gap-1.5 truncate whitespace-nowrap"
-                        title={user.fullName}
-                      >
-                        <FaUser className="text-[#757575d2]" />
-                        {user.fullName}
-                      </p>
-                      <hr className="border-gray-300" />
-                      <p
-                        className="text-[#757575] text-xs flex items-center gap-1.5 truncate whitespace-nowrap"
-                        title={user.email}
-                      >
-                        <FaEnvelope className="text-[#757575d2]" />
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Menu Items */}
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => {
-                        navigate("/user/edit-profile");
-                        setDropdownOpen(false);
-                      }}
-                      className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded"
-                    >
-                      <span className="text-[#141414] text-base">Profile</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        navigate("/orders");
-                        setDropdownOpen(false);
-                      }}
-                      className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded"
-                    >
-                      <span className="text-[#141414] text-base">
-                        My Orders
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        logoutUser();
-                        setDropdownOpen(false);
-                      }}
-                      className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded text-red-500"
-                    >
-                      <span className="material-icons text-red-500">
-                        logout
-                      </span>
-                    </button>
+              <div
+                className={`fixed right-0 top-[72px] bg-neutral-50 p-3 shadow-lg z-50 w-64 border-2 border-gray-100 max-w-[90vw]
+        origin-top transform transition-all duration-300 ease-in-out ${
+          activeDropdown === "desktop"
+            ? "opacity-100 scale-y-100 pointer-events-auto"
+            : "opacity-0 scale-y-0 pointer-events-none"
+        }`}
+                style={{ transformOrigin: "top" }}
+              >
+                {/* User Info */}
+                <div className="flex gap-2 items-start mb-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors duration-200">
+                  <div
+                    className="bg-center bg-no-repeat bg-cover aspect-square min-h-20 w-25 rounded-tl-md rounded-bl-md rounded-tr-none rounded-br-none"
+                    style={{
+                      backgroundImage: `url('${user.profileImage}')`,
+                    }}
+                  ></div>
+                  <div className="flex flex-col justify-center min-h-20 max-w-[200px] overflow-hidden gap-2">
+                    <p className="text-[#757575] text-xs font-bold flex items-center gap-1.5 truncate whitespace-nowrap">
+                      <FaUser className="text-[#757575d2]" />
+                      {user.fullName}
+                    </p>
+                    <hr className="border-gray-300" />
+                    <p className="text-[#757575] text-xs flex items-center gap-1.5 truncate whitespace-nowrap">
+                      <FaEnvelope className="text-[#757575d2]" />
+                      {user.email}
+                    </p>
                   </div>
                 </div>
-              )}
+
+                {/* Menu */}
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => {
+                      navigate("/user/edit-profile");
+                      setActiveDropdown(null);
+                    }}
+                    className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded"
+                  >
+                    Profile
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/orders");
+                      setActiveDropdown(null);
+                    }}
+                    className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded"
+                  >
+                    My Orders
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate("/orders");
+                      setActiveDropdown(null);
+                    }}
+                    className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded"
+                  >
+                    My Bookings
+                  </button>
+                  <button
+                    onClick={() => {
+                      logoutUser();
+                      setActiveDropdown(null);
+                    }}
+                    className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded text-red-500"
+                  >
+                    <span className="material-icons text-red-500">logout</span>
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <button
@@ -415,41 +428,76 @@ const Navbar = () => {
             )}
           </Link>
 
-          {/* User Login */}
           {user ? (
-            <div className="relative">
+            <div className="flex flex-col" ref={dropdownRef}>
               <button
+                ref={userMobileButtonRef}
+                onClick={() =>
+                  setActiveDropdown((prev) =>
+                    prev === "mobile" ? null : "mobile"
+                  )
+                }
                 className="flex items-center gap-2 hover:text-orange-400 transition"
-                onClick={() => setDropdownOpen(!dropdownOpen)} // Toggle dropdown visibility
+                aria-haspopup="true"
+                aria-expanded={activeDropdown === "mobile"}
+                aria-controls="user-menu-mobile"
               >
                 <FaUser className="text-xl" />
               </button>
 
-              {/* Dropdown menu using <ul> and <li> */}
-              {dropdownOpen && (
-                <ul className="absolute mt-4 bg-white text-black shadow-md rounded-md w-48">
+              {activeDropdown === "mobile" && (
+                <ul
+                  id="user-menu"
+                  className="absolute right-0 mt-9 bg-neutral-100 text-black shadow-lg w-48 max-w-[90vw] border border-gray-200 z-50
+        divide-y divide-gray-100
+        transition-opacity duration-200 ease-in-out"
+                  role="menu"
+                  aria-label="User menu"
+                >
                   <li
                     onClick={() => {
-                      setOpen(false);
+                      navigate("/user/edit-profile");
+                      handleClose();
+                      setActiveDropdown(null);
                     }}
-                    className="cursor-pointer text-sm text-black hover:bg-gray-100 py-2 px-4"
+                    className="cursor-pointer text-sm text-black hover:bg-gray-100 py-3 px-4"
+                    role="menuitem"
+                    tabIndex={0}
                   >
                     Profile
                   </li>
                   <li
                     onClick={() => {
-                      setOpen(false);
+                      navigate("/orders");
+                      handleClose();
+                      setActiveDropdown(null);
                     }}
-                    className="cursor-pointer text-sm text-black hover:bg-gray-100 py-2 px-4"
+                    className="cursor-pointer text-sm text-black hover:bg-gray-100 py-3 px-4"
+                    role="menuitem"
+                    tabIndex={0}
                   >
-                    Settings
+                    My Orders
+                  </li>
+                  <li
+                    onClick={() => {
+                      setActiveDropdown(null);
+                      handleClose();
+                    }}
+                    className="cursor-pointer text-sm text-black hover:bg-gray-100 py-3 px-4"
+                    role="menuitem"
+                    tabIndex={0}
+                  >
+                    My Bookings
                   </li>
                   <li
                     onClick={() => {
                       logoutUser();
-                      setOpen(false);
+                      handleClose();
+                      setActiveDropdown(null);
                     }}
-                    className="cursor-pointer text-sm text-red-500 hover:bg-red-100 py-2 px-4"
+                    className="cursor-pointer text-sm text-red-600 hover:bg-red-100 py-3 px-4"
+                    role="menuitem"
+                    tabIndex={0}
                   >
                     Logout
                   </li>
