@@ -5,6 +5,7 @@ import {
   FaShoppingCart,
   FaUser,
   FaMapMarkerAlt,
+  FaEnvelope,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { LiaTimesSolid } from "react-icons/lia";
@@ -239,22 +240,35 @@ const Navbar = () => {
 
               {dropdownOpen && (
                 <div
-                  className="fixed right-4 top-[72px] bg-neutral-50 p-3 shadow-lg z-50 w-64"
+                  className="fixed right-4 top-[72px] bg-neutral-50 p-3 shadow-lg z-50 w-64 border-2 border-gray-100"
                   style={{ maxWidth: "90vw" }} // optional for smaller screens
                 >
                   {/* User Info */}
-                  <div className="flex gap-4 items-start mb-4">
+                  <div className="flex gap-2 items-start mb-4 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors duration-200">
                     <div
-                      className="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-20 w-25"
+                      className="bg-center bg-no-repeat bg-cover aspect-square min-h-20 w-25 rounded-tl-md rounded-bl-md rounded-tr-none rounded-br-none"
                       style={{
                         backgroundImage: `url('${user.profileImage}')`,
                       }}
                     ></div>
-                    <div className="flex flex-col justify-center">
-                      <p className="text-[#141414] text-[14px] font-bold">
+
+                    {/* Limit width and allow truncation */}
+                    <div className="flex flex-col justify-center min-h-20 max-w-[200px] overflow-hidden gap-2">
+                      <p
+                        className="text-[#757575] text-xs font-bold flex items-center gap-1.5 truncate whitespace-nowrap"
+                        title={user.fullName}
+                      >
+                        <FaUser className="text-[#757575d2]" />
                         {user.fullName}
                       </p>
-                      <p className="text-[#757575] text-[12px]">{user.email}</p>
+                      <hr className="border-gray-300" />
+                      <p
+                        className="text-[#757575] text-xs flex items-center gap-1.5 truncate whitespace-nowrap"
+                        title={user.email}
+                      >
+                        <FaEnvelope className="text-[#757575d2]" />
+                        {user.email}
+                      </p>
                     </div>
                   </div>
 
@@ -265,7 +279,7 @@ const Navbar = () => {
                         navigate("/user/edit-profile");
                         setDropdownOpen(false);
                       }}
-                      className="flex items-center gap-4 px-4 py-3 bg-white hover:bg-gray-100 rounded"
+                      className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded"
                     >
                       <span className="text-[#141414] text-base">Profile</span>
                     </button>
@@ -275,7 +289,7 @@ const Navbar = () => {
                         navigate("/orders");
                         setDropdownOpen(false);
                       }}
-                      className="flex items-center gap-4 px-4 py-3 bg-white hover:bg-gray-100 rounded"
+                      className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded"
                     >
                       <span className="text-[#141414] text-base">
                         My Orders
@@ -287,7 +301,7 @@ const Navbar = () => {
                         logoutUser();
                         setDropdownOpen(false);
                       }}
-                      className="flex items-center gap-4 px-4 py-3 bg-white hover:bg-gray-100 rounded text-red-500"
+                      className="flex items-center gap-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded text-red-500"
                     >
                       <span className="material-icons text-red-500">
                         logout
