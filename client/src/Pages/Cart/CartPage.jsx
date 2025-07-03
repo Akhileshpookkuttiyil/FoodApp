@@ -38,12 +38,11 @@ const CartPage = () => {
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [loading, setLoading] = useState(true); // Track loading state
 
-  // Simulating loading of cart data with a timeout (remove in production)
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       setTimeout(() => {
-        setLoading(false); // Mock loading complete after 2 seconds
+        setLoading(false);
       }, 1000);
     };
     loadData();
@@ -77,9 +76,10 @@ const CartPage = () => {
     const trimmedCode = couponCode.trim().toUpperCase();
     if (trimmedCode === "DISCOUNT10") {
       setIsCouponApplied(true);
+      setCouponCode("");
       toast.success("🎉 Coupon applied! You received 10% off.");
       confetti({
-        particleCount: 300,
+        particleCount: 900,
         spread: 100,
         origin: { y: 0.6 },
         colors: ["#ff6347", "#ffeb3b", "#4caf50"],
@@ -88,6 +88,11 @@ const CartPage = () => {
       setIsCouponApplied(false);
       toast.error("🚫 Invalid coupon code.");
     }
+  };
+
+  const removeCoupon = () => {
+    setIsCouponApplied(false);
+    toast.info("🗑️ Coupon removed.");
   };
 
   const handlePlaceOrder = async () => {
@@ -348,21 +353,58 @@ const CartPage = () => {
               </React.Fragment>
             ))}
 
-            {/* Coupon code input */}
-            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
-              <input
-                type="text"
-                placeholder="Enter coupon code"
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-              />
-              <button
-                onClick={applyCoupon}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-md font-medium transition"
-              >
-                Apply
-              </button>
+            {/* Coupon Code Input */}
+            <div className="mt-8 space-y-4">
+              {/* Input + Apply Button */}
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <input
+                  type="text"
+                  placeholder="Enter coupon code"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:bg-gray-100"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  disabled={isCouponApplied}
+                />
+                <button
+                  onClick={applyCoupon}
+                  className={`text-white px-6 py-2 rounded-md font-medium transition ${
+                    isCouponApplied
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-orange-500 hover:bg-orange-600"
+                  }`}
+                  disabled={isCouponApplied}
+                >
+                  Apply
+                </button>
+              </div>
+
+              {/* Static Coupon Info */}
+              {!isCouponApplied && (
+                <div className="flex items-center justify-between px-4 py-3 border border-orange-200 rounded-md bg-orange-50 text-sm text-orange-700 shadow-sm">
+                  <span>
+                    Try coupon{" "}
+                    <strong className="text-red-600">DISCOUNT10</strong> — Get
+                    10% off on selected dishes
+                  </span>
+                  <span className="text-xs text-orange-400">*Limited time</span>
+                </div>
+              )}
+
+              {/* Applied Coupon Box */}
+              {isCouponApplied && (
+                <div className="flex items-center justify-between px-4 py-3 border border-green-400 rounded-md bg-green-50 text-green-700 shadow-sm">
+                  <span className="text-sm font-medium">
+                    🎉 Coupon <strong>DISCOUNT10</strong> applied — 10% off!
+                  </span>
+                  <button
+                    onClick={removeCoupon}
+                    className="text-green-700 hover:text-red-500 text-xl font-bold focus:outline-none"
+                    aria-label="Remove coupon"
+                  >
+                    &times;
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

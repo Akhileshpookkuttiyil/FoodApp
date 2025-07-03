@@ -349,7 +349,7 @@ const Navbar = () => {
             </button>
 
             {showLocation && (
-              <div className="absolute top-10 right-0 bg-white shadow-md rounded-md p-3 w-44 text-neutral-700 z-40">
+              <div className="absolute top-12 right-0 rounded-lg bg-neutral-50 shadow-md p-3 w-44 text-neutral-700 z-40">
                 <p className="text-sm">Your Location:</p>
                 <p className="font-semibold">{currentLocation}</p>
               </div>
