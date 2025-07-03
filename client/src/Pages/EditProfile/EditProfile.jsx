@@ -5,23 +5,20 @@ import { useAppContext } from "../../Context/AppContext";
 const EditProfile = () => {
   const { axios, setUser, user } = useAppContext();
 
-  const initialProfileImage =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCQ7QZvbNpLc3owUDhYLpPXR2ijXhab_fU5hIYQ0pHKaBYsW2hGBNOaaIF_ds0xd9uqPvMg9aUqESwiENJDGASykdocFzNryABCOZAzpmdaS7b8PP7f_VmlKS7Er-n8WdL8ispV_g27ZYn_3Pvfz9AaDN-hfJiJIVwxjkEqM64Salh4sXCgh6nLMESvnUUb0ss7-WDRaXCKqaqufeBjzByDP-5AFb5vVQYHbWFBmbiJtnTaBNJmPZkkjvYXC5zUoeor3BTzo8SXzQ";
-
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    email: user?.email || "",
-    phoneNumber: user?.phoneNumber || "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
   });
 
-  const [profileImage, setProfileImage] = useState(
-    user?.profileImage || initialProfileImage
-  );
-
+  const [previewImage, setPreviewImage] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Sync form data with user when user data changes
+  const fallbackImage =
+    "https://lh3.googleusercontent.com/a-/default-user-profile.png";
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -30,7 +27,12 @@ const EditProfile = () => {
         email: user.email || "",
         phoneNumber: user.phoneNumber || "",
       });
-      setProfileImage(user.profileImage || initialProfileImage);
+
+      setPreviewImage(
+        user.profileImage?.startsWith("http")
+          ? user.profileImage
+          : fallbackImage
+      );
     }
   }, [user]);
 
@@ -39,83 +41,75 @@ const EditProfile = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageClick = () => fileInputRef.current?.click();
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setSelectedFile(file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const updatedUser = {
-        ...formData,
-        profileImage,
-      };
+      const form = new FormData();
+      Object.entries(formData).forEach(([key, value]) =>
+        form.append(key, value)
+      );
+      if (selectedFile) form.append("profileImage", selectedFile);
+      else form.append("profileImage", previewImage);
 
-      const { data } = await axios.put("/api/user/update", updatedUser);
+      const { data } = await axios.put("/api/user/update", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (data.success) {
         setUser(data.user);
         toast.success("Profile updated successfully!");
       } else {
-        toast.error(data.message || "Failed to update profile.");
+        toast.error(data.message || "Update failed.");
       }
     } catch (error) {
-      const message =
-        error.response?.data?.message || "Failed to update profile.";
-      toast.error(message);
-      console.error("Update error:", error);
-    }
-  };
-
-  const handleImageClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setProfileImage(url);
+      const msg = error.response?.data?.message || "Update failed.";
+      toast.error(msg);
     }
   };
 
   const handleReset = () => {
     setFormData({
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
-      email: user?.email || "",
-      phoneNumber: user?.phoneNumber || "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
     });
-    setProfileImage(user?.profileImage || initialProfileImage);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = null;
-    }
+
+    setPreviewImage(
+      user?.profileImage?.startsWith("http") ? user.profileImage : fallbackImage
+    );
+
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = null;
   };
 
   return (
-    <div
-      className="min-h-screen bg-slate-50 py-28 px-4 sm:px-6 lg:px-16"
-      style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}
-    >
-      {/* Header */}
+    <div className="min-h-screen bg-slate-50 py-28 px-4 lg:px-16 font-sans">
       <div className="flex items-center mb-10">
         <button className="text-[#0d141c] mr-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            fill="currentColor"
-            viewBox="0 0 256 256"
-          >
-            <path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z" />
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M224,128a8,8,0,0,1-8,8H59.3l58.3,58.3a8,8,0,0,1-11.3,11.3l-72-72a8,8,0,0,1,0-11.3l72-72a8,8,0,0,1,11.3,11.3L59.3,120H216A8,8,0,0,1,224,128Z" />
           </svg>
         </button>
         <h2 className="text-xl text-[#0d141c]">Back</h2>
       </div>
 
-      {/* Profile Image */}
       <div className="flex flex-col items-center gap-4 mb-12">
         <div
           onClick={handleImageClick}
           className="rounded-full bg-cover bg-center w-32 h-32 sm:w-36 sm:h-36 cursor-pointer ring-2 ring-[#49709c]/30 hover:ring-orange-400 transition"
-          style={{ backgroundImage: `url(${profileImage})` }}
+          style={{ backgroundImage: `url(${previewImage})` }}
         />
         <input
           ref={fileInputRef}
@@ -134,10 +128,9 @@ const EditProfile = () => {
         </div>
       </div>
 
-      {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-6 w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto"
+        className="flex flex-col gap-6 w-full max-w-2xl mx-auto"
       >
         {[
           { label: "First Name", name: "firstName" },
@@ -145,7 +138,7 @@ const EditProfile = () => {
           { label: "Email", name: "email", type: "email" },
           { label: "Phone Number", name: "phoneNumber", type: "tel" },
         ].map(({ label, name, type = "text" }) => (
-          <div key={name} className="w-full">
+          <div key={name}>
             <label className="block text-sm font-medium text-[#0d141c] mb-2">
               {label}
             </label>
@@ -160,7 +153,6 @@ const EditProfile = () => {
           </div>
         ))}
 
-        {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-10">
           <button
             type="submit"

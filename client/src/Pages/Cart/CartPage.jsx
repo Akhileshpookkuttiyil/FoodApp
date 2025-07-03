@@ -342,7 +342,11 @@ const CartPage = () => {
             </div>
 
             {/* Cart Items */}
-            {cartItems.map(renderCartItem)}
+            {cartItems.map((item) => (
+              <React.Fragment key={item.id}>
+                {renderCartItem(item)}
+              </React.Fragment>
+            ))}
 
             {/* Coupon code input */}
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
