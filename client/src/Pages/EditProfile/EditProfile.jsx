@@ -14,6 +14,7 @@ const EditProfile = () => {
 
   const [previewImage, setPreviewImage] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const fallbackImage =
@@ -53,6 +54,7 @@ const EditProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const form = new FormData();
@@ -75,6 +77,8 @@ const EditProfile = () => {
     } catch (error) {
       const msg = error.response?.data?.message || "Update failed.";
       toast.error(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -95,20 +99,31 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-28 px-4 lg:px-16 font-sans">
-      <div className="flex items-center mb-10">
-        <button className="text-[#0d141c] mr-4">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+    <div className="min-h-screen bg-slate-50 px-4 lg:px-16 py-28 font-sans text-[#0d141c]">
+      {/* Back Button */}
+      <div className="mb-10">
+        <button
+          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-[#0d141c] hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-orange-400"
+          aria-label="Go back"
+        >
+          <svg
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 256 256"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path d="M224,128a8,8,0,0,1-8,8H59.3l58.3,58.3a8,8,0,0,1-11.3,11.3l-72-72a8,8,0,0,1,0-11.3l72-72a8,8,0,0,1,11.3,11.3L59.3,120H216A8,8,0,0,1,224,128Z" />
           </svg>
+          <span>Back</span>
         </button>
-        <h2 className="text-xl text-[#0d141c]">Back</h2>
       </div>
 
+      {/* Profile Picture & Name */}
       <div className="flex flex-col items-center gap-4 mb-12">
         <div
           onClick={handleImageClick}
-          className="rounded-full bg-cover bg-center w-32 h-32 sm:w-36 sm:h-36 cursor-pointer ring-2 ring-[#49709c]/30 hover:ring-orange-400 transition"
+          className="rounded-full w-36 h-36 cursor-pointer ring-2 ring-orange-400/30 hover:ring-orange-500 transition bg-cover bg-center shadow-md"
           style={{ backgroundImage: `url(${previewImage})` }}
         />
         <input
@@ -119,18 +134,19 @@ const EditProfile = () => {
           onChange={handleImageChange}
         />
         <div className="text-center">
-          <p className="text-xl sm:text-2xl font-bold text-[#0d141c]">
+          <p className="text-2xl font-semibold">
             {user?.firstName} {user?.lastName}
           </p>
-          <p className="text-sm text-[#49709c]">
+          <p className="text-sm text-orange-500 font-mono">
             @{user?.username || "username"}
           </p>
         </div>
       </div>
 
+      {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-6 w-full max-w-2xl mx-auto"
+        className="w-full max-w-2xl mx-auto bg-white shadow-md rounded-xl p-8 border border-gray-200 flex flex-col gap-6"
       >
         {[
           { label: "First Name", name: "firstName" },
@@ -139,7 +155,7 @@ const EditProfile = () => {
           { label: "Phone Number", name: "phoneNumber", type: "tel" },
         ].map(({ label, name, type = "text" }) => (
           <div key={name}>
-            <label className="block text-sm font-medium text-[#0d141c] mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               {label}
             </label>
             <input
@@ -148,22 +164,29 @@ const EditProfile = () => {
               value={formData[name]}
               onChange={handleChange}
               placeholder={`Enter ${label}`}
-              className="w-full h-12 rounded-lg bg-[#e7edf4] text-[#0d141c] placeholder-[#49709c] px-4 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
+              className="w-full h-12 px-4 rounded-lg bg-gray-100 text-[#0d141c] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 transition"
             />
           </div>
         ))}
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-10">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 mt-8">
           <button
             type="submit"
-            className="bg-orange-500 text-white h-12 px-6 rounded-lg font-bold hover:bg-orange-600 transition"
+            disabled={loading}
+            className={`h-12 px-6 rounded-lg font-bold transition text-white ${
+              loading
+                ? "bg-orange-400 cursor-not-allowed"
+                : "bg-orange-500 hover:bg-orange-600"
+            }`}
           >
-            Save Changes
+            {loading ? "Saving..." : "Save Changes"}
           </button>
           <button
             type="button"
             onClick={handleReset}
-            className="bg-gray-300 text-gray-800 h-12 px-6 rounded-lg font-bold hover:bg-gray-400 transition"
+            disabled={loading}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 h-12 px-6 rounded-lg font-bold transition"
           >
             Reset
           </button>

@@ -114,7 +114,7 @@ const MyOrders = () => {
                   {/* Product */}
                   <div
                     className="flex items-center gap-4 cursor-pointer"
-                    onClick={() => navigate(`/products/food/${product._id}`)}
+                    onClick={() => navigate(`/menu/${product.id}`)}
                   >
                     <img
                       src={product.images?.[0] || "/placeholder.jpg"}
