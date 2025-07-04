@@ -135,7 +135,6 @@ const CartPage = () => {
             quantity: qty,
           })),
           addressId: selectedAddress._id,
-          notes: "",
         };
 
         const { data } = await axios.post("/api/order/cod", orderPayload);
