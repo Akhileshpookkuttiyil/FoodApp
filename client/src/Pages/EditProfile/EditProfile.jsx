@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useAppContext } from "../../Context/AppContext";
+import { useNavigate } from "react-router-dom";
 
 const EditProfile = () => {
   const { axios, setUser, user } = useAppContext();
-
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -103,19 +104,21 @@ const EditProfile = () => {
       {/* Back Button */}
       <div className="mb-10">
         <button
-          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-[#0d141c] hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-orange-400"
+          onClick={() => {
+            navigate("/");
+          }}
+          className="flex items-center gap-1 px-3 py-2 rounded-md text-[#0d141c] hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-orange-400"
           aria-label="Go back"
         >
           <svg
-            width="16"
-            height="16"
+            className="w-5 h-5 md:w-6 md:h-6"
             fill="currentColor"
             viewBox="0 0 256 256"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path d="M224,128a8,8,0,0,1-8,8H59.3l58.3,58.3a8,8,0,0,1-11.3,11.3l-72-72a8,8,0,0,1,0-11.3l72-72a8,8,0,0,1,11.3,11.3L59.3,120H216A8,8,0,0,1,224,128Z" />
           </svg>
-          <span>Back</span>
+          <span className="text-base md:text-lg select-none">Back</span>
         </button>
       </div>
 
@@ -138,7 +141,7 @@ const EditProfile = () => {
             {user?.firstName} {user?.lastName}
           </p>
           <p className="text-sm text-orange-500 font-mono">
-            @{user?.username || "username"}
+            @{user?.email || "email"}
           </p>
         </div>
       </div>

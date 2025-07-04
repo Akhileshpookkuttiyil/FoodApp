@@ -3,7 +3,6 @@ import { useAppContext } from "../../Context/AppContext";
 import { useNavigate } from "react-router-dom";
 import emptyOrdersImg from "../../assets/img/no-order.png";
 
-
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
