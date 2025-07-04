@@ -3,14 +3,12 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-// Axios global config
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  // ======== States ========
   const [user, setUser] = useState(null);
   const [seller, setSeller] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
@@ -20,8 +18,7 @@ export const AppProvider = ({ children }) => {
   const currency = "₹";
   const MAX_QUANTITY = 99;
 
-  // ======== Auth Functions ========
-
+  // ========== AUTH ==========
   const loginSeller = async ({ email, password }) => {
     try {
       const { data } = await axios.post("/api/seller/login", {
@@ -92,14 +89,13 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // ======== Cart Helpers ========
-
+  // ========== CART ==========
   const findItemById = (id) => cartItems.find((item) => item.id === id);
 
   const addToCart = (newItem, selectedQuantity = 1) => {
     if (!user) {
       toast.error("You need to be logged in to add items to the cart.");
-      return;
+      return false;
     }
 
     const validQuantity = Math.min(selectedQuantity, MAX_QUANTITY);
@@ -117,7 +113,7 @@ export const AppProvider = ({ children }) => {
   const updateItemQuantity = (itemId, quantityChange) => {
     if (!user) {
       toast.error("You need to be logged in to update the cart.");
-      return;
+      return false;
     }
 
     setCartItems((prevItems) =>
@@ -140,14 +136,13 @@ export const AppProvider = ({ children }) => {
   const removeItemFromCart = (itemId) => {
     if (!user) {
       toast.error("You need to be logged in to remove items from the cart.");
-      return;
+      return false;
     }
 
     const removedItem = findItemById(itemId);
     if (removedItem) {
-      setCartItems((prevItems) =>
-        prevItems.filter((item) => item.id !== itemId)
-      );
+      const updatedCart = cartItems.filter((item) => item.id !== itemId);
+      setCartItems(updatedCart);
       toast.success(`${removedItem.name} removed from cart.`);
     }
   };
@@ -155,9 +150,10 @@ export const AppProvider = ({ children }) => {
   const clearCart = () => {
     if (!user) {
       toast.error("You need to be logged in to clear the cart.");
-      return;
+      return false;
     }
     setCartItems([]);
+    localStorage.setItem("cartItems", JSON.stringify([]));
   };
 
   const cartTotalAmount = cartItems.reduce(
@@ -166,35 +162,69 @@ export const AppProvider = ({ children }) => {
   );
 
   const loadCartItems = (items) => {
-    const normalized = items.map((cartItem) => ({
-      id: cartItem.item._id,
-      name: cartItem.item.name,
-      price: cartItem.item.price,
-      qty: cartItem.quantity,
-      hotel: cartItem.item.restaurant?.name || "Unknown Restaurant",
-      image: cartItem.item.images[0],
-    }));
+    if (!items || !Array.isArray(items)) return;
+
+    const isNormalized = items.length > 0 && items[0].id && !items[0].item;
+
+    const normalized = isNormalized
+      ? items
+      : items.map((cartItem) => ({
+          id: cartItem.item._id,
+          name: cartItem.item.name,
+          price: cartItem.item.price,
+          qty: cartItem.quantity,
+          hotel: cartItem.item.restaurant?.name || "Unknown Restaurant",
+          image: cartItem.item.images[0],
+        }));
+
     setCartItems(normalized);
   };
 
-  // ======== Effects ========
+  // ========== SYNC & EFFECTS ==========
 
+  // Initial auth check
   useEffect(() => {
     fetchSeller();
     fetchUser();
   }, []);
 
-  // Load cart items from user data when available
+  // Load cart from user OR from localStorage
   useEffect(() => {
-    if (user?.cartItems) {
+    const storedCart = localStorage.getItem("cartItems");
+    const parsedStoredCart = storedCart ? JSON.parse(storedCart) : null;
+
+    if (parsedStoredCart && parsedStoredCart.length > 0) {
+      loadCartItems(parsedStoredCart);
+    } else if (user?.cartItems) {
       loadCartItems(user.cartItems);
     }
   }, [user?.cartItems]);
 
-  // Sync cart with backend — skip first render
+  // Save cart to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  // Listen for tab-to-tab cart updates
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === "cartItems") {
+        try {
+          const newCart = JSON.parse(e.newValue || "[]");
+          setCartItems(newCart);
+        } catch {
+          console.error("Failed to sync cart from another tab.");
+        }
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  // Sync cart with backend after initial mount
   const hasMountedCartSync = useRef(false);
   useEffect(() => {
-    if (!user || cartItems.length === 0) return;
+    if (!user) return;
 
     if (!hasMountedCartSync.current) {
       hasMountedCartSync.current = true;
@@ -222,11 +252,10 @@ export const AppProvider = ({ children }) => {
     updateCart();
   }, [cartItems, user]);
 
-  // ======== Context Value ========
+  // ========== PROVIDER ==========
   return (
     <AppContext.Provider
       value={{
-        // Auth
         user,
         axios,
         currency,
@@ -240,7 +269,6 @@ export const AppProvider = ({ children }) => {
         logoutSeller,
         fetchSeller,
         fetchUser,
-        // Cart
         cartItems,
         setCartItems,
         addToCart,

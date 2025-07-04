@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAppContext } from "../../Context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import emptyOrdersImg from "../../assets/img/no-order.png";
 
@@ -46,8 +46,9 @@ const MyOrders = () => {
         <img
           src={emptyOrdersImg}
           alt="No orders"
-          className="mx-auto mb-4 w-32 h-32"
+          className="mx-auto mb-4 w-32 h-32 object-contain"
         />
+
         <p className="text-2xl text-gray-500">No orders found</p>
       </div>
     );

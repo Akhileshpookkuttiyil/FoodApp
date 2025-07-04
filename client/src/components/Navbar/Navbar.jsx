@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { LiaTimesSolid } from "react-icons/lia";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../../Context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
