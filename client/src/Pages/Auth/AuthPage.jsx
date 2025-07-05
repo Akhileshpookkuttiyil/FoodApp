@@ -7,7 +7,8 @@ import { useAppContext } from "../../Context/AppContext";
 
 const AuthPage = () => {
   // Context
-  const { setShowLogin, setUser, axios,fetchUser } = useAppContext();
+  const { setShowLogin, setUser, axios, loadCartItems} =
+    useAppContext();
 
   // State
   const [isSignup, setIsSignup] = useState(false);
@@ -69,7 +70,6 @@ const AuthPage = () => {
     setErrors(validate());
   };
 
-  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -107,8 +107,18 @@ const AuthPage = () => {
 
       const res = await axios.post(url, payload);
 
-      setUser(res.data.user);
-      await fetchUser();
+      if (!res.data.success || !res.data.user) {
+        throw new Error(res.data.message || "Invalid response from server");
+      }
+
+      const user = res.data.user;
+
+      setUser(user);
+
+      if (Array.isArray(user.cartItems)) {
+        loadCartItems(user.cartItems);
+      }
+      window.location.reload();
       toast.success(res.data.message);
 
       // Reset form and close modal
@@ -118,7 +128,9 @@ const AuthPage = () => {
       setShowLogin(false);
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Something went wrong. Try again."
+        error.response?.data?.message ||
+          error.message ||
+          "Something went wrong. Try again."
       );
     } finally {
       setLoading(false);

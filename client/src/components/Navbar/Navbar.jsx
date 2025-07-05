@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { LiaTimesSolid } from "react-icons/lia";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../Context/AppContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -57,7 +57,9 @@ const Navbar = () => {
       const { data } = await axios.post("/api/user/logout");
 
       if (data.success) {
+        clearCart();
         navigate("/");
+        setUser(null);
         toast.success("Logged out successfully.");
       } else {
         toast.error(data.message || "Logout response was not successful.");

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../Context/AppContext";
 import { useNavigate } from "react-router-dom";
 
 const EditProfile = () => {

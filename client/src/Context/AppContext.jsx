@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -10,6 +17,7 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
   const [seller, setSeller] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -17,6 +25,26 @@ export const AppProvider = ({ children }) => {
 
   const currency = "₹";
   const MAX_QUANTITY = 99;
+
+  const checkSessionValid = async () => {
+    try {
+      const { data } = await axios.get("/api/user/checkAuth");
+      if (!data.success || !data.user) {
+        setUser(null);
+        setCartItems([]);
+        setShowLogin(true); // optionally show login modal
+        toast.error("Session expired. Please log in again.");
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.log(err.message);
+      setUser(null);
+      setCartItems([]);
+      toast.error("Session expired. Please log in again.");
+      return false;
+    }
+  };
 
   // ========== AUTH ==========
   const loginSeller = async ({ email, password }) => {
@@ -55,52 +83,54 @@ export const AppProvider = ({ children }) => {
   };
 
   const fetchUser = async () => {
+    setLoadingUser(true);
+
     try {
       const { data } = await axios.get("/api/user/checkAuth");
-      if (data.success) {
-        setUser(data.user);
-      } else {
+
+      if (!data.success || !data.user) {
         setUser(null);
+        setCartItems([]);
+        return;
+      }
+
+      const user = data.user;
+      setUser(user);
+
+      if (Array.isArray(user.cartItems)) {
+        loadCartItems(user.cartItems);
       }
     } catch (error) {
-      console.error(
-        "Auth check failed:",
-        error.response?.data || error.message
-      );
+      console.error("Failed to fetch user:", error.message);
       setUser(null);
+      setCartItems([]);
+    } finally {
+      setLoadingUser(false);
     }
   };
 
   const logoutSeller = async () => {
     try {
       const { data } = await axios.post("/api/seller/logout");
-      if (data.success) {
-        toast.success("Logged out successfully.");
-      } else {
-        toast.error(data.message || "Logout response was not successful.");
-      }
-      setSeller(null);
+      if (data.success) toast.success("Logged out successfully.");
+      else toast.error(data.message || "Logout response was not successful.");
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Logout failed. Please try again."
       );
     } finally {
       setSeller(null);
+      setCartItems([]); // Clear cart on logout
     }
   };
 
   // ========== CART ==========
-  const findItemById = (id) => cartItems.find((item) => item.id === id);
-
-  const addToCart = (newItem, selectedQuantity = 1) => {
-    if (!user) {
-      toast.error("You need to be logged in to add items to the cart.");
-      return false;
-    }
+  const addToCart = async (newItem, selectedQuantity = 1) => {
+    if (!(await checkSessionValid())) return false;
 
     const validQuantity = Math.min(selectedQuantity, MAX_QUANTITY);
     setCartItems((prevItems) => {
-      const existingItem = findItemById(newItem.id);
+      const existingItem = prevItems.find((item) => item.id === newItem.id);
       if (!existingItem) {
         toast.success(`${newItem.name} added to cart!`);
         return [...prevItems, { ...newItem, qty: validQuantity }];
@@ -110,11 +140,8 @@ export const AppProvider = ({ children }) => {
     });
   };
 
-  const updateItemQuantity = (itemId, quantityChange) => {
-    if (!user) {
-      toast.error("You need to be logged in to update the cart.");
-      return false;
-    }
+  const updateItemQuantity = async (itemId, quantityChange) => {
+    if (!(await checkSessionValid())) return false;
 
     setCartItems((prevItems) =>
       prevItems.map((item) => {
@@ -123,9 +150,8 @@ export const AppProvider = ({ children }) => {
             Math.max(1, item.qty + quantityChange),
             MAX_QUANTITY
           );
-          if (newQty !== item.qty) {
-            toast.success("Cart updated");
-          }
+          if (newQty === item.qty) return item;
+          toast.success("Cart updated");
           return { ...item, qty: newQty };
         }
         return item;
@@ -133,95 +159,43 @@ export const AppProvider = ({ children }) => {
     );
   };
 
-  const removeItemFromCart = (itemId) => {
-    if (!user) {
-      toast.error("You need to be logged in to remove items from the cart.");
-      return false;
-    }
-
-    const removedItem = findItemById(itemId);
-    if (removedItem) {
-      const updatedCart = cartItems.filter((item) => item.id !== itemId);
-      setCartItems(updatedCart);
-      toast.success(`${removedItem.name} removed from cart.`);
-    }
+  const removeItemFromCart = async (itemId) => {
+    if (!(await checkSessionValid())) return false;
+    setCartItems((prevItems) => {
+      const item = prevItems.find((item) => item.id === itemId);
+      if (item) toast.success(`${item.name} removed from cart.`);
+      return prevItems.filter((item) => item.id !== itemId);
+    });
   };
 
-  const clearCart = () => {
-    if (!user) {
-      toast.error("You need to be logged in to clear the cart.");
-      return false;
-    }
+  const clearCart = async () => {
+    if (!(await checkSessionValid())) return false;
     setCartItems([]);
-    localStorage.setItem("cartItems", JSON.stringify([]));
   };
 
-  const cartTotalAmount = cartItems.reduce(
-    (total, item) => total + item.qty * item.price,
-    0
-  );
+  const cartTotalAmount = useMemo(() => {
+    return cartItems.reduce((total, item) => total + item.qty * item.price, 0);
+  }, [cartItems]);
 
   const loadCartItems = (items) => {
-    if (!items || !Array.isArray(items)) return;
-
-    const isNormalized = items.length > 0 && items[0].id && !items[0].item;
-
-    const normalized = isNormalized
-      ? items
-      : items.map((cartItem) => ({
-          id: cartItem.item._id,
-          name: cartItem.item.name,
-          price: cartItem.item.price,
-          qty: cartItem.quantity,
-          hotel: cartItem.item.restaurant?.name || "Unknown Restaurant",
-          image: cartItem.item.images[0],
-        }));
-
+    if (!Array.isArray(items)) return;
+    const normalized = items.map((cartItem) => ({
+      id: cartItem.item?._id || cartItem.id,
+      name: cartItem.item?.name || cartItem.name,
+      price: cartItem.item?.price || cartItem.price,
+      qty: cartItem.quantity || cartItem.qty,
+      hotel: cartItem.item?.restaurant?.name || cartItem.hotel || "Unknown",
+      image: cartItem.item?.images?.[0] || cartItem.image,
+    }));
     setCartItems(normalized);
   };
 
-  // ========== SYNC & EFFECTS ==========
-
-  // Initial auth check
+  // ========== SYNC ==========
   useEffect(() => {
     fetchSeller();
     fetchUser();
   }, []);
 
-  // Load cart from user OR from localStorage
-  useEffect(() => {
-    const storedCart = localStorage.getItem("cartItems");
-    const parsedStoredCart = storedCart ? JSON.parse(storedCart) : null;
-
-    if (parsedStoredCart && parsedStoredCart.length > 0) {
-      loadCartItems(parsedStoredCart);
-    } else if (user?.cartItems) {
-      loadCartItems(user.cartItems);
-    }
-  }, [user?.cartItems]);
-
-  // Save cart to localStorage on change
-  useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  // Listen for tab-to-tab cart updates
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === "cartItems") {
-        try {
-          const newCart = JSON.parse(e.newValue || "[]");
-          setCartItems(newCart);
-        } catch {
-          console.error("Failed to sync cart from another tab.");
-        }
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  // Sync cart with backend after initial mount
   const hasMountedCartSync = useRef(false);
   useEffect(() => {
     if (!user) return;
@@ -232,18 +206,15 @@ export const AppProvider = ({ children }) => {
     }
 
     const updateCart = async () => {
-      const formattedCartItems = cartItems.map((item) => ({
+      const formatted = cartItems.map((item) => ({
         item: item.id,
         quantity: item.qty,
       }));
-
       try {
         const { data } = await axios.post("/api/cart/update", {
-          cartItems: formattedCartItems,
+          cartItems: formatted,
         });
-        if (!data.success) {
-          toast.error(data.message || "Cart sync failed.");
-        }
+        if (!data.success) toast.error(data.message || "Cart sync failed.");
       } catch (error) {
         toast.error(error.response?.data?.message || "Error syncing cart.");
       }
@@ -252,16 +223,16 @@ export const AppProvider = ({ children }) => {
     updateCart();
   }, [cartItems, user]);
 
-  // ========== PROVIDER ==========
   return (
     <AppContext.Provider
       value={{
         user,
+        seller,
         axios,
         currency,
-        seller,
         showLogin,
         loading,
+        loadingUser,
         setUser,
         setSeller,
         setShowLogin,

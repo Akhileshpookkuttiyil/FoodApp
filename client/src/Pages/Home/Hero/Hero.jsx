@@ -1,6 +1,8 @@
 import Slider from "./Slider/Slider";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <div className="w-full bg-gradient-to-tr from-orange-700 via-amber-800 to-red-700 mt-[8ch]">
       <div className="flex flex-col-reverse md:flex-row items-center justify-between px-4 sm:px-7 md:px-16 lg:px-28 py-8 md:py-0 md:h-[calc(100vh-8ch)]">
@@ -21,7 +23,7 @@ const Hero = () => {
             </p>
           </div>
           <div className="flex justify-center md:justify-start">
-            <button className="px-8 py-2 text-base sm:text-lg font-medium text-neutral-900 bg-orange-500 hover:bg-orange-600 border-2 border-orange-500 rounded-xl transition duration-300">
+            <button onClick={()=>{navigate('/menus')}} className="px-8 py-2 text-base sm:text-lg font-medium text-neutral-900 bg-orange-500 hover:bg-orange-600 border-2 border-orange-500 rounded-xl transition duration-300">
               Order Now
             </button>
           </div>

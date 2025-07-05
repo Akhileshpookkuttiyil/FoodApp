@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../Context/AppContext";
 import { useNavigate } from "react-router-dom";
 import emptyOrdersImg from "../../assets/img/no-order.png";
 
