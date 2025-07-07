@@ -147,7 +147,7 @@ const MenuGrid = ({ items }) => {
                 <div className="mt-4 w-full">
                   <div className="flex justify-between items-center w-full">
                     <div className="text-lg font-bold text-gray-800">
-                      ₹{item.price}
+                      ₹{item.offerPrice}
                     </div>
 
                     {count === 0 ? (

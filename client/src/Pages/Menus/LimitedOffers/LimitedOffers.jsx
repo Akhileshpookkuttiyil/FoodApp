@@ -10,7 +10,7 @@ import {
 import StarRating from "../../StarRating"; // Adjust the path if necessary
 
 // If you use CartContext:
-import { useAppContext } from "../../../context/AppContext";
+import { useAppContext } from "../../../Context/AppContext";
 import { Offers } from "../Data/limitedOffersData";
 
 const LimitedOffers = () => {

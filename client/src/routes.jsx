@@ -17,6 +17,8 @@ const SearchResults = lazy(() => import("./Pages/SearchResults/SearchResults"));
 const CartPage = lazy(() => import("./Pages/Cart/CartPage"));
 const AddAddressPage = lazy(() => import("./Pages/AddAddress/AddAddressPage"));
 const MyOrders = lazy(() => import("./Pages/Orders/myOrders"));
+const Loader = lazy(() => import("./components/Loading"));
+
 const EditProfile = lazy(() => import("./Pages/EditProfile/EditProfile"));
 
 // Lazy-loaded seller pages
@@ -33,7 +35,7 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     if (!loadingUser && !user) {
-      setShowLogin(true); 
+      setShowLogin(true);
     }
   }, [user, loadingUser, setShowLogin]);
 
@@ -57,6 +59,7 @@ const AppRoutes = () => {
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/contact" element={<ContactSection />} />
         <Route path="/about" element={<About />} />
+        <Route path="/loader" element={<Loader />} />
         <Route path="/menu/:id" element={<DishDetail />} />
         <Route path="/search" element={<SearchResults />} />
 

@@ -76,7 +76,10 @@ const CartPage = () => {
   };
 
   const { subtotal, tax, discount, total } = useMemo(() => {
-    const sub = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+    const sub = cartItems.reduce(
+      (sum, item) => sum + item.offerPrice * item.qty,
+      0
+    );
     const taxAmount = sub * 0.02;
     const discountAmount = isCouponApplied ? sub * 0.1 : 0;
     const finalTotal = sub + taxAmount - discountAmount;
@@ -127,16 +130,16 @@ const CartPage = () => {
 
     setPlacingOrder(true);
 
+    const orderPayload = {
+      items: cartItems.map(({ id, qty }) => ({
+        productId: id,
+        quantity: qty,
+      })),
+      addressId: selectedAddress._id,
+    };
+
     if (paymentMethod === "COD") {
       try {
-        const orderPayload = {
-          items: cartItems.map(({ id, qty }) => ({
-            productId: id,
-            quantity: qty,
-          })),
-          addressId: selectedAddress._id,
-        };
-
         const { data } = await axios.post("/api/order/cod", orderPayload);
         toast.success(data.message || "Order placed successfully!");
         clearCart();
@@ -145,12 +148,28 @@ const CartPage = () => {
         toast.error(
           error.response?.data?.message || "Failed to place order. Try again."
         );
+      } finally {
+        setPlacingOrder(false);
       }
     } else if (paymentMethod === "Online") {
-      toast.error("Online payment");
-    }
+      try {
+        const { data } = await axios.post("/api/order/stripe", orderPayload);
 
-    setPlacingOrder(false);
+        if (data.success && data.url) {
+          clearCart(); 
+          window.location.href = data.url; 
+        } else {
+          toast.error(data.message || "Stripe checkout URL not received.");
+        }
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to create Stripe payment. Try again."
+        );
+      } finally {
+        setPlacingOrder(false);
+      }
+    }
   };
 
   const handlePaymentChange = (e) => {
@@ -226,7 +245,7 @@ const CartPage = () => {
               </button>
             </div>
             <p className="text-lg font-semibold text-gray-700">
-              ₹{(item.price * item.qty).toFixed(2)}
+              ₹{(item.offerPrice * item.qty).toFixed(2)}
             </p>
             <button
               onClick={() => removeItemFromCart(item.id)}
@@ -287,7 +306,7 @@ const CartPage = () => {
 
           <div className="text-right mt-4 lg:mt-0">
             <p className="text-lg font-semibold text-gray-700">
-              ₹{(item.price * item.qty).toFixed(2)}
+              ₹{(item.offerPrice * item.qty).toFixed(2)}
             </p>
           </div>
 

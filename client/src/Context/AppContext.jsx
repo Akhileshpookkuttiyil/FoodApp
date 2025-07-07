@@ -32,7 +32,7 @@ export const AppProvider = ({ children }) => {
       if (!data.success || !data.user) {
         setUser(null);
         setCartItems([]);
-        setShowLogin(true); // optionally show login modal
+        setShowLogin(true); // show login modal
         toast.error("Session expired. Please log in again.");
         return false;
       }
@@ -183,6 +183,7 @@ export const AppProvider = ({ children }) => {
       id: cartItem.item?._id || cartItem.id,
       name: cartItem.item?.name || cartItem.name,
       price: cartItem.item?.price || cartItem.price,
+      offerPrice: cartItem.item?.offerPrice || cartItem.price,
       qty: cartItem.quantity || cartItem.qty,
       hotel: cartItem.item?.restaurant?.name || cartItem.hotel || "Unknown",
       image: cartItem.item?.images?.[0] || cartItem.image,
