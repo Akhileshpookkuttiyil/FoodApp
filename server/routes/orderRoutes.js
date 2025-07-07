@@ -5,11 +5,13 @@ import {
   getAllOrders,
   getUserOrders,
   placeOrderCOD,
+  placeOrderStripe,
 } from "../controllers/orderController.js";
 
 const orderRouter = express.Router();
 
 orderRouter.post("/cod", authUser, placeOrderCOD);
+orderRouter.post("/stripe", authUser, placeOrderStripe);
 orderRouter.get("/user", authUser, getUserOrders);
 orderRouter.get("/seller", authRole("seller"), getAllOrders);
 

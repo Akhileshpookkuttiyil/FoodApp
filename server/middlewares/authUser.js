@@ -15,12 +15,10 @@ const authUser = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Find the user to ensure they still exist (optional but safer)
-    const user = await User.findById(decoded.id).select("-password");
-    if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Unauthorized: User not found" });
-    }
+   const user = await User.findById(decoded.id).select("+sessionId");
+        if (!user || user.sessionId !== decoded.sessionId) {
+      return res.status(401).json({ success: false, message: "Session invalid or expired. Please log in again." });
+        }
 
     // Attach user to request object
     req.user = user;

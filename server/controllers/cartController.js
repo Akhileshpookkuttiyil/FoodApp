@@ -1,4 +1,4 @@
-import User from "../models/User.js"; 
+import User from "../models/User.js";
 
 export const updateCart = async (req, res) => {
   try {
@@ -51,6 +51,37 @@ export const updateCart = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to update cart. Please try again.",
+    });
+  }
+};
+
+export const clearCart = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { cartItems: [] },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Cart cleared successfully.",
+      cart: updatedUser.cartItems,
+    });
+  } catch (error) {
+    console.error("Clear Cart Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to clear cart. Please try again.",
     });
   }
 };

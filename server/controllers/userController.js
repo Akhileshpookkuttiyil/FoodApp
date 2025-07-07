@@ -2,10 +2,11 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import crypto from "crypto";
 
 // ===================== Generate JWT Token =====================
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+const generateToken = (userId, sessionId) => {
+  return jwt.sign({ id: userId, sessionId }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
@@ -52,7 +53,8 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const newUser = await User.create({
+    // Create user object
+    const newUser = new User({
       firstName,
       lastName,
       email,
@@ -60,10 +62,17 @@ const registerUser = async (req, res) => {
       password,
     });
 
-    // Only issue token if it's a user
+    // For normal users, attach sessionId and token
     if (newUser.role === "user") {
-      const token = generateToken(newUser._id);
+      const sessionId = crypto.randomBytes(16).toString("hex");
+      newUser.sessionId = sessionId;
+
+      await newUser.save();
+
+      const token = generateToken(newUser._id, sessionId);
       setTokenCookie(res, token);
+    } else {
+      await newUser.save(); // sellers/admins
     }
 
     res.status(201).json({
@@ -145,11 +154,18 @@ const loginUser = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email, role: "user" }).select(
-      "+password"
+    let user = await User.findOne({ email, role: "user" }).select(
+      "+password +sessionId"
     );
 
-    const isValid = user && (await user.comparePassword(password));
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials.",
+      });
+    }
+
+    const isValid = await user.comparePassword(password);
     if (!isValid) {
       return res.status(401).json({
         success: false,
@@ -157,13 +173,32 @@ const loginUser = async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id);
+    // Generate a new sessionId (which will invalidate any previous session)
+    const sessionId = crypto.randomBytes(16).toString("hex");
+    user.sessionId = sessionId;
+    await user.save();
+
+    user = await User.findById(user._id)
+      .populate({
+        path: "cartItems.item",
+        populate: {
+          path: "restaurant",
+          select: "name",
+        },
+      })
+      .select("-password");
+
+    // Issue token with sessionId
+    const token = generateToken(user._id, sessionId);
     setTokenCookie(res, token);
+
+    // Filter cartItems with valid products
+    const validCartItems = user.cartItems.filter((ci) => ci.item !== null);
 
     res.status(200).json({
       success: true,
       message: "Login successful.",
-      user: formatUserResponse(user),
+      user: { ...formatUserResponse(user), cartItems: validCartItems || [] },
     });
   } catch (error) {
     console.error("Login error:", error.message);
@@ -173,6 +208,7 @@ const loginUser = async (req, res) => {
     });
   }
 };
+
 // ===================== AUTH CHECK CONTROLLER =====================
 const isAuthorized = async (req, res) => {
   try {
@@ -221,17 +257,29 @@ const isAuthorized = async (req, res) => {
 };
 
 // ===================== LOGOUT CONTROLLER =====================
-const logoutUser = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "Strict",
-  });
+const logoutUser = async (req, res) => {
+  try {
+    const userId = req.user?._id;
 
-  res.status(200).json({
-    success: true,
-    message: "Logged out successfully.",
-  });
+    if (userId) {
+      await User.findByIdAndUpdate(userId, { sessionId: null });
+    }
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "Strict",
+    });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Logged out successfully." });
+  } catch (err) {
+    console.error("Logout error:", err.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "Logout failed. Please try again." });
+  }
 };
 
 // ===================== EXPORT CONTROLLERS =====================

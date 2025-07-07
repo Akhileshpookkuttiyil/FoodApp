@@ -13,6 +13,7 @@ import addressRouter from "./routes/addressRoutes.js";
 import orderRouter from "./routes/orderRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 import locationRouter from "./routes/locationRoutes.js";
+import { stripeWebhooks } from "./controllers/orderController.js";
 
 dotenv.config();
 
@@ -26,7 +27,15 @@ const startServer = async () => {
 
     await connectDB();
 
-    // Middleware
+    // ========== Stripe Webhook Route (MUST BE FIRST) ==========
+
+    app.post(
+      "/api/stripe/webhook",
+      express.raw({ type: "application/json" }),
+      stripeWebhooks
+    );
+
+    // ========== Middleware ==========
     app.use(express.json({ limit: "10mb" }));
     app.use(cookieParser());
     app.use(morgan("dev"));
@@ -35,7 +44,7 @@ const startServer = async () => {
 
     app.use(cors({ origin: allowOrigin, credentials: true }));
 
-    // Routes
+    // ========== API Routes ==========
     app.use("/api/user", userRouter);
     app.use("/api/seller", sellerRouter);
     app.use("/api/product", productRouter);
@@ -49,9 +58,13 @@ const startServer = async () => {
       res.send("API is running");
     });
 
+    // ========== 404 Route ==========
+
     app.use((req, res) => {
       res.status(404).json({ success: false, message: "Route not found" });
     });
+
+    // ========== Global Error Handler ==========
 
     app.use((err, req, res, next) => {
       const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
@@ -61,6 +74,8 @@ const startServer = async () => {
         ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
       });
     });
+
+    // ========== Start Server ==========
 
     app.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}`);

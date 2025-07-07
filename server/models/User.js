@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"],
-      select: false, // ensures password is not returned by default
+      select: false,
     },
     isVerified: {
       type: Boolean,
@@ -57,11 +57,19 @@ const userSchema = new mongoose.Schema(
         quantity: {
           type: Number,
           required: true,
-          default: 1,
-          min: 1,
+          min: [1, "Quantity must be at least 1"],
+          validate: {
+            validator: Number.isInteger,
+            message: "Quantity must be an integer",
+          },
         },
       },
     ],
+    sessionId: {
+      type: String,
+      default: null,
+      select: false,
+    },
   },
   {
     timestamps: true,
