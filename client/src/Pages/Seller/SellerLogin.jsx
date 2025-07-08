@@ -38,7 +38,7 @@ const SellerLogin = () => {
 
     if (result.success) {
       toast.success("Login successful!");
-      navigate("/seller");
+      navigate("/seller/dashboard");
       return null;
     } else {
       toast.error(result.message || "Invalid credentials.");

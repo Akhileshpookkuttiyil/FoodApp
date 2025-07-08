@@ -170,7 +170,7 @@ const Footer = () => {
         </div>
         {/* Footer Bottom Bar */}
         <div className="w-full text-center text-neutral-400 text-sm mt-6">
-          © 2024 FoodieMania. All rights reserved.
+          © 2025 FoodieMania. All rights reserved.
         </div>
       </footer>
     </>

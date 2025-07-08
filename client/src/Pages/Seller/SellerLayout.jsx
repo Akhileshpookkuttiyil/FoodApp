@@ -129,7 +129,7 @@ const SellerLayout = () => {
           <button
             onClick={handleLogout}
             disabled={loadingLogout}
-            className={`border border-gray-400 bg-gray-200 rounded-full text-sm px-3 py-1 hover:bg-gray-300 focus:outline-none ${
+            className={` bg-orange-400 rounded-full font-light text-sm text-white px-4 py-1.5 hover:bg-orange-600 focus:outline-none ${
               loadingLogout ? "opacity-50 cursor-not-allowed" : ""
             }`}
             aria-label="Logout"

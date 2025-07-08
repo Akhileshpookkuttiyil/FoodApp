@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { FaStar, FaRegStarHalf } from "react-icons/fa";
-import restaurantsData from "./restaurantsData";
 import FilterModal from "../RestaurantList/FilterModal";
 
 const filters = [
@@ -12,9 +12,10 @@ const filters = [
 ];
 
 const RestaurantList = ({ selectedCategory }) => {
-  const [activeFilter, setActiveFilter] = useState(null);
-  const [userLocation, setUserLocation] = useState(null);
   const [restaurants, setRestaurants] = useState([]);
+  const [originalRestaurants, setOriginalRestaurants] = useState([]);
+  const [userLocation, setUserLocation] = useState(null);
+  const [activeFilter, setActiveFilter] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customFilterActive, setCustomFilterActive] = useState(false);
 
@@ -42,36 +43,57 @@ const RestaurantList = ({ selectedCategory }) => {
   };
 
   useEffect(() => {
+    console.log(originalRestaurants);
+    const fetchRestaurants = async () => {
+      try {
+        const res = await axios.get("/api/restaurant/getAll");
+        setOriginalRestaurants(res.data);
+      } catch (err) {
+        console.error("Failed to fetch restaurants:", err);
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
+
+  useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) =>
+        (position) => {
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          }),
+          });
+        },
         (error) => console.error("Error getting location:", error)
       );
-    } else {
-      setRestaurants(restaurantsData);
     }
   }, []);
 
   useEffect(() => {
-    if (userLocation) {
-      const updated = restaurantsData.map((r) => ({
-        ...r,
-        distance: calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          r.latitude,
-          r.longitude
-        ),
-      }));
+    if (originalRestaurants.length > 0) {
+      let updated = [...originalRestaurants];
+
+      if (userLocation) {
+        updated = updated.map((r) => ({
+          ...r,
+          latitude: r.latitude || 0,
+          longitude: r.longitude || 0,
+          distance:
+            r.latitude && r.longitude
+              ? calculateDistance(
+                  userLocation.lat,
+                  userLocation.lng,
+                  r.latitude,
+                  r.longitude
+                )
+              : null,
+        }));
+      }
+
       setRestaurants(updated);
-    } else {
-      setRestaurants(restaurantsData);
     }
-  }, [userLocation]);
+  }, [originalRestaurants, userLocation]);
 
   useEffect(() => {
     if (selectedCategory && selectedCategory !== "All") {
@@ -83,160 +105,98 @@ const RestaurantList = ({ selectedCategory }) => {
   }, [selectedCategory]);
 
   const applyCustomFilters = () => {
-    console.log("🔍 Applying custom filters:", customFilters);
-
-    let filtered = [...restaurantsData];
-    console.log("📦 Starting with", filtered.length, "restaurants");
+    let filtered = [...originalRestaurants];
 
     if (userLocation) {
       filtered = filtered.map((r) => ({
         ...r,
-        distance: calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          r.latitude,
-          r.longitude
-        ),
+        distance:
+          r.latitude && r.longitude
+            ? calculateDistance(
+                userLocation.lat,
+                userLocation.lng,
+                r.latitude,
+                r.longitude
+              )
+            : null,
       }));
-      console.log(
-        "📍 Distances calculated:",
-        filtered.map((r) => `${r.name}: ${r.distance} km`)
-      );
     }
 
-    // 🔽 Sort By
     if (customFilters.sortBy === "distance" && userLocation) {
-      console.log("Sorting by distance...");
       filtered.sort((a, b) => a.distance - b.distance);
     }
 
     if (customFilters.sortBy === "deliveryTime") {
-      console.log("Sorting by Fast Delivery");
-
-      const withMin = filtered.filter((r) => {
-        const hasMin = r.duration.includes("min");
-        if (!hasMin)
-          console.warn("Skipping (no 'min' in duration):", r.name, r.duration);
-        return hasMin;
-      });
-
-      console.log(
-        "Before sort:",
-        withMin.map((r) => `${r.name}: ${r.duration}`)
-      );
-
-      const sorted = withMin.sort((a, b) => {
-        const timeA = parseInt(a.duration);
-        const timeB = parseInt(b.duration);
-        console.log(`Comparing ${a.name} (${timeA}) vs ${b.name} (${timeB})`);
-        return timeA - timeB;
-      });
-
-      console.log(
-        "After sort:",
-        sorted.map((r) => `${r.name}: ${r.duration}`)
-      );
-
-      filtered = sorted;
+      filtered = filtered
+        .filter((r) => /\d+/.test(r.duration))
+        .sort((a, b) => parseInt(a.duration) - parseInt(b.duration));
     }
 
     if (customFilters.sortBy === "rating") {
       filtered.sort((a, b) => b.rating - a.rating);
-      console.log(
-        "🌟 Sorted by rating:",
-        filtered.map((r) => `${r.name}: ${r.rating}`)
-      );
     }
 
-    // 🔽 Filter by rating
     if (customFilters.rating > 0) {
       filtered = filtered.filter((r) => r.rating >= customFilters.rating);
-      console.log(
-        "⭐ Filtered by rating >=",
-        customFilters.rating,
-        "→",
-        filtered.length,
-        "restaurants"
-      );
     }
 
-    // 🔽 Filter by distance
     if (customFilters.distance > 0 && userLocation) {
       filtered = filtered.filter((r) => r.distance <= customFilters.distance);
-      console.log(
-        "📏 Filtered by max distance <=",
-        customFilters.distance,
-        "→",
-        filtered.length,
-        "restaurants"
-      );
     }
 
     if (customFilters.happyHours) {
-      console.log("Applying Happy Hours filter");
-      const before = filtered.length;
-      filtered = filtered.filter((r) => r.happyHours); // or however your data is structured
-      console.log(`Filtered Happy Hours: ${before} → ${filtered.length}`);
+      filtered = filtered.filter((r) => r.happyHours);
     }
 
     if (customFilters.drinksNight) {
-      console.log("Applying Drinks Night filter");
-      const before = filtered.length;
       filtered = filtered.filter((r) => r.drinksNight);
-      console.log(`Filtered Drinks Night: ${before} → ${filtered.length}`);
     }
 
     setRestaurants(filtered);
-    setActiveFilter(null);
     setCustomFilterActive(true);
+    setActiveFilter(null);
   };
 
   const handleFilterClick = (value) => {
-    if (activeFilter === value) {
-      setActiveFilter(null);
-    } else {
-      setActiveFilter(value);
-      setCustomFilterActive(false);
-    }
+    setCustomFilterActive(false);
+    setActiveFilter(value === activeFilter ? null : value);
   };
 
-  let filteredRestaurants = restaurants;
+  let filteredRestaurants = [...restaurants];
 
   if (selectedCategory && selectedCategory.toLowerCase() !== "all") {
     filteredRestaurants = filteredRestaurants.filter(
-      (r) => r.category.toLowerCase() === selectedCategory.toLowerCase()
+      (r) =>
+        r.category &&
+        r.category.toLowerCase() === selectedCategory.toLowerCase()
     );
   }
 
   if (activeFilter && !customFilterActive) {
     switch (activeFilter) {
       case "nearest":
-        filteredRestaurants = [...filteredRestaurants]
+        filteredRestaurants = filteredRestaurants
           .filter((r) => typeof r.distance === "number")
           .sort((a, b) => a.distance - b.distance);
         break;
       case "fast":
-        filteredRestaurants = [...filteredRestaurants]
+        filteredRestaurants = filteredRestaurants
           .filter((r) => /\d+/.test(r.duration))
-          .sort((a, b) => {
-            const timeA = parseInt(a.duration.match(/\d+/));
-            const timeB = parseInt(b.duration.match(/\d+/));
-            return timeA - timeB;
-          });
+          .sort((a, b) => parseInt(a.duration) - parseInt(b.duration));
         break;
       case "rating":
-        filteredRestaurants = [...filteredRestaurants].sort(
+        filteredRestaurants = filteredRestaurants.sort(
           (a, b) => b.rating - a.rating
         );
         break;
       case "veg":
         filteredRestaurants = filteredRestaurants.filter(
           (r) =>
-            r.category.toLowerCase().includes("veg") || // covers "vegetarian", "veg", "pure veg"
-            r.category.toLowerCase() === "vegetarian"
+            r.category &&
+            (r.category.toLowerCase().includes("veg") ||
+              r.category.toLowerCase() === "vegetarian")
         );
         break;
-
       case "offers":
         filteredRestaurants = filteredRestaurants.filter((r) => r.hasOffer);
         break;
@@ -289,7 +249,7 @@ const RestaurantList = ({ selectedCategory }) => {
         {filteredRestaurants.length > 0 ? (
           filteredRestaurants.map((restaurant) => (
             <div
-              key={restaurant.id}
+              key={restaurant._id}
               className="bg-white shadow-md rounded-xl overflow-hidden transition transform hover:scale-105 hover:shadow-2xl duration-300"
             >
               <div className="relative">
@@ -299,7 +259,7 @@ const RestaurantList = ({ selectedCategory }) => {
                   className="w-full h-44 object-cover rounded-t-xl"
                 />
                 <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                  {restaurant.category}
+                  {restaurant.category || "Restaurant"}
                 </span>
                 {restaurant.hasOffer && (
                   <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
@@ -313,7 +273,7 @@ const RestaurantList = ({ selectedCategory }) => {
                   {restaurant.name}
                 </h3>
                 <p className="text-gray-500 text-sm">
-                  {restaurant.fullAddress}
+                  {restaurant.location?.address}, {restaurant.location?.city}
                 </p>
 
                 {userLocation && restaurant.distance && (
@@ -324,7 +284,7 @@ const RestaurantList = ({ selectedCategory }) => {
 
                 <div className="flex items-center justify-between mt-3 text-gray-700 text-sm">
                   <span className="flex items-center">
-                    ⏳ {restaurant.duration}
+                    ⏳ {restaurant.duration || "N/A"}
                   </span>
 
                   <div className="flex items-center text-yellow-500">

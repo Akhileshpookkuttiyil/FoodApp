@@ -4,33 +4,36 @@ import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import ScrollToTop from "./ScrolltoTop";
-import AuthPage from "./Pages/Auth/AuthPage";
 import AppRoutes from "./routes.jsx";
-
-import { useAppContext } from "./Context/AppContext";
+import AdminRoutes from "./AdminRoutes.jsx";
+import { useAppContext } from "./Context/AppContext.jsx";
+import AuthPage from "./Pages/Auth/AuthPage";
 
 function AppContent() {
-  const { showLogin } = useAppContext();
   const location = useLocation();
+  const { showLogin } = useAppContext();
   const isSellerRoute = location.pathname.startsWith("/seller");
+  const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
     <>
       <Toaster />
       <ScrollToTop />
 
-      {!isSellerRoute && <Navbar />}
+      {!isSellerRoute && !isAdminRoute && <Navbar />}
 
       <main
         className={
-          isSellerRoute ? "" : "flex flex-col min-h-screen bg-neutral-100/40"
+          isSellerRoute || isAdminRoute
+            ? ""
+            : "flex flex-col min-h-screen bg-neutral-100/40"
         }
       >
-        <AppRoutes />
+        {isAdminRoute ? <AdminRoutes /> : <AppRoutes />}
         {showLogin && <AuthPage />}
       </main>
 
-      {!isSellerRoute && <Footer />}
+      {!isSellerRoute && !isAdminRoute && <Footer />}
     </>
   );
 }

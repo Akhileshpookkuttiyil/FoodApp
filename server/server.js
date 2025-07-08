@@ -14,6 +14,7 @@ import orderRouter from "./routes/orderRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
 import locationRouter from "./routes/locationRoutes.js";
 import { stripeWebhooks } from "./controllers/orderController.js";
+import restaurantRouter from "./routes/restaurantRoutes.js";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ const startServer = async () => {
     );
 
     // ========== Middleware ==========
+    app.use(express.urlencoded({ extended: true }));
     app.use(express.json({ limit: "10mb" }));
     app.use(cookieParser());
     app.use(morgan("dev"));
@@ -52,6 +54,7 @@ const startServer = async () => {
     app.use("/api/address", addressRouter);
     app.use("/api/order", orderRouter);
     app.use("/api/admin", adminRouter);
+    app.use('/api/restaurant',restaurantRouter)
     app.use("/api/location", locationRouter);
 
     app.get("/", (req, res) => {

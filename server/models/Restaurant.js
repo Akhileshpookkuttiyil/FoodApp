@@ -55,13 +55,13 @@ const restaurantSchema = new mongoose.Schema(
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Assuming your user/seller model is called 'User'
+      ref: "User",
       required: true,
       index: true,
     },
   },
   {
-    timestamps: true, // adds createdAt & updatedAt
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }

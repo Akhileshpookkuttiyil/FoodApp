@@ -1,58 +1,40 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import Restaurant from "../models/Restaurant.js";
 
 const authRole = (...allowedRoles) => {
   return async (req, res, next) => {
     try {
       const { sellerToken, adminToken } = req.cookies;
 
-      let decoded;
-      let user;
+      const tokenMap = {
+        seller: sellerToken,
+        admin: adminToken,
+      };
 
-      // First try adminToken
-      if (adminToken) {
+      for (const role of allowedRoles) {
+        const token = tokenMap[role];
+        if (!token) continue;
+
         try {
-          decoded = jwt.verify(adminToken, process.env.JWT_SECRET);
-          user = await User.findById(decoded.id).select("-password");
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          const user = await User.findById(decoded.id).select("-password");
 
-          if (user && allowedRoles.includes(user.role)) {
+          if (user && user.role === role) {
             req.user = user;
-            req.admin = user;
+            if (role === "seller") req.seller = user;
+            if (role === "admin") req.admin = user;
             return next();
           }
         } catch (err) {
-          console.warn("Invalid admin token:", err.message);
-        }
-      }
-
-      // Then try sellerToken
-      if (sellerToken) {
-        try {
-          decoded = jwt.verify(sellerToken, process.env.JWT_SECRET);
-          user = await User.findById(decoded.id).select("-password");
-
-          if (user && allowedRoles.includes(user.role)) {
-            const restaurants = await Restaurant.find({ owner: user._id });
-            if (!restaurants.length) {
-              return res.status(403).json({
-                success: false,
-                message: "Access denied: no associated restaurants found",
-              });
-            }
-            req.user = user;
-            req.seller = user;
-            req.restaurants = restaurants;
-            return next();
+          if (process.env.NODE_ENV !== "production") {
+            console.warn(`Invalid ${role} token:`, err.message);
           }
-        } catch (err) {
-          console.warn("Invalid seller token:", err.message);
         }
       }
 
       return res.status(403).json({
         success: false,
-        message: "Access denied: insufficient permissions or invalid tokens",
+        message: "Access denied: insufficient permissions or invalid token",
       });
     } catch (error) {
       console.error("Authorization error:", error.message);
