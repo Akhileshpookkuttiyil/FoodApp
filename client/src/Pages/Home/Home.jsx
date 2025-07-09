@@ -6,6 +6,7 @@ import Offer from "./Offer/Offer";
 import Menu from "./Menu/Menu";
 import BookTable from "./Table/BookTable";
 import Blog from "./Blog/Blog";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -25,14 +26,12 @@ const Home = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <dotlottie-player
-          src="https://lottie.host/b6062add-37e0-465f-a1e3-6ae48065cd76/KVkNjiNVxl.lottie"
-          background="transparent"
-          speed="1"
-          style={{ width: "230px", height: "250px" }}
+        <DotLottieReact
+          src="https://lottie.host/4af2faac-0722-4717-8098-b7f94ef00f9b/p7nyoKCZk4.lottie"
           loop
           autoplay
-        ></dotlottie-player>
+          style={{ width: "230px", height: "250px" }}
+        />
       </div>
     );
   }

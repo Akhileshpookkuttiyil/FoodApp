@@ -9,6 +9,7 @@ import {
 import PropTypes from "prop-types";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
@@ -248,6 +249,7 @@ export const AppProvider = ({ children }) => {
         clearCart,
         cartTotalAmount,
         loadCartItems,
+        DotLottieReact,
       }}
     >
       {children}

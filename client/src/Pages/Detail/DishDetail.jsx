@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import Skeleton from "react-loading-skeleton";
 import StarRating from "../StarRating";
 import { useAppContext } from "../../Context/AppContext";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 const DishDetail = () => {
   const { id } = useParams();
@@ -100,11 +101,13 @@ const DishDetail = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[400px]">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="w-10 h-10 border-4 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm text-gray-500">Loading dish details...</p>
-        </div>
+      <div className="flex items-center justify-center h-screen">
+        <DotLottieReact
+          src="https://lottie.host/4af2faac-0722-4717-8098-b7f94ef00f9b/p7nyoKCZk4.lottie"
+          loop
+          autoplay
+          style={{ width: "230px", height: "250px" }}
+        />
       </div>
     );
   }
