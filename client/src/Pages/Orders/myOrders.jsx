@@ -3,24 +3,38 @@ import { useAppContext } from "../../Context/AppContext";
 import { useNavigate } from "react-router-dom";
 import emptyOrdersImg from "../../assets/img/no-order.png";
 
+const MIN_LOADER_TIME = 800;
+
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [showLoader, setShowLoader] = useState(true);
   const [error, setError] = useState(null);
   const { axios, user, currency } = useAppContext();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
-    axios
-      .get("/api/order/user")
-      .then(({ data }) => data.success && setOrders(data.orders))
-      .catch((err) => setError(err.message || "Failed to load orders."))
-      .finally(() => setLoading(false));
+
+    const loadOrders = async () => {
+      try {
+        const start = Date.now();
+        const { data } = await axios.get("/api/order/user");
+        if (data.success) setOrders(data.orders);
+        else throw new Error("Failed to load orders.");
+
+        const elapsed = Date.now() - start;
+        const delay = Math.max(MIN_LOADER_TIME - elapsed, 0);
+        setTimeout(() => setShowLoader(false), delay);
+      } catch (err) {
+        setError(err.message || "Failed to load orders.");
+        setShowLoader(false);
+      }
+    };
+
+    loadOrders();
   }, [user]);
 
   const getStatusColor = (status) => {
-    const base = "font-semibold";
     const map = {
       placed: "text-blue-600",
       accepted: "text-indigo-600",
@@ -29,15 +43,28 @@ const MyOrders = () => {
       delivered: "text-green-600",
       cancelled: "text-red-600",
     };
-    return `${base} ${map[status?.toLowerCase()] || "text-gray-500"}`;
+    return `font-semibold ${map[status?.toLowerCase()] || "text-gray-500"}`;
   };
 
-  if (loading)
-    return <p className="text-center mt-20 text-gray-600">Loading orders...</p>;
+  if (showLoader)
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <dotlottie-player
+          src="https://lottie.host/b6062add-37e0-465f-a1e3-6ae48065cd76/KVkNjiNVxl.lottie"
+          background="transparent"
+          speed="1"
+          style={{ width: "200px", height: "200px" }}
+          loop
+          autoplay
+        ></dotlottie-player>
+      </div>
+    );
 
   if (error)
     return (
-      <p className="text-center mt-20 text-red-500 font-medium">{error}</p>
+      <p className="text-center mt-20 text-red-500 font-medium text-lg">
+        {error}
+      </p>
     );
 
   if (!orders.length)
@@ -48,7 +75,6 @@ const MyOrders = () => {
           alt="No orders"
           className="mx-auto mb-4 w-32 h-32 object-contain"
         />
-
         <p className="text-2xl text-gray-500">No orders found</p>
       </div>
     );
@@ -65,15 +91,15 @@ const MyOrders = () => {
           key={order._id}
           className="w-full bg-white border rounded-lg shadow-sm mb-10 p-6"
         >
-          {/* Order Info */}
           <div className="mb-4 flex flex-wrap justify-between text-sm text-gray-700">
             <p>
               <span className="font-medium">Order ID:</span> {order._id}
             </p>
-            <p>Placed: {new Date(order.createdAt).toLocaleDateString()}</p>
+            <p>
+              Placed: {new Date(order.createdAt).toLocaleDateString("en-IN")}
+            </p>
           </div>
 
-          {/* Address */}
           {order.shippingAddress && (
             <div className="text-sm text-gray-600 mb-4">
               <p className="font-medium text-gray-800 mb-1">
@@ -90,7 +116,7 @@ const MyOrders = () => {
               </p>
             </div>
           )}
-          {/* Table Head */}
+
           <div className="hidden md:grid grid-cols-[3fr_2fr_1fr_1fr_1fr] text-xs font-semibold text-gray-500 uppercase px-1 pb-2">
             <div>Product</div>
             <div className="flex justify-center">Restaurant</div>
@@ -99,7 +125,6 @@ const MyOrders = () => {
             <div className="flex justify-center">Price</div>
           </div>
 
-          {/* Order Items */}
           <div className="overflow-x-auto">
             {order.items.map(({ product, quantity }, i) => {
               if (!product) return null;
@@ -111,7 +136,6 @@ const MyOrders = () => {
                   key={i}
                   className="py-4 grid grid-cols-[3fr_2fr_1fr_1fr_1fr] items-center border-t min-w-[900px]"
                 >
-                  {/* Product */}
                   <div
                     className="flex items-center gap-4 cursor-pointer"
                     onClick={() => navigate(`/menu/${product.id}`)}
@@ -120,6 +144,9 @@ const MyOrders = () => {
                       src={product.images?.[0] || "/placeholder.jpg"}
                       alt={product.name}
                       className="w-14 h-14 rounded object-cover"
+                      onError={(e) =>
+                        (e.target.src = "/assets/img/default-image.png")
+                      }
                     />
                     <div>
                       <p className="font-medium text-gray-900">
@@ -129,24 +156,21 @@ const MyOrders = () => {
                     </div>
                   </div>
 
-                  {/* Restaurant */}
                   <div className="text-sm text-gray-700 flex justify-center truncate">
                     {order.restaurant?.name}
                   </div>
 
-                  {/* Payment */}
                   <div className="text-sm flex justify-center">
                     {order.paymentMethod}{" "}
                     <span
-                      className={
+                      className={`ml-1 ${
                         order.isPaid ? "text-green-600" : "text-yellow-600"
-                      }
+                      }`}
                     >
                       ({order.isPaid ? "Paid" : "Pending"})
                     </span>
                   </div>
 
-                  {/* Status */}
                   <div
                     className={`text-sm flex justify-center ${getStatusColor(
                       order.orderStatus
@@ -155,16 +179,14 @@ const MyOrders = () => {
                     {order.orderStatus}
                   </div>
 
-                  {/* Price */}
                   <div className="text-sm flex justify-center font-semibold text-gray-800">
                     {currency}
                     {(price * quantity).toFixed(2)}
                   </div>
-                  {/* Total */}
                 </div>
               );
             })}
-            {/* Order Total Row */}
+
             <div className="py-4 grid grid-cols-[3fr_2fr_1fr_1fr_1fr_1.3fr] items-center font-semibold text-sm gap-6 border-t text-orange-600 min-w-[900px]">
               <div className="col-span-5 text-right pr-4">Total:</div>
               <div className="flex justify-center">

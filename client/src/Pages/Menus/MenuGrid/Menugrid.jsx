@@ -1,51 +1,48 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
+import { FaShoppingCart, FaHotel } from "react-icons/fa";
+
 import SearchBar from "../SearchBar/SearchBar";
 import SortDropdown from "../SortDropdown/SortDropdown";
 import FilterButton from "../FilterButton/FilterButton";
 import FilterDialog from "../FilterDialog";
-import { FaShoppingCart, FaHotel } from "react-icons/fa";
-import noResultsImg from "../../../assets/img/Noimg.gif";
 import StarRating from "../../StarRating";
-import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../../../Context/AppContext";
-import { ClipLoader } from "react-spinners"; // Loading spinner from react-spinners
 
-// eslint-disable-next-line
+import { useAppContext } from "../../../Context/AppContext";
+import noResultsImg from "../../../assets/img/Noimg.gif";
+
 const MenuGrid = ({ items }) => {
   const navigate = useNavigate();
   const { user, addToCart, updateItemQuantity, cartItems } = useAppContext();
+
   const [inputTerm, setInputTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState(1000);
   const [minRating, setMinRating] = useState(0);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+
+  // Debounced search
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      setSearchTerm(inputTerm);
+    }, 300);
+    return () => clearTimeout(delay);
+  }, [inputTerm]);
 
   const filteredItems = useMemo(() => {
-    return (
-      items
-        // eslint-disable-next-line
-        .filter((item) => {
-          return (
-            item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            item.price <= priceRange &&
-            item.rating >= minRating
-          );
-        })
-        .sort((a, b) => {
-          if (sortBy === "lowToHigh") return a.price - b.price;
-          if (sortBy === "highToLow") return b.price - a.price;
-          return a.name.localeCompare(b.name);
-        })
-    );
+    return items
+      .filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .filter((item) => item.price <= priceRange && item.rating >= minRating)
+      .sort((a, b) => {
+        if (sortBy === "lowToHigh") return a.price - b.price;
+        if (sortBy === "highToLow") return b.price - a.price;
+        return a.name.localeCompare(b.name);
+      });
   }, [items, searchTerm, priceRange, minRating, sortBy]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    const timeout = setTimeout(() => setIsLoading(false), 300);
-    return () => clearTimeout(timeout);
-  }, [filteredItems]);
 
   const handleAddToCart = useCallback(
     (item) => {
@@ -68,17 +65,9 @@ const MenuGrid = ({ items }) => {
     [updateItemQuantity]
   );
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      setSearchTerm(inputTerm);
-    }, 300); // 300ms delay
-
-    return () => clearTimeout(delay); // clear previous timer
-  }, [inputTerm]);
-
   return (
     <div className="min-h-screen p-6 bg-white">
-      {/* Controls */}
+      {/* Top Controls */}
       <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 shadow-md rounded-md mb-6">
         <SearchBar searchTerm={inputTerm} setSearchTerm={setInputTerm} />
         <div className="flex items-center space-x-2">
@@ -99,11 +88,7 @@ const MenuGrid = ({ items }) => {
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 px-4 mt-10">
-        {isLoading ? (
-          <div className="col-span-full flex justify-center items-center text-gray-500 text-lg py-12">
-            <ClipLoader color="#FF7F50" loading={isLoading} size={40} />
-          </div>
-        ) : filteredItems.length > 0 ? (
+        {filteredItems.length > 0 ? (
           filteredItems.map((item) => {
             const existingItem =
               user && cartItems.find((cartItem) => cartItem.id === item.id);
@@ -117,11 +102,10 @@ const MenuGrid = ({ items }) => {
                 <div
                   onClick={() => navigate(`/menu/${item.id}`)}
                   className="flex flex-col items-center cursor-pointer p-3 transition duration-200"
-                  aria-label={`View details of ${item.name}`}
                 >
                   <img
                     src={item.image}
-                    alt={`Image of ${item.name}`}
+                    alt={item.name}
                     onError={(e) =>
                       (e.target.src = "/assets/img/default-image.png")
                     }
@@ -149,12 +133,10 @@ const MenuGrid = ({ items }) => {
                     <div className="text-lg font-bold text-gray-800">
                       ₹{item.offerPrice}
                     </div>
-
                     {count === 0 ? (
                       <button
                         className="flex items-center gap-2 text-white bg-orange-400 hover:bg-orange-500 rounded-md px-3 py-2 transition font-medium"
                         onClick={() => handleAddToCart(item)}
-                        aria-label={`Add ${item.name} to cart`}
                       >
                         <FaShoppingCart size={18} />
                         <span>Add</span>
@@ -164,7 +146,6 @@ const MenuGrid = ({ items }) => {
                         <button
                           onClick={() => handleDecrease(item.id)}
                           className="text-orange-600 font-bold hover:text-orange-800 text-xl"
-                          aria-label={`Decrease quantity of ${item.name}`}
                         >
                           −
                         </button>
@@ -174,7 +155,6 @@ const MenuGrid = ({ items }) => {
                         <button
                           onClick={() => handleIncrease(item.id)}
                           className="text-orange-600 font-bold hover:text-orange-800 text-xl"
-                          aria-label={`Increase quantity of ${item.name}`}
                         >
                           +
                         </button>
@@ -201,3 +181,20 @@ const MenuGrid = ({ items }) => {
 };
 
 export default MenuGrid;
+
+// ✅ PropTypes validation
+MenuGrid.propTypes = {
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      hotel: PropTypes.string.isRequired,
+      image: PropTypes.string,
+      price: PropTypes.number.isRequired,
+      offerPrice: PropTypes.number.isRequired,
+      rating: PropTypes.number.isRequired,
+      deliveryTime: PropTypes.number.isRequired,
+      category: PropTypes.string,
+    })
+  ).isRequired,
+};

@@ -27,21 +27,20 @@ export const AppProvider = ({ children }) => {
   const MAX_QUANTITY = 99;
 
   const checkSessionValid = async () => {
+    let errorShown = false;
     try {
       const { data } = await axios.get("/api/user/checkAuth");
       if (!data.success || !data.user) {
-        setUser(null);
-        setCartItems([]);
-        setShowLogin(true); // show login modal
-        toast.error("Session expired. Please log in again.");
-        return false;
+        errorShown = true;
+        throw new Error("Invalid session");
       }
       return true;
     } catch (err) {
       console.log(err.message);
       setUser(null);
       setCartItems([]);
-      toast.error("Session expired. Please log in again.");
+      setShowLogin(true);
+      if (!errorShown) toast.error("Session expired. Please log in again.");
       return false;
     }
   };

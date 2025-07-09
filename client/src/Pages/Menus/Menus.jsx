@@ -63,9 +63,17 @@ const Menus = () => {
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
       />
-
       {loading ? (
-        <div className="text-center text-gray-500 py-10">Loading menu...</div>
+        <div className="flex justify-center items-center py-16">
+          <dotlottie-player
+            src="https://lottie.host/b6062add-37e0-465f-a1e3-6ae48065cd76/KVkNjiNVxl.lottie"
+            background="transparent"
+            speed="1"
+            style={{ width: "160px", height: "160px" }}
+            loop
+            autoplay
+          ></dotlottie-player>
+        </div>
       ) : (
         <MenuGrid items={categoryItems} />
       )}

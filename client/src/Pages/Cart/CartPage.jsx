@@ -10,13 +10,15 @@ import removeIcon from "../../assets/img/remove_icon.svg";
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
-  <div className="flex justify-center items-center h-40">
-    <div
-      className="spinner-border animate-spin inline-block w-8 h-8 border-4 border-solid border-orange-500 border-t-transparent rounded-full"
-      role="status"
-    >
-      <span className="sr-only">Loading...</span>
-    </div>
+  <div className="flex items-center justify-center">
+    <dotlottie-player
+      src="https://lottie.host/b6062add-37e0-465f-a1e3-6ae48065cd76/KVkNjiNVxl.lottie"
+      background="transparent"
+      speed="1"
+      style={{ width: "230px", height: "250px" }}
+      loop
+      autoplay
+    ></dotlottie-player>
   </div>
 );
 
@@ -156,8 +158,8 @@ const CartPage = () => {
         const { data } = await axios.post("/api/order/stripe", orderPayload);
 
         if (data.success && data.url) {
-          clearCart(); 
-          window.location.href = data.url; 
+          clearCart();
+          window.location.href = data.url;
         } else {
           toast.error(data.message || "Stripe checkout URL not received.");
         }

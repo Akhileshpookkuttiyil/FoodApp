@@ -68,9 +68,6 @@ const Navbar = () => {
       toast.error(
         error.response?.data?.message || "Logout failed. Please try again."
       );
-    } finally {
-      clearCart();
-      setUser(null);
     }
   };
 
