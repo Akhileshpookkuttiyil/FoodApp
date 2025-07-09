@@ -49,7 +49,7 @@ const MyOrders = () => {
 
   if (showLoader)
     return (
-      <div className="flex justify-center items-center h-[60vh]">
+      <div className="flex justify-center items-center h-screen">
         <DotLottieReact
           src="https://lottie.host/4af2faac-0722-4717-8098-b7f94ef00f9b/p7nyoKCZk4.lottie"
           loop
