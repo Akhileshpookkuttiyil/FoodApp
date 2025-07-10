@@ -180,6 +180,60 @@ export const productByRestaurant = async (req, res) => {
   }
 };
 
+export const productBySeller = async (req, res) => {
+  try {
+    const sellerId = req.seller?._id;
+    console.log("Seller ID:", sellerId);
+
+    if (!sellerId) {
+      return res.status(400).json({
+        success: false,
+        message: "Seller not authenticated",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(sellerId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid seller ID",
+      });
+    }
+
+    // Fetch all restaurant IDs owned by the seller
+    const restaurants = await Restaurant.find({ owner: sellerId }).select(
+      "_id"
+    );
+
+    if (!restaurants.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No restaurants found for this seller",
+      });
+    }
+
+    const restaurantIds = restaurants.map((r) => r._id);
+    console.log("Restaurant IDs:", restaurantIds);
+
+    // Fetch products linked to those restaurants
+    const products = await Product.find({
+      restaurant: { $in: restaurantIds },
+    }).populate("restaurant", "name");
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  } catch (error) {
+    console.error("Error fetching seller's products:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching products",
+      error: error.message,
+    });
+  }
+};
+
 export const toggleStock = async (req, res) => {
   try {
     const { id, inStock } = req.body;

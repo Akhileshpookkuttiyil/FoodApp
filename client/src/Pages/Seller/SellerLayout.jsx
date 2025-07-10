@@ -12,6 +12,7 @@ import {
 
 // ================== Seller Layout ==================
 const SellerLayout = () => {
+  document.title = "Seller@FoodieMania";
   const { seller, logoutSeller } = useAppContext();
   const location = useLocation();
 
@@ -44,7 +45,7 @@ const SellerLayout = () => {
     },
     {
       name: "Restaurant",
-      path: "/seller/get-restaurants",
+      path: "/seller/view-restaurants",
       icon: <FaUtensils className="w-5 h-5" />,
     },
     {

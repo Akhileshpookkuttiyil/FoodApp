@@ -24,7 +24,8 @@ const EditProfile = lazy(() => import("./Pages/EditProfile/EditProfile"));
 // Lazy-loaded seller pages
 const SellerLayout = lazy(() => import("./Pages/Seller/SellerLayout"));
 const AddProduct = lazy(() => import("./Pages/Seller/AddProduct"));
-const ViewProducts = lazy(() => import("./Pages/Seller/viewProducts"));
+const ViewProducts = lazy(() => import("./Pages/Seller/ViewProducts"));
+const ViewRestaurants = lazy(() => import("./Pages/Seller/viewRestaurant"));
 const SellerLogin = lazy(() => import("./Pages/Seller/SellerLogin"));
 const DashboardOverview = lazy(() => import("./Pages/Seller/dashboard"));
 const GetOrders = lazy(() => import("./Pages/Seller/getOrders"));
@@ -105,6 +106,7 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<DashboardOverview />} />
           <Route path="add-product" element={<AddProduct />} />
           <Route path="view-products" element={<ViewProducts />} />
+          <Route path="view-restaurants" element={<ViewRestaurants />} />
           <Route path="get-orders" element={<GetOrders />} />
         </Route>
 

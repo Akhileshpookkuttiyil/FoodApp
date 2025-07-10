@@ -8,31 +8,22 @@ import {
   toggleStock,
   updateProduct,
   productByRestaurant,
+  productBySeller,
 } from "../controllers/productController.js";
-import authUser from "../middlewares/authUser.js";
 
 const productRouter = express.Router();
 
-// Add new product (only sellers allowed, with image uploads)
-productRouter.post(
-  "/add",
-  authRole("seller"),
-  upload.array("images"),
-  addProduct
-);
+// --- Public Routes ---
+productRouter.get("/list", productList); //list all products
+productRouter.get("/:id", productById); //
 
-// Get all products
-productRouter.get("/list", productList);
+// --- Seller Routes (protected) ---
+productRouter.use(authRole("seller"));
 
-// Get product by Restaurant
-productRouter.get("/getByRestaurant", authRole("seller"), productByRestaurant);
-// Get product by ID (pass id as query or param based on your frontend setup)
-productRouter.get("/:id", productById);
-
-// Toggle inStock status of a product (seller access)
-productRouter.patch("/toggle-stock", authRole("seller"), toggleStock);
-
-// Update product (id sent in request body)
-productRouter.patch("/update", authRole("seller"), updateProduct);
+productRouter.post("/add", upload.array("images"), addProduct);
+productRouter.get("/getByRestaurant", productByRestaurant);
+productRouter.get("/getProductsBySeller", productBySeller);
+productRouter.patch("/toggle-stock", toggleStock);
+productRouter.patch("/update", updateProduct);
 
 export default productRouter;
