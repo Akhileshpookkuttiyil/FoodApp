@@ -120,16 +120,17 @@ export const productList = async (req, res) => {
 };
 
 export const productById = async (req, res) => {
+  const { id } = req.params;
+
+  // Check if ID is a valid MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid product ID",
+    });
+  }
+
   try {
-    const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid product ID",
-      });
-    }
-
     const product = await Product.findById(id).populate("restaurant", "name");
 
     if (!product) {
@@ -139,15 +140,15 @@ export const productById = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: product,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Error fetching product by ID:", error);
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch product",
-      error: error.message,
     });
   }
 };

@@ -14,16 +14,18 @@ import {
 const productRouter = express.Router();
 
 // --- Public Routes ---
-productRouter.get("/list", productList); //list all products
-productRouter.get("/:id", productById); //
+productRouter.get("/list", productList);
+productRouter.get("/:id", productById); // must be above seller-only routes
 
 // --- Seller Routes (protected) ---
 productRouter.use(authRole("seller"));
 
 productRouter.post("/add", upload.array("images"), addProduct);
 productRouter.get("/getByRestaurant", productByRestaurant);
-productRouter.get("/getProductsBySeller", productBySeller);
+productRouter.get("/get/BySeller", productBySeller);
 productRouter.patch("/toggle-stock", toggleStock);
 productRouter.patch("/update", updateProduct);
+
+productRouter.get("/:id", productById);
 
 export default productRouter;
