@@ -41,17 +41,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     >
       {/* Logo */}
       <div className="flex p-6 border-b border-gray-200 justify-center">
-        <Link
+         <Link
           to="/"
           onClick={handleLogoClick}
-          className="flex text-3xl font-bold tracking-tight select-none"
+          className="flex text-2xl font-extrabold tracking-wide select-none"
         >
           {letters.map((letter, i) => (
-            <span
-              key={i}
-              className={`swing ${letter.color}`}
-              style={{ animationDelay: `${i * 0.15}s` }}
-            >
+            <span key={i} className={`${letter.color}`}>
               {letter.char}
             </span>
           ))}

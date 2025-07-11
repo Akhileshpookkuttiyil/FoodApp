@@ -13,7 +13,7 @@ const ViewProducts = () => {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/api/product/getProductsBySeller");
+      const res = await axios.get("/api/product/get/BySeller");
       setProducts(res.data.data); // ← array of products
     } catch (err) {
       console.error(err.message);
