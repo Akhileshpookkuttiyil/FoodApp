@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useAppContext } from "../../../Context/AppContext";
 
 const statusStyles = {
   green: "bg-green-100 text-green-800",
@@ -7,12 +7,13 @@ const statusStyles = {
 };
 
 const Users = () => {
+  const { axios } = useAppContext();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchUsers = async () =>{ 
       try {
         const res = await axios.get("/api/admin/users/getAllUsers");
         setUsers(res.data);
