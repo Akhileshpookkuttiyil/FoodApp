@@ -5,6 +5,7 @@ const statusStyles = {
   green: "bg-green-100 text-green-800",
   yellow: "bg-yellow-100 text-yellow-800",
 };
+
 const Sellers = () => {
   const { axios } = useAppContext();
   const [sellers, setSellers] = useState([]);
@@ -24,64 +25,71 @@ const Sellers = () => {
       }
     };
     fetchSellers();
-  }, []);
+  }, [axios]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <h2 className="text-xl font-semibold text-gray-900">
             Sellers Management
           </h2>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+            {/* Search */}
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <div className="w-4 h-4 flex items-center justify-center text-gray-400">
-                  <i className="ri-search-line text-sm"></i>
-                </div>
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <i className="ri-search-line text-sm"></i>
               </div>
               <input
                 type="text"
                 placeholder="Search sellers..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
-            {/* Filter */}
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium whitespace-nowrap !rounded-button">
-              <div className="w-4 h-4 items-center justify-center inline">
-                <i className="ri-filter-line text-sm"></i>
-              </div>
-              Filter
+
+            {/* Filter Button */}
+            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium whitespace-nowrap !rounded-button flex items-center space-x-2">
+              <i className="ri-filter-line text-sm"></i>
+              <span>Filter</span>
             </button>
           </div>
         </div>
       </div>
-      {/* Table / Content */}
+
+      {/* Table */}
       <div className="overflow-x-auto">
         {loading ? (
-          <div className="p-6 text-center text-gray-500">Loading sellers...</div>
+          <div className="p-6 text-center text-gray-500">
+            Loading sellers...
+          </div>
         ) : error ? (
           <div className="p-6 text-center text-red-500">{error}</div>
         ) : (
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                {["Seller", "Email", "Status", "Joined", "Actions"].map(
-                  (header) => (
-                    <th
-                      key={header}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {header}
-                    </th>
-                  )
-                )}
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Seller
+                </th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Joined
+                </th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
+
             <tbody className="bg-white divide-y divide-gray-200">
               {sellers.map((user) => (
                 <tr key={user.id}>
-                  {/* User Info */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <img
@@ -99,48 +107,39 @@ const Sellers = () => {
                       </div>
                     </div>
                   </td>
-
-                  {/* Email */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-900 text-center">
                     {user.email}
                   </td>
-
-                  {/* Status */}
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 text-center">
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        statusStyles[user.statusColor]
+                        statusStyles[user.statusColor] ??
+                        "bg-gray-100 text-gray-600"
                       }`}
                     >
                       {user.status}
                     </span>
                   </td>
-
-                  {/* Joined */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-gray-500 text-center">
                     {user.joined}
                   </td>
-
-                  {/* Actions */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button
-                        className="text-primary hover:text-blue-700"
-                        aria-label={`View ${user.name}`}
-                      >
-                        <i className="ri-eye-line w-4 h-4 flex items-center justify-center"></i>
+                  <td className="px-6 py-4 text-sm font-medium text-center">
+                    <div className="flex justify-center flex-wrap gap-2">
+                      <button className="flex items-center gap-1 text-primary hover:text-blue-700 px-2 py-1 border border-primary rounded-md text-xs font-semibold">
+                        <i className="ri-eye-line"></i>
+                        <span>View</span>
                       </button>
-                      <button
-                        className="text-gray-600 hover:text-gray-900"
-                        aria-label={`Edit ${user.name}`}
-                      >
-                        <i className="ri-edit-line w-4 h-4 flex items-center justify-center"></i>
+                      <button className="flex items-center gap-1 text-gray-700 hover:text-gray-900 px-2 py-1 border border-gray-400 rounded-md text-xs font-semibold">
+                        <i className="ri-edit-line"></i>
+                        <span>Edit</span>
                       </button>
-                      <button
-                        className="text-red-600 hover:text-red-900"
-                        aria-label={`Delete ${user.name}`}
-                      >
-                        <i className="ri-delete-bin-line w-4 h-4 flex items-center justify-center"></i>
+                      <button className="flex items-center gap-1 text-yellow-700 hover:text-yellow-900 px-2 py-1 border border-yellow-600 rounded-md text-xs font-semibold">
+                        <i className="ri-user-unfollow-line"></i>
+                        <span>Block</span>
+                      </button>
+                      <button className="flex items-center gap-1 text-red-700 hover:text-red-900 px-2 py-1 border border-red-600 rounded-md text-xs font-semibold">
+                        <i className="ri-delete-bin-line"></i>
+                        <span>Delete</span>
                       </button>
                     </div>
                   </td>
@@ -150,6 +149,8 @@ const Sellers = () => {
           </table>
         )}
       </div>
+
+      {/* Pagination */}
       <div className="px-6 py-4 border-t border-gray-200">
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-700">

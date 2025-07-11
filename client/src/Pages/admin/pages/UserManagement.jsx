@@ -13,7 +13,7 @@ const Users = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUsers = async () =>{ 
+    const fetchUsers = async () => {
       try {
         const res = await axios.get("/api/admin/users/getAllUsers");
         setUsers(res.data);
@@ -73,16 +73,21 @@ const Users = () => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  {["User", "Email", "Status", "Joined", "Actions"].map(
-                    (header) => (
-                      <th
-                        key={header}
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        {header}
-                      </th>
-                    )
-                  )}
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    User
+                  </th>
+                  <th className="px-6 py-3 text-center align-middle text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-center align-middle text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-center align-middle text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Joined
+                  </th>
+                  <th className="px-6 py-3 text-center align-middle text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -132,22 +137,32 @@ const Users = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
-                          className="text-primary hover:text-blue-700"
+                          className="flex items-center space-x-1 text-primary hover:text-blue-700 px-2 py-1 border border-primary rounded-md text-xs font-semibold"
                           aria-label={`View ${user.name}`}
                         >
-                          <i className="ri-eye-line w-4 h-4 flex items-center justify-center"></i>
+                          <i className="ri-eye-line"></i>
+                          <span>View</span>
                         </button>
                         <button
-                          className="text-gray-600 hover:text-gray-900"
+                          className="flex items-center space-x-1 text-gray-700 hover:text-gray-900 px-2 py-1 border border-gray-400 rounded-md text-xs font-semibold"
                           aria-label={`Edit ${user.name}`}
                         >
-                          <i className="ri-edit-line w-4 h-4 flex items-center justify-center"></i>
+                          <i className="ri-edit-line"></i>
+                          <span>Edit</span>
                         </button>
                         <button
-                          className="text-red-600 hover:text-red-900"
+                          className="flex items-center space-x-1 text-yellow-700 hover:text-yellow-900 px-2 py-1 border border-yellow-600 rounded-md text-xs font-semibold"
+                          aria-label={`Block ${user.name}`}
+                        >
+                          <i className="ri-user-unfollow-line"></i>
+                          <span>Block</span>
+                        </button>
+                        <button
+                          className="flex items-center space-x-1 text-red-700 hover:text-red-900 px-2 py-1 border border-red-600 rounded-md text-xs font-semibold"
                           aria-label={`Delete ${user.name}`}
                         >
-                          <i className="ri-delete-bin-line w-4 h-4 flex items-center justify-center"></i>
+                          <i className="ri-delete-bin-line"></i>
+                          <span>Delete</span>
                         </button>
                       </div>
                     </td>
