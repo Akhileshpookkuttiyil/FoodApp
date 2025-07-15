@@ -15,10 +15,12 @@ const letters = [
   { char: "a", color: "" },
 ];
 
+// 👇 Added a "Products" option to the list
 const links = [
   { name: "Dashboard", icon: "ri-dashboard-line", path: "/admin/dashboard" },
   { name: "Users", icon: "ri-user-line", path: "/admin/users" },
   { name: "Sellers", icon: "ri-store-line", path: "/admin/sellers" },
+  { name: "Products", icon: "ri-box-3-line", path: "/admin/products" },
   {
     name: "Restaurants",
     icon: "ri-restaurant-line",
@@ -41,7 +43,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     >
       {/* Logo */}
       <div className="flex p-6 border-b border-gray-200 justify-center">
-         <Link
+        <Link
           to="/"
           onClick={handleLogoClick}
           className="flex text-2xl font-extrabold tracking-wide select-none"

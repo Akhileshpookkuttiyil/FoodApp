@@ -5,6 +5,8 @@ import Users from "./Pages/admin/pages/UserManagement";
 import Sellers from "./Pages/admin/pages/SellerManagement";
 import Restaurants from "./Pages/admin/pages/RestaurantManagement";
 import Orders from "./Pages/admin/pages/OrderManagement";
+import ProductsContent from "./Pages/admin/pages/ProductManagement";
+import AddRestaurant from "./Pages/admin/pages/addRestaurant";
 
 const AdminRoutes = () => (
   <Routes>
@@ -14,7 +16,9 @@ const AdminRoutes = () => (
       <Route path="users" element={<Users />} />
       <Route path="sellers" element={<Sellers />} />
       <Route path="restaurants" element={<Restaurants />} />
+      <Route path="products" element={<ProductsContent />} />
       <Route path="orders" element={<Orders />} />
+      <Route path="add-Restaurant" element={<AddRestaurant />} />
     </Route>
   </Routes>
 );

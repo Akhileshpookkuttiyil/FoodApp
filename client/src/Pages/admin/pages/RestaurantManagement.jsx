@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../../Context/AppContext";
 import "remixicon/fonts/remixicon.css";
+import { useNavigate } from "react-router-dom";
 
 function RestaurantsContent() {
+  const navigate = useNavigate();
   const { axios } = useAppContext();
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +73,10 @@ function RestaurantsContent() {
               </button>
 
               {/* Add Restaurant Button */}
-              <button className="px-4 flex items-center justify-center bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium whitespace-nowrap rounded-button gap-1">
+              <button
+                onClick={() => navigate("/admin/add-Restaurant")}
+                className="px-4 flex items-center justify-center bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium whitespace-nowrap rounded-button gap-1"
+              >
                 <div className="w-5 h-7 flex items-center justify-center">
                   <i className="ri-add-line text-sm" />
                 </div>
@@ -99,7 +104,10 @@ function RestaurantsContent() {
             <tbody className="bg-white divide-y divide-gray-200">
               {restaurants.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
+                  <td
+                    colSpan={7}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
                     No restaurants found.
                   </td>
                 </tr>
@@ -122,7 +130,9 @@ function RestaurantsContent() {
                     </td>
 
                     <td className={tdClassLeft}>
-                      <div className="text-sm text-gray-900">{r.location.city}</div>
+                      <div className="text-sm text-gray-900">
+                        {r.location.city}
+                      </div>
                       <div className="text-sm text-gray-500">
                         {r.location.state}, {r.location.address}
                       </div>
@@ -139,7 +149,9 @@ function RestaurantsContent() {
                         <div className="w-4 h-4 flex items-center justify-center text-yellow-400 mr-1">
                           <i className="ri-star-fill" />
                         </div>
-                        <span className="text-sm text-gray-900">{r.rating}</span>
+                        <span className="text-sm text-gray-900">
+                          {r.rating}
+                        </span>
                         <span className="text-sm text-gray-500 ml-1">
                           ({r.totalReviews})
                         </span>
