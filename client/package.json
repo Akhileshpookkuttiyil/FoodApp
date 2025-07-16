@@ -19,6 +19,7 @@
     "aos": "^2.3.4",
     "axios": "^1.10.0",
     "canvas-confetti": "^1.9.3",
+    "classnames": "^2.5.1",
     "font-awesome": "^4.7.0",
     "fragment": "^0.3.0",
     "framer-motion": "^12.6.2",

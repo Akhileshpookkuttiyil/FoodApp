@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
   ArrowLeft,
@@ -13,10 +14,9 @@ import {
   ChevronDown,
   Check,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
-// Button
-const Button = ({
+// === Reusable UI Components ===
+export const Button = ({
   children,
   variant = "default",
   size = "default",
@@ -38,7 +38,10 @@ const Button = ({
 
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`}
+      type="button"
+      className={`inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors 
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none 
+        disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={disabled}
       {...props}
     >
@@ -55,10 +58,10 @@ Button.propTypes = {
   disabled: PropTypes.bool,
 };
 
-// Input
-const Input = ({ className = "", ...props }) => (
+export const Input = ({ className = "", ...props }) => (
   <input
-    className={`w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${className}`}
+    className={`w-full px-3 py-2 border border-input rounded-md bg-background text-foreground 
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${className}`}
     {...props}
   />
 );
@@ -67,11 +70,10 @@ Input.propTypes = {
   className: PropTypes.string,
 };
 
-// Label
-const Label = ({ children, className = "", htmlFor, ...props }) => (
+export const Label = ({ children, className = "", htmlFor, ...props }) => (
   <label
-    className={`block text-sm font-medium text-foreground mb-1 ${className}`}
     htmlFor={htmlFor}
+    className={`block text-sm font-medium text-foreground mb-1 ${className}`}
     {...props}
   >
     {children}
@@ -84,10 +86,10 @@ Label.propTypes = {
   htmlFor: PropTypes.string,
 };
 
-// Textarea
-const Textarea = ({ className = "", ...props }) => (
+export const Textarea = ({ className = "", ...props }) => (
   <textarea
-    className={`w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${className}`}
+    className={`w-full px-3 py-2 border border-input rounded-md bg-background text-foreground 
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${className}`}
     rows={3}
     {...props}
   />
@@ -97,22 +99,20 @@ Textarea.propTypes = {
   className: PropTypes.string,
 };
 
-// Switch
-const Switch = ({ checked, onCheckedChange, className = "", id }) => (
+export const Switch = ({ checked, onCheckedChange, className = "", id }) => (
   <button
     type="button"
     role="switch"
     aria-checked={checked}
     id={id}
-    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-      checked ? "bg-primary" : "bg-input"
-    } ${className}`}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors 
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+      ${checked ? "bg-primary" : "bg-input"} ${className}`}
     onClick={() => onCheckedChange?.(!checked)}
   >
     <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-background shadow-lg transition-transform ${
-        checked ? "translate-x-6" : "translate-x-1"
-      }`}
+      className={`inline-block h-4 w-4 transform rounded-full bg-background shadow-lg transition-transform 
+        ${checked ? "translate-x-6" : "translate-x-1"}`}
     />
   </button>
 );
@@ -124,8 +124,7 @@ Switch.propTypes = {
   id: PropTypes.string,
 };
 
-// Card
-const Card = ({ children, className = "" }) => (
+export const Card = ({ children, className = "" }) => (
   <div
     className={`bg-card text-card-foreground rounded-lg border border-border shadow-sm ${className}`}
   >
@@ -138,8 +137,7 @@ Card.propTypes = {
   className: PropTypes.string,
 };
 
-// CardHeader
-const CardHeader = ({ children }) => (
+export const CardHeader = ({ children }) => (
   <div className="p-6 border-b border-border">{children}</div>
 );
 
@@ -147,29 +145,28 @@ CardHeader.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-// CardContent
-const CardContent = ({ children }) => <div className="p-6">{children}</div>;
+export const CardContent = ({ children }) => (
+  <div className="p-6">{children}</div>
+);
 
 CardContent.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-// useToast hook
-const useToast = () => {
+// === Toast ===
+export const useToast = () => {
   const toast = ({ title, description, variant = "default" }) => {
     const icon = variant === "destructive" ? "❌" : "✅";
     alert(`${icon} ${title}\n${description}`);
   };
-
   return { toast };
 };
 
 const AddRestaurant = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Form data
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -191,7 +188,6 @@ const AddRestaurant = () => {
   const [showOwnerDropdown, setShowOwnerDropdown] = useState(false);
   const [ownerSearch, setOwnerSearch] = useState("");
 
-  // Static data
   const categories = [
     { id: "italian", name: "Italian", icon: "🍝" },
     { id: "chinese", name: "Chinese", icon: "🥢" },
@@ -211,7 +207,6 @@ const AddRestaurant = () => {
     { id: "5", name: "David Brown", email: "david@example.com" },
   ];
 
-  // Helper functions
   const updateField = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -221,27 +216,62 @@ const AddRestaurant = () => {
 
   const validateForm = () => {
     const newErrors = {};
+    const {
+      name,
+      image,
+      categories,
+      address,
+      city,
+      state,
+      pincode,
+      contactNumber,
+      owner,
+    } = formData;
 
-    if (!formData.name.trim()) newErrors.name = "Restaurant name is required";
-    if (!formData.image.trim())
-      newErrors.image = "Restaurant image is required";
-    if (formData.categories.length === 0)
+    if (!name.trim()) newErrors.name = "Restaurant name is required";
+    if (!image.trim()) newErrors.image = "Restaurant image is required";
+    if (categories.length === 0)
       newErrors.categories = "Select at least one category";
-    if (!formData.address.trim()) newErrors.address = "Address is required";
-    if (!formData.city.trim()) newErrors.city = "City is required";
-    if (!formData.state.trim()) newErrors.state = "State is required";
-    if (!formData.pincode.trim()) newErrors.pincode = "Pincode is required";
-    else if (!/^\d{6}$/.test(formData.pincode))
+    if (!address.trim()) newErrors.address = "Address is required";
+    if (!city.trim()) newErrors.city = "City is required";
+    if (!state.trim()) newErrors.state = "State is required";
+    if (!/^\d{6}$/.test(pincode))
       newErrors.pincode = "Pincode must be 6 digits";
-    if (!formData.contactNumber.trim())
-      newErrors.contactNumber = "Contact number is required";
-    else if (!/^\d{10}$/.test(formData.contactNumber))
+    if (!/^\d{10}$/.test(contactNumber))
       newErrors.contactNumber = "Contact number must be 10 digits";
-    if (!formData.owner) newErrors.owner = "Please select an owner";
+    if (!owner) newErrors.owner = "Please select an owner";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const toggleCategory = (id) => {
+    const selected = formData.categories.includes(id)
+      ? formData.categories.filter((c) => c !== id)
+      : [...formData.categories, id];
+    updateField("categories", selected);
+  };
+
+  const removeCategory = (id) => {
+    updateField(
+      "categories",
+      formData.categories.filter((c) => c !== id)
+    );
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      setShowCategoryDropdown(false);
+      setShowOwnerDropdown(false);
+    }
+  };
+
+  const filteredOwners = owners.filter(
+    (owner) =>
+      owner.name.toLowerCase().includes(ownerSearch.toLowerCase()) ||
+      owner.email.toLowerCase().includes(ownerSearch.toLowerCase())
+  );
+  const selectedOwner = owners.find((owner) => owner.id === formData.owner);
 
   const handleSubmit = async (saveAndAddAnother = false) => {
     if (!validateForm()) {
@@ -264,7 +294,6 @@ const AddRestaurant = () => {
       });
 
       if (saveAndAddAnother) {
-        // Reset form
         setFormData({
           name: "",
           description: "",
@@ -285,7 +314,7 @@ const AddRestaurant = () => {
         navigate("/restaurants");
       }
     } catch (error) {
-      console.error("Error adding restaurant:", error);
+      console.error("Add restaurant failed:", error);
       toast({
         title: "Error",
         description: "Failed to add restaurant. Please try again.",
@@ -296,40 +325,10 @@ const AddRestaurant = () => {
     }
   };
 
-  const toggleCategory = (categoryId) => {
-    const newCategories = formData.categories.includes(categoryId)
-      ? formData.categories.filter((id) => id !== categoryId)
-      : [...formData.categories, categoryId];
-    updateField("categories", newCategories);
-  };
-
-  const removeCategory = (categoryId) => {
-    updateField(
-      "categories",
-      formData.categories.filter((id) => id !== categoryId)
-    );
-  };
-
-  const filteredOwners = owners.filter(
-    (owner) =>
-      owner.name.toLowerCase().includes(ownerSearch.toLowerCase()) ||
-      owner.email.toLowerCase().includes(ownerSearch.toLowerCase())
-  );
-
-  const selectedOwner = owners.find((owner) => owner.id === formData.owner);
-
-  // Close dropdowns on escape key
-  const handleKeyDown = (event) => {
-    if (event.key === "Escape") {
-      setShowCategoryDropdown(false);
-      setShowOwnerDropdown(false);
-    }
-  };
-
   return (
     <div className="min-h-screen" onKeyDown={handleKeyDown}>
       <div className="max-w-4xl mx-5">
-        {/* Header */}
+        {/* === Breadcrumb & Page Header === */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <nav
@@ -339,19 +338,17 @@ const AddRestaurant = () => {
               <button
                 onClick={() => navigate("/")}
                 className="hover:text-foreground transition-colors"
-                aria-label="Go to Dashboard"
               >
                 Dashboard
               </button>
-              <ChevronRight className="h-4 w-4 mx-2" aria-hidden="true" />
+              <ChevronRight className="h-4 w-4 mx-2" />
               <button
                 onClick={() => navigate("/restaurants")}
                 className="hover:text-foreground transition-colors"
-                aria-label="Go to Restaurants"
               >
                 Restaurants
               </button>
-              <ChevronRight className="h-4 w-4 mx-2" aria-hidden="true" />
+              <ChevronRight className="h-4 w-4 mx-2" />
               <span className="text-foreground font-medium">Add New</span>
             </nav>
             <h1 className="text-3xl font-bold text-foreground">
@@ -364,6 +361,7 @@ const AddRestaurant = () => {
           </Button>
         </div>
 
+        {/* === Form Start === */}
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -371,7 +369,7 @@ const AddRestaurant = () => {
           }}
           className="space-y-8"
         >
-          {/* Basic Information */}
+          {/* === Basic Info Card === */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -388,6 +386,7 @@ const AddRestaurant = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Name */}
                 <div className="md:col-span-2">
                   <Label htmlFor="name">
                     Restaurant Name <span className="text-destructive">*</span>
@@ -398,29 +397,26 @@ const AddRestaurant = () => {
                     onChange={(e) => updateField("name", e.target.value)}
                     placeholder="Enter restaurant name"
                     className={errors.name ? "border-destructive" : ""}
-                    aria-describedby={errors.name ? "name-error" : undefined}
                   />
                   {errors.name && (
-                    <p
-                      className="text-destructive text-sm mt-1"
-                      id="name-error"
-                      role="alert"
-                    >
+                    <p className="text-destructive text-sm mt-1">
                       {errors.name}
                     </p>
                   )}
                 </div>
 
+                {/* Description */}
                 <div className="md:col-span-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => updateField("description", e.target.value)}
-                    placeholder="Brief description of the restaurant..."
+                    placeholder="Brief description..."
                   />
                 </div>
 
+                {/* Image */}
                 <div className="md:col-span-2">
                   <Label htmlFor="image">
                     Restaurant Image <span className="text-destructive">*</span>
@@ -430,92 +426,76 @@ const AddRestaurant = () => {
                       id="image"
                       value={formData.image}
                       onChange={(e) => updateField("image", e.target.value)}
-                      placeholder="Enter image URL"
+                      placeholder="Image URL"
                       className={errors.image ? "border-destructive" : ""}
-                      aria-describedby={
-                        errors.image ? "image-error" : undefined
-                      }
                     />
                     <Button type="button" variant="outline">
-                      <Upload className="h-4 w-4" />
-                      Upload
+                      <Upload className="h-4 w-4" /> Upload
                     </Button>
                   </div>
                   {formData.image && (
-                    <div className="mt-4">
-                      <div className="relative w-32 h-32 border-2 border-border rounded-lg overflow-hidden">
-                        <img
-                          src={formData.image}
-                          alt="Restaurant preview"
-                          className="w-full h-full object-cover"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => updateField("image", "")}
-                          className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90 transition-colors"
-                          aria-label="Remove image"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
+                    <div className="mt-4 relative w-32 h-32 border-2 border-border rounded-lg overflow-hidden">
+                      <img
+                        src={formData.image}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateField("image", "")}
+                        className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
                     </div>
                   )}
                   {errors.image && (
-                    <p
-                      className="text-destructive text-sm mt-1"
-                      id="image-error"
-                      role="alert"
-                    >
+                    <p className="text-destructive text-sm mt-1">
                       {errors.image}
                     </p>
                   )}
                 </div>
 
+                {/* Categories */}
                 <div className="md:col-span-2">
                   <Label>
                     Categories <span className="text-destructive">*</span>
                   </Label>
                   <div className="relative">
                     <div
-                      className={`min-h-[40px] w-full rounded-md border px-3 py-2 cursor-pointer ${
-                        errors.categories
-                          ? "border-destructive"
-                          : "border-input"
-                      }`}
+                      className={`min-h-[40px] w-full rounded-md border px-3 py-2 cursor-pointer 
+                        ${
+                          errors.categories
+                            ? "border-destructive"
+                            : "border-input"
+                        }`}
                       onClick={() =>
                         setShowCategoryDropdown(!showCategoryDropdown)
                       }
-                      role="combobox"
-                      aria-expanded={showCategoryDropdown}
-                      aria-label="Select categories"
                     >
                       <div className="flex flex-wrap gap-2">
-                        {formData.categories.map((categoryId) => {
-                          const category = categories.find(
-                            (c) => c.id === categoryId
-                          );
-                          return category ? (
+                        {formData.categories.map((id) => {
+                          const c = categories.find((cat) => cat.id === id);
+                          return (
                             <span
-                              key={categoryId}
+                              key={id}
                               className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-md text-xs"
                             >
-                              <span role="img" aria-label={category.name}>
-                                {category.icon}
+                              <span role="img" aria-label={c.name}>
+                                {c.icon}
                               </span>
-                              <span>{category.name}</span>
+                              <span>{c.name}</span>
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  removeCategory(categoryId);
+                                  removeCategory(id);
                                 }}
-                                className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
-                                aria-label={`Remove ${category.name}`}
                               >
                                 <X className="h-3 w-3" />
                               </button>
                             </span>
-                          ) : null;
+                          );
                         })}
                         {formData.categories.length === 0 && (
                           <span className="text-muted-foreground">
@@ -527,25 +507,17 @@ const AddRestaurant = () => {
                     </div>
 
                     {showCategoryDropdown && (
-                      <div className="absolute z-50 w-full mt-1 bg-gray-100 border border-border rounded-md shadow-lg max-h-60 overflow-auto">
-                        {categories.map((category) => (
+                      <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                        {categories.map((cat) => (
                           <div
-                            key={category.id}
+                            key={cat.id}
                             className="flex items-center gap-3 px-3 py-2 hover:bg-accent cursor-pointer"
-                            onClick={() => toggleCategory(category.id)}
-                            role="option"
-                            aria-selected={formData.categories.includes(
-                              category.id
-                            )}
+                            onClick={() => toggleCategory(cat.id)}
                           >
-                            <div className="flex items-center gap-2 flex-1">
-                              <span role="img" aria-label={category.name}>
-                                {category.icon}
-                              </span>
-                              <span>{category.name}</span>
-                            </div>
-                            {formData.categories.includes(category.id) && (
-                              <Check className="h-4 w-4 text-primary" />
+                            <span role="img">{cat.icon}</span>
+                            <span>{cat.name}</span>
+                            {formData.categories.includes(cat.id) && (
+                              <Check className="h-4 w-4 text-primary ml-auto" />
                             )}
                           </div>
                         ))}
@@ -553,7 +525,7 @@ const AddRestaurant = () => {
                     )}
                   </div>
                   {errors.categories && (
-                    <p className="text-destructive text-sm mt-1" role="alert">
+                    <p className="text-destructive text-sm mt-1">
                       {errors.categories}
                     </p>
                   )}
@@ -561,8 +533,7 @@ const AddRestaurant = () => {
               </div>
             </CardContent>
           </Card>
-
-          {/* Location Details */}
+          {/* === Location Card === */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -589,21 +560,13 @@ const AddRestaurant = () => {
                     onChange={(e) => updateField("address", e.target.value)}
                     placeholder="Street address"
                     className={errors.address ? "border-destructive" : ""}
-                    aria-describedby={
-                      errors.address ? "address-error" : undefined
-                    }
                   />
                   {errors.address && (
-                    <p
-                      className="text-destructive text-sm mt-1"
-                      id="address-error"
-                      role="alert"
-                    >
+                    <p className="text-destructive text-sm mt-1">
                       {errors.address}
                     </p>
                   )}
                 </div>
-
                 <div>
                   <Label htmlFor="city">
                     City <span className="text-destructive">*</span>
@@ -612,21 +575,14 @@ const AddRestaurant = () => {
                     id="city"
                     value={formData.city}
                     onChange={(e) => updateField("city", e.target.value)}
-                    placeholder="City name"
                     className={errors.city ? "border-destructive" : ""}
-                    aria-describedby={errors.city ? "city-error" : undefined}
                   />
                   {errors.city && (
-                    <p
-                      className="text-destructive text-sm mt-1"
-                      id="city-error"
-                      role="alert"
-                    >
+                    <p className="text-destructive text-sm mt-1">
                       {errors.city}
                     </p>
                   )}
                 </div>
-
                 <div>
                   <Label htmlFor="state">
                     State <span className="text-destructive">*</span>
@@ -635,42 +591,27 @@ const AddRestaurant = () => {
                     id="state"
                     value={formData.state}
                     onChange={(e) => updateField("state", e.target.value)}
-                    placeholder="State name"
                     className={errors.state ? "border-destructive" : ""}
-                    aria-describedby={errors.state ? "state-error" : undefined}
                   />
                   {errors.state && (
-                    <p
-                      className="text-destructive text-sm mt-1"
-                      id="state-error"
-                      role="alert"
-                    >
+                    <p className="text-destructive text-sm mt-1">
                       {errors.state}
                     </p>
                   )}
                 </div>
-
                 <div>
                   <Label htmlFor="pincode">
                     Pincode <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="pincode"
+                    maxLength={6}
                     value={formData.pincode}
                     onChange={(e) => updateField("pincode", e.target.value)}
-                    placeholder="6-digit pincode"
-                    maxLength={6}
                     className={errors.pincode ? "border-destructive" : ""}
-                    aria-describedby={
-                      errors.pincode ? "pincode-error" : undefined
-                    }
                   />
                   {errors.pincode && (
-                    <p
-                      className="text-destructive text-sm mt-1"
-                      id="pincode-error"
-                      role="alert"
-                    >
+                    <p className="text-destructive text-sm mt-1">
                       {errors.pincode}
                     </p>
                   )}
@@ -679,7 +620,7 @@ const AddRestaurant = () => {
             </CardContent>
           </Card>
 
-          {/* Contact & Owner */}
+          {/* === Contact & Owner Card === */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -689,7 +630,7 @@ const AddRestaurant = () => {
                 <div>
                   <h2 className="text-lg font-semibold">Contact & Owner</h2>
                   <p className="text-sm text-muted-foreground">
-                    Communication and ownership details
+                    Communication and ownership
                   </p>
                 </div>
               </div>
@@ -702,41 +643,30 @@ const AddRestaurant = () => {
                   </Label>
                   <Input
                     id="contactNumber"
+                    maxLength={10}
                     value={formData.contactNumber}
                     onChange={(e) =>
                       updateField("contactNumber", e.target.value)
                     }
-                    placeholder="10-digit contact number"
-                    maxLength={10}
                     className={errors.contactNumber ? "border-destructive" : ""}
-                    aria-describedby={
-                      errors.contactNumber ? "contact-error" : undefined
-                    }
                   />
                   {errors.contactNumber && (
-                    <p
-                      className="text-destructive text-sm mt-1"
-                      id="contact-error"
-                      role="alert"
-                    >
+                    <p className="text-destructive text-sm mt-1">
                       {errors.contactNumber}
                     </p>
                   )}
                 </div>
-
                 <div>
                   <Label>
                     Owner <span className="text-destructive">*</span>
                   </Label>
                   <div className="relative">
                     <div
-                      className={`min-h-[40px] w-full rounded-md border px-3 py-2 cursor-pointer flex items-center justify-between ${
-                        errors.owner ? "border-destructive" : "border-input"
-                      }`}
+                      className={`min-h-[40px] w-full rounded-md border px-3 py-2 cursor-pointer flex items-center justify-between 
+                        ${
+                          errors.owner ? "border-destructive" : "border-input"
+                        }`}
                       onClick={() => setShowOwnerDropdown(!showOwnerDropdown)}
-                      role="combobox"
-                      aria-expanded={showOwnerDropdown}
-                      aria-label="Select owner"
                     >
                       <span
                         className={
@@ -751,10 +681,9 @@ const AddRestaurant = () => {
                       </span>
                       <ChevronDown className="h-4 w-4 text-muted-foreground" />
                     </div>
-
                     {showOwnerDropdown && (
-                      <div className="absolute z-50 w-full mt-1 bg-gray-100 border border-border rounded-md shadow-lg">
-                        <div className="p-2 border-b border-border">
+                      <div className="absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg">
+                        <div className="p-2 border-b">
                           <Input
                             placeholder="Search owners..."
                             value={ownerSearch}
@@ -772,8 +701,6 @@ const AddRestaurant = () => {
                                 setShowOwnerDropdown(false);
                                 setOwnerSearch("");
                               }}
-                              role="option"
-                              aria-selected={formData.owner === owner.id}
                             >
                               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                                 <User className="h-4 w-4 text-primary" />
@@ -801,7 +728,7 @@ const AddRestaurant = () => {
                     )}
                   </div>
                   {errors.owner && (
-                    <p className="text-destructive text-sm mt-1" role="alert">
+                    <p className="text-destructive text-sm mt-1">
                       {errors.owner}
                     </p>
                   )}
@@ -810,7 +737,7 @@ const AddRestaurant = () => {
             </CardContent>
           </Card>
 
-          {/* Additional Settings */}
+          {/* === Additional Settings Card === */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -820,7 +747,7 @@ const AddRestaurant = () => {
                 <div>
                   <h2 className="text-lg font-semibold">Additional Settings</h2>
                   <p className="text-sm text-muted-foreground">
-                    Optional rating and status configuration
+                    Optional configuration
                   </p>
                 </div>
               </div>
@@ -828,7 +755,7 @@ const AddRestaurant = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="initialRating">Initial Rating (0-5)</Label>
+                  <Label htmlFor="initialRating">Initial Rating (0–5)</Label>
                   <Input
                     id="initialRating"
                     type="number"
@@ -844,7 +771,6 @@ const AddRestaurant = () => {
                     }
                   />
                 </div>
-
                 <div>
                   <Label htmlFor="totalReviews">Total Reviews</Label>
                   <Input
@@ -857,7 +783,6 @@ const AddRestaurant = () => {
                     }
                   />
                 </div>
-
                 <div className="flex items-center space-x-3 pt-6">
                   <Switch
                     id="isActive"
@@ -872,7 +797,7 @@ const AddRestaurant = () => {
             </CardContent>
           </Card>
 
-          {/* Action Buttons */}
+          {/* === Action Buttons === */}
           <Card>
             <CardContent>
               <div className="flex flex-col sm:flex-row gap-4 justify-end">
@@ -884,7 +809,6 @@ const AddRestaurant = () => {
                 >
                   Cancel
                 </Button>
-
                 <Button
                   type="button"
                   variant="outline"
@@ -893,7 +817,6 @@ const AddRestaurant = () => {
                 >
                   {isLoading ? "Saving..." : "Save & Add Another"}
                 </Button>
-
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? "Saving..." : "Save Restaurant"}
                 </Button>
@@ -903,7 +826,7 @@ const AddRestaurant = () => {
         </form>
       </div>
 
-      {/* Backdrop for dropdowns */}
+      {/* === Backdrop for dropdowns === */}
       {(showCategoryDropdown || showOwnerDropdown) && (
         <div
           className="fixed inset-0 z-40 bg-black/20"
@@ -911,7 +834,6 @@ const AddRestaurant = () => {
             setShowCategoryDropdown(false);
             setShowOwnerDropdown(false);
           }}
-          aria-label="Close dropdown"
         />
       )}
     </div>
