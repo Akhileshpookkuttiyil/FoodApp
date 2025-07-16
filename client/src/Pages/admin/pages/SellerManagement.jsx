@@ -16,16 +16,24 @@ const Sellers = () => {
     const fetchSellers = async () => {
       try {
         const res = await axios.get("/api/admin/sellers/getAllSellers");
-        setSellers(res.data);
+        if (res.data.success) {
+          setSellers(res.data.sellers); // Assuming the data is in `res.data.sellers`
+        } else {
+          setError("Failed to load sellers.");
+        }
       } catch (error) {
-        console.error("Error fetching sellers:", error.message);
+        console.error(
+          "Error fetching sellers:",
+          error.response?.data?.message || error.message
+        );
         setError("Failed to load sellers.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchSellers();
-  }, [axios]);
+  }, []);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
