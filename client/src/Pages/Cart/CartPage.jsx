@@ -13,7 +13,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center">
     <DotLottieReact
-      src="https://lottie.host/4af2faac-0722-4717-8098-b7f94ef00f9b/p7nyoKCZk4.lottie"
+      src="https://lottie.host/a611eb2d-f9ef-440f-b99e-e5a551088375/RONuBSFnFW.lottie"
       loop
       autoplay
       style={{ width: "230px", height: "250px" }}

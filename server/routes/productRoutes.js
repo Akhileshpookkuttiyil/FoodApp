@@ -15,7 +15,7 @@ const productRouter = express.Router();
 
 // --- Public Routes ---
 productRouter.get("/list", productList);
-productRouter.get("/:id", productById); // must be above seller-only routes
+productRouter.get("/:id", productById);
 
 // --- Seller Routes (protected) ---
 productRouter.use(authRole("seller"));

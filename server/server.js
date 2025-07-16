@@ -15,6 +15,7 @@ import adminRouter from "./routes/adminRoutes.js";
 import locationRouter from "./routes/locationRoutes.js";
 import { stripeWebhooks } from "./controllers/orderController.js";
 import restaurantRouter from "./routes/restaurantRoutes.js";
+import categoryRouter from "./routes/categoryRoutes.js";
 
 dotenv.config();
 
@@ -54,8 +55,9 @@ const startServer = async () => {
     app.use("/api/address", addressRouter);
     app.use("/api/order", orderRouter);
     app.use("/api/admin", adminRouter);
-    app.use('/api/restaurant',restaurantRouter)
+    app.use("/api/restaurant", restaurantRouter);
     app.use("/api/location", locationRouter);
+    app.use("/api/category", categoryRouter);
 
     app.get("/", (req, res) => {
       res.send("API is running");

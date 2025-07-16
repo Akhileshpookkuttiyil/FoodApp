@@ -17,11 +17,14 @@ const restaurantSchema = new mongoose.Schema(
       type: String,
       required: [true, "Restaurant image URL is required"],
     },
-    categories: {
-      type: [String],
-      required: true,
-      default: [],
-    },
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: true,
+      },
+    ],
+
     location: {
       address: { type: String, required: true, trim: true },
       city: { type: String, required: true, trim: true },

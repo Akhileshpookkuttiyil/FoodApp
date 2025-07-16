@@ -21,9 +21,36 @@ const getCoordinatesFromAddress = async (address) => {
 
 export const addRestaurant = async (req, res) => {
   try {
-    const { name, description, categories, location, contactNumber, owner } =
-      req.body;
+    const { name, description, contactNumber, owner } = req.body;
     const imageFile = req.file;
+
+    // Parse categories - it might come as a JSON string or comma-separated string
+    let categories = [];
+    if (req.body.categories) {
+      try {
+        categories = JSON.parse(req.body.categories);
+        if (!Array.isArray(categories)) categories = [];
+      } catch {
+        // If not JSON, try comma separated
+        categories = req.body.categories.split(",").map((cat) => cat.trim());
+      }
+    }
+
+    // Parse location - expecting JSON string
+    let location = {};
+    if (req.body.location) {
+      try {
+        location = JSON.parse(req.body.location);
+      } catch {
+        // Optionally handle separate location fields
+        location = {
+          address: req.body.address,
+          city: req.body.city,
+          state: req.body.state,
+          pincode: req.body.pincode,
+        };
+      }
+    }
 
     // Validate required fields
     if (
@@ -35,7 +62,8 @@ export const addRestaurant = async (req, res) => {
       !location?.city ||
       !location?.state ||
       !location?.pincode ||
-      !contactNumber
+      !contactNumber ||
+      !owner
     ) {
       return res.status(400).json({
         success: false,
@@ -63,7 +91,7 @@ export const addRestaurant = async (req, res) => {
 
     fs.unlinkSync(imageFile.path); // remove temp image
 
-    // Get coordinates from address (can be Plus Code or full address)
+    // Get coordinates from address
     const coords = await getCoordinatesFromAddress(location.address);
 
     if (!coords) {
@@ -106,7 +134,6 @@ export const addRestaurant = async (req, res) => {
     });
   }
 };
-
 export const getUsers = async (req, res) => {
   try {
     const users = await User.find({ role: "user" })
