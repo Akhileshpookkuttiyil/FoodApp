@@ -14,7 +14,7 @@ const ViewProducts = () => {
     setLoading(true);
     try {
       const res = await axios.get("/api/product/get/BySeller");
-      setProducts(res.data.data); // ← array of products
+      setProducts(res.data.data); 
     } catch (err) {
       console.error(err.message);
       toast.error("Failed to load products.");

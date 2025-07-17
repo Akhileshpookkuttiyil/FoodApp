@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaStar, FaRegStarHalf } from "react-icons/fa";
 import FilterModal from "../RestaurantList/FilterModal";
+import PropTypes from "prop-types";
 
 const filters = [
   { label: "Nearest", value: "nearest" },
@@ -15,6 +16,7 @@ const RestaurantList = ({ selectedCategory }) => {
   const [restaurants, setRestaurants] = useState([]);
   const [originalRestaurants, setOriginalRestaurants] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
   const [activeFilter, setActiveFilter] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customFilterActive, setCustomFilterActive] = useState(false);
@@ -43,16 +45,14 @@ const RestaurantList = ({ selectedCategory }) => {
   };
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      try {
-        const res = await axios.get("/api/restaurant/getAll");
+    axios
+      .get("/api/restaurant/getAll")
+      .then((res) => {
         setOriginalRestaurants(res.data);
-      } catch (err) {
+      })
+      .catch((err) => {
         console.error("Failed to fetch restaurants:", err);
-      }
-    };
-
-    fetchRestaurants();
+      });
   }, []);
 
   useEffect(() => {
@@ -64,8 +64,13 @@ const RestaurantList = ({ selectedCategory }) => {
             lng: position.coords.longitude,
           });
         },
-        (error) => console.error("Error getting location:", error)
+        (err) => {
+          console.error("Geolocation error:", err);
+          setLocationError("Location access denied or unavailable.");
+        }
       );
+    } else {
+      setLocationError("Geolocation is not supported in this browser.");
     }
   }, []);
 
@@ -126,7 +131,7 @@ const RestaurantList = ({ selectedCategory }) => {
     if (customFilters.sortBy === "deliveryTime") {
       filtered = filtered
         .filter((r) => /\d+/.test(r.duration))
-        .sort((a, b) => parseInt(a.duration) - parseInt(b.duration));
+        .sort((a, b) => parseInt(a.duration, 10) - parseInt(b.duration, 10));
     }
 
     if (customFilters.sortBy === "rating") {
@@ -159,8 +164,8 @@ const RestaurantList = ({ selectedCategory }) => {
     setActiveFilter(value === activeFilter ? null : value);
   };
 
-  // === 🧠 CATEGORY FILTERING BASED ON category.name
   let filteredRestaurants = [...restaurants];
+
   if (selectedCategory && selectedCategory.toLowerCase() !== "all") {
     filteredRestaurants = filteredRestaurants.filter((r) =>
       r.categories?.some(
@@ -171,7 +176,6 @@ const RestaurantList = ({ selectedCategory }) => {
     );
   }
 
-  // === 🧠 Apply predefined filter buttons
   if (activeFilter && !customFilterActive) {
     switch (activeFilter) {
       case "nearest":
@@ -182,7 +186,7 @@ const RestaurantList = ({ selectedCategory }) => {
       case "fast":
         filteredRestaurants = filteredRestaurants
           .filter((r) => /\d+/.test(r.duration))
-          .sort((a, b) => parseInt(a.duration) - parseInt(b.duration));
+          .sort((a, b) => parseInt(a.duration, 10) - parseInt(b.duration, 10));
         break;
       case "rating":
         filteredRestaurants = filteredRestaurants.sort(
@@ -206,9 +210,13 @@ const RestaurantList = ({ selectedCategory }) => {
 
   return (
     <div id="restaurent" className="px-4 py-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-8">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
         Restaurants Near You
       </h2>
+
+      {locationError && (
+        <p className="text-red-600 text-sm mb-4">⚠️ {locationError}</p>
+      )}
 
       <div className="flex overflow-x-auto gap-3 mb-6 scrollbar-hide">
         <button
@@ -257,8 +265,6 @@ const RestaurantList = ({ selectedCategory }) => {
                   alt={restaurant.name}
                   className="w-full h-44 object-cover rounded-t-xl"
                 />
-
-                {/* 🏷️ Category Labels */}
                 <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                   {restaurant.categories?.map((cat) => (
                     <span
@@ -269,7 +275,6 @@ const RestaurantList = ({ selectedCategory }) => {
                     </span>
                   ))}
                 </div>
-
                 {restaurant.hasOffer && (
                   <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
                     Offer Available
@@ -300,12 +305,11 @@ const RestaurantList = ({ selectedCategory }) => {
                     {Array.from({ length: 5 }).map((_, index) => {
                       if (index + 1 <= Math.floor(restaurant.rating)) {
                         return <FaStar key={index} />;
-                      } else if (restaurant.rating - index > 0) {
+                      }
+                      if (restaurant.rating - index > 0) {
                         return <FaRegStarHalf key={index} />;
                       }
-                      return (
-                        <FaStar key={index} className="text-gray-300" />
-                      );
+                      return <FaStar key={index} className="text-gray-300" />;
                     })}
                     <span className="ml-1 font-semibold text-gray-700">
                       {restaurant.rating}
@@ -323,6 +327,10 @@ const RestaurantList = ({ selectedCategory }) => {
       </div>
     </div>
   );
+};
+
+RestaurantList.propTypes = {
+  selectedCategory: PropTypes.string,
 };
 
 export default RestaurantList;

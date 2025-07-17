@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppContext } from "../../Context/AppContext";
 import toast, { Toaster } from "react-hot-toast";
 
 const AddProduct = () => {
   const { axios } = useAppContext();
+
   const [images, setImages] = useState(Array(4).fill(null));
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
@@ -12,7 +13,27 @@ const AddProduct = () => {
   const [offerPrice, setOfferPrice] = useState("");
   const [deliveryTime, setDeliveryTime] = useState("");
   const [stock, setStock] = useState("");
+  const [restaurantId, setRestaurantId] = useState("");
+  const [restaurants, setRestaurants] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const res = await axios.get("/api/restaurant/getByUser");
+        if (res.data.success) {
+          setRestaurants(res.data.data);
+        } else {
+          toast.error("Failed to fetch your restaurants");
+        }
+      } catch (err) {
+        console.error("Failed to load restaurants", err);
+        toast.error("Failed to load restaurants");
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
 
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
@@ -44,14 +65,21 @@ const AddProduct = () => {
     setOfferPrice("");
     setDeliveryTime("");
     setStock("");
+    setRestaurantId("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Validation
-    if (!productName || !category || !productPrice || !deliveryTime || !stock) {
+    if (
+      !productName ||
+      !category ||
+      !productPrice ||
+      !deliveryTime ||
+      !stock ||
+      !restaurantId
+    ) {
       toast.error("Please fill all required fields.");
       setIsSubmitting(false);
       return;
@@ -75,6 +103,7 @@ const AddProduct = () => {
     if (offerPrice) formData.append("offerPrice", parseFloat(offerPrice));
     formData.append("deliveryTime", parseInt(deliveryTime));
     formData.append("stock", parseInt(stock));
+    formData.append("restaurantId", restaurantId);
 
     try {
       const res = await axios.post("/api/product/add", formData, {
@@ -102,7 +131,7 @@ const AddProduct = () => {
         className="space-y-6 max-w-lg bg-white shadow-lg rounded p-6"
         onSubmit={handleSubmit}
       >
-        {/* Images */}
+        {/* Product Images */}
         <div>
           <p className="text-lg font-semibold mb-2">Product Images</p>
           <div className="flex gap-4 flex-wrap">
@@ -163,9 +192,7 @@ const AddProduct = () => {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium mb-1">
-            Description <span className="text-red-500">*</span>
-          </label>
+          <label className="block text-sm font-medium mb-1">Description</label>
           <textarea
             rows={4}
             maxLength={2000}
@@ -174,6 +201,26 @@ const AddProduct = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+        </div>
+
+        {/* Restaurant Dropdown */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Restaurant <span className="text-red-500">*</span>
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            value={restaurantId}
+            onChange={(e) => setRestaurantId(e.target.value)}
+            required
+          >
+            <option value="">-- Select Restaurant --</option>
+            {restaurants.map((r) => (
+              <option key={r.id || r._id} value={r.id || r._id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Category */}
@@ -198,7 +245,7 @@ const AddProduct = () => {
           </select>
         </div>
 
-        {/* Price Fields */}
+        {/* Price & Offer Price */}
         <div className="flex gap-4 flex-wrap">
           <div className="flex-1">
             <label className="block text-sm font-medium mb-1">
@@ -262,7 +309,7 @@ const AddProduct = () => {
           </div>
         </div>
 
-        {/* Submit */}
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={isSubmitting}
