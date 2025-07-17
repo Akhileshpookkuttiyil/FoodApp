@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import PropTypes from "prop-types";
 import axios from "axios";
 import {
@@ -146,16 +147,10 @@ export const CardContent = ({ children }) => (
 );
 CardContent.propTypes = { children: PropTypes.node.isRequired };
 
-// === Toast (temporary alert-based)
-export const useToast = () => {
-  const toast = ({ title, description, variant = "default" }) => {
-    const icon = variant === "destructive" ? "❌" : "✅";
-    alert(`${icon} ${title}\n${description}`);
-  };
-  return { toast };
-};
+export const useToast = () => ({ toast });
+
 const AddRestaurant = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -194,18 +189,10 @@ const AddRestaurant = () => {
           }));
           setCategory(transformed);
         } else {
-          toast({
-            title: "Error",
-            description: res.data.message || "Failed to load categories",
-            variant: "destructive",
-          });
+          toast.error(res.data.message || "Something went wrong");
         }
       } catch (error) {
-        toast({
-          title: "Network Error",
-          description: error.message || "Something went wrong",
-          variant: "destructive",
-        });
+        toast.error(error.message || "Something went wrong");
       }
     };
 
@@ -222,11 +209,7 @@ const AddRestaurant = () => {
       } catch (error) {
         console.log(error.message);
 
-        toast({
-          title: "Error",
-          description: "Failed to fetch owners",
-          variant: "destructive",
-        });
+        toast.error(error.message || "Failed to fetch owners");
       }
     };
 
@@ -267,14 +250,6 @@ const AddRestaurant = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  // const handleKeyDown = (e) => {
-  //   if (e.key === "Escape") {
-  //     setShowCategoryDropdown(false);
-  //     setShowOwnerDropdown(false);
-  //     setOwnerSearch("");
-  //   }
-  // };
 
   const toggleCategory = (id) => {
     const selected = formData.categories.includes(id)
@@ -348,46 +323,63 @@ const AddRestaurant = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) return;
 
     try {
       setIsLoading(true);
+
       const data = new FormData();
-      for (const key in formData) {
-        if (key === "categories") {
-          formData.categories.forEach((cat) => data.append("categories", cat));
-        } else {
-          data.append(key, formData[key]);
-        }
+
+      // Append required text fields
+      data.append("name", formData.name.trim());
+      data.append("description", formData.description.trim());
+      data.append("contactNumber", formData.contactNumber.trim());
+      data.append("owner", formData.owner.trim());
+
+      // Append location as JSON string (backend expects this)
+      const location = {
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.pincode,
+      };
+      data.append("location", JSON.stringify(location));
+
+      // Append categories (as comma-separated string)
+      data.append("categories", formData.categories.join(","));
+
+      // Append image
+      if (formData.image && typeof formData.image === "object") {
+        data.append("image", formData.image);
       }
 
+      // Submit to backend
       const res = await axios.post("/api/admin/restaurants/add", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (res.data.success) {
-        toast({
-          title: "Success",
-          description: "Restaurant added successfully",
-        });
+        toast.success("Restaurant added successfully");
         resetForm();
+        navigate("/admin/restaurants");
       } else {
-        toast({
-          title: "Error",
-          description: res.data.message || "Failed to add restaurant",
-          variant: "destructive",
-        });
+        toast.error(res.data.message || "Failed to add restaurant");
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Something went wrong",
-        variant: "destructive",
-      });
+      console.error("Submission error:", error);
+
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        toast.error(error.response.data.message || "Invalid submission.");
+      } else {
+        toast.error(error.message || "Something went wrong");
+      }
     } finally {
       setIsLoading(false);
     }
   };
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -410,7 +402,7 @@ const AddRestaurant = () => {
         <Button
           variant="ghost"
           onClick={() => {
-            // implement back navigation with useNavigate if needed
+            navigate(-1);
           }}
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
@@ -471,7 +463,7 @@ const AddRestaurant = () => {
                   <img
                     src={URL.createObjectURL(formData.image)}
                     alt="preview"
-                    className="w-32 h-32 rounded-md object-cover mt-2 border"
+                    className="w-32 h-32 rounded-md object-cover border"
                   />
                   <button
                     type="button"

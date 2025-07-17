@@ -39,6 +39,7 @@
     "react-spinners": "^0.17.0",
     "react-toastify": "^11.0.5",
     "remixicon": "^4.6.0",
+    "sonner": "^2.0.6",
     "swiper": "^11.1.15",
     "yup": "^1.6.1"
   },

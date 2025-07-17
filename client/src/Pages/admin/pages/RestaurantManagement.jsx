@@ -139,9 +139,16 @@ function RestaurantsContent() {
                     </td>
 
                     <td className={tdClassCenter}>
-                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                        {r.category}
-                      </span>
+                      <div className="flex flex-wrap justify-center gap-1">
+                        {r.categories.map((cat, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+                          >
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
                     </td>
 
                     <td className={tdClassCenter}>
