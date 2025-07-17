@@ -43,7 +43,6 @@ const RestaurantList = ({ selectedCategory }) => {
   };
 
   useEffect(() => {
-    console.log(originalRestaurants);
     const fetchRestaurants = async () => {
       try {
         const res = await axios.get("/api/restaurant/getAll");
@@ -77,15 +76,13 @@ const RestaurantList = ({ selectedCategory }) => {
       if (userLocation) {
         updated = updated.map((r) => ({
           ...r,
-          latitude: r.latitude || 0,
-          longitude: r.longitude || 0,
           distance:
-            r.latitude && r.longitude
+            r.location?.latitude && r.location?.longitude
               ? calculateDistance(
                   userLocation.lat,
                   userLocation.lng,
-                  r.latitude,
-                  r.longitude
+                  r.location.latitude,
+                  r.location.longitude
                 )
               : null,
         }));
@@ -111,12 +108,12 @@ const RestaurantList = ({ selectedCategory }) => {
       filtered = filtered.map((r) => ({
         ...r,
         distance:
-          r.latitude && r.longitude
+          r.location?.latitude && r.location?.longitude
             ? calculateDistance(
                 userLocation.lat,
                 userLocation.lng,
-                r.latitude,
-                r.longitude
+                r.location.latitude,
+                r.location.longitude
               )
             : null,
       }));
@@ -162,16 +159,19 @@ const RestaurantList = ({ selectedCategory }) => {
     setActiveFilter(value === activeFilter ? null : value);
   };
 
+  // === 🧠 CATEGORY FILTERING BASED ON category.name
   let filteredRestaurants = [...restaurants];
-
   if (selectedCategory && selectedCategory.toLowerCase() !== "all") {
-    filteredRestaurants = filteredRestaurants.filter(
-      (r) =>
-        r.category &&
-        r.category.toLowerCase() === selectedCategory.toLowerCase()
+    filteredRestaurants = filteredRestaurants.filter((r) =>
+      r.categories?.some(
+        (cat) =>
+          cat?.name &&
+          cat.name.toLowerCase() === selectedCategory.toLowerCase()
+      )
     );
   }
 
+  // === 🧠 Apply predefined filter buttons
   if (activeFilter && !customFilterActive) {
     switch (activeFilter) {
       case "nearest":
@@ -190,11 +190,10 @@ const RestaurantList = ({ selectedCategory }) => {
         );
         break;
       case "veg":
-        filteredRestaurants = filteredRestaurants.filter(
-          (r) =>
-            r.category &&
-            (r.category.toLowerCase().includes("veg") ||
-              r.category.toLowerCase() === "vegetarian")
+        filteredRestaurants = filteredRestaurants.filter((r) =>
+          r.categories?.some((cat) =>
+            cat?.name?.toLowerCase().includes("veg")
+          )
         );
         break;
       case "offers":
@@ -258,9 +257,19 @@ const RestaurantList = ({ selectedCategory }) => {
                   alt={restaurant.name}
                   className="w-full h-44 object-cover rounded-t-xl"
                 />
-                <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                  {restaurant.category || "Restaurant"}
-                </span>
+
+                {/* 🏷️ Category Labels */}
+                <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                  {restaurant.categories?.map((cat) => (
+                    <span
+                      key={cat._id}
+                      className="bg-orange-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow"
+                    >
+                      {cat.name}
+                    </span>
+                  ))}
+                </div>
+
                 {restaurant.hasOffer && (
                   <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
                     Offer Available
@@ -294,7 +303,9 @@ const RestaurantList = ({ selectedCategory }) => {
                       } else if (restaurant.rating - index > 0) {
                         return <FaRegStarHalf key={index} />;
                       }
-                      return <FaStar key={index} className="text-gray-300" />;
+                      return (
+                        <FaStar key={index} className="text-gray-300" />
+                      );
                     })}
                     <span className="ml-1 font-semibold text-gray-700">
                       {restaurant.rating}
