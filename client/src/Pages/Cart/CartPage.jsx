@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { FaTrash } from "react-icons/fa";
+import { FaHotel, FaTrash } from "react-icons/fa";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useAppContext } from "../../Context/AppContext";
 import { Link, useNavigate } from "react-router-dom";
@@ -219,6 +219,7 @@ const CartPage = () => {
               <p className="text-base sm:text-lg text-gray-800 font-semibold">
                 {item.name}
               </p>
+              <FaHotel className="text-orange-400 text-xs" />
               <p className="text-xs sm:text-sm text-gray-500">{item.hotel}</p>
             </div>
           </div>
@@ -276,10 +277,13 @@ const CartPage = () => {
               className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain rounded-lg"
             />
             <div>
-              <p className="text-base sm:text-lg text-gray-800 font-semibold">
+              <p className="text-base sm:text-lg text-gray-700 font-semibold">
                 {item.name}
               </p>
-              <p className="text-xs sm:text-sm text-gray-500">{item.hotel}</p>
+              <div className="flex items-center gap-1">
+                <FaHotel className="text-orange-400 text-sm" />
+                <p className="text-xs sm:text-sm text-gray-500">{item.hotel}</p>
+              </div>
             </div>
           </div>
 

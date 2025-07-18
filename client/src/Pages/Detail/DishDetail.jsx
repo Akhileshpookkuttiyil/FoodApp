@@ -26,7 +26,6 @@ const DishDetail = () => {
 
   useEffect(() => {
     let isMounted = true;
-
     const fetchData = async () => {
       try {
         const [dishRes, menuRes] = await Promise.all([
@@ -127,7 +126,8 @@ const DishDetail = () => {
   const relatedDishes = menuItems.filter(
     (item) =>
       item.id !== dish.id &&
-      item.category?.toLowerCase() === dish.category?.toLowerCase()
+      String(item.category).toLowerCase() ===
+        String(dish.category).toLowerCase()
   );
 
   return (
@@ -140,9 +140,8 @@ const DishDetail = () => {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Image Gallery */}
         <div>
-          <div className="w-full h-[420px] rounded-xl overflow-hidden border">
+          <div className="w-full h-[420px] rounded-xl overflow-hidden border bg-white">
             <img
               src={selectedImage}
               alt={dish.name || "Dish image"}
@@ -151,7 +150,7 @@ const DishDetail = () => {
             />
           </div>
 
-          {dish.images && dish.images.length > 1 && (
+          {dish.images?.length > 1 && (
             <div className="flex gap-1 mt-5 overflow-x-auto pb-2">
               {dish.images.map((image, idx) => (
                 <img
@@ -173,13 +172,15 @@ const DishDetail = () => {
           )}
         </div>
 
-        {/* Dish Info */}
         <div className="space-y-3 max-w-lg">
           <p className="text-orange-500 uppercase font-semibold tracking-wide text-sm">
             {dish.category}
           </p>
-
           <h1 className="text-2xl font-semibold text-gray-900">{dish.name}</h1>
+          <p className="text-md text-gray-500 flex items-center">
+            <FaHotel className="mr-1 text-orange-400" />{" "}
+            {dish.restaurant?.name || "Unknown"}
+          </p>
 
           <div className="flex items-center gap-2 mt-2">
             <StarRating rating={dish.rating || 0} />
@@ -193,7 +194,6 @@ const DishDetail = () => {
               "Deliciously crafted dish with the finest ingredients to delight your taste buds."}
           </p>
 
-          {/* Price */}
           <div className="flex items-center gap-4 mt-6">
             <span className="text-2xl font-semibold text-gray-900">
               ₹{dish.price}
@@ -206,7 +206,6 @@ const DishDetail = () => {
             </span>
           </div>
 
-          {/* Quantity & Cart Buttons */}
           <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:gap-6 space-y-4 sm:space-y-0">
             <div className="flex items-center gap-3 border border-gray-300 rounded-md px-3 py-1.5 max-w-fit">
               <button
@@ -245,7 +244,6 @@ const DishDetail = () => {
         </div>
       </div>
 
-      {/* Related Dishes */}
       <div className="mt-20">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">
           You Might Also Like
@@ -271,7 +269,7 @@ const DishDetail = () => {
                     className="cursor-pointer space-y-1"
                   >
                     <img
-                      src={item.image}
+                      src={item.images[0]}
                       alt={item.name}
                       onError={(e) =>
                         (e.target.src = "/assets/img/default-image.png")
@@ -280,9 +278,14 @@ const DishDetail = () => {
                     />
                     <h2 className="text-lg font-semibold">{item.name}</h2>
                     <p className="text-xs text-gray-500 flex items-center justify-center">
-                      <FaHotel className="mr-1 text-orange-400" /> {item.hotel}
+                      <FaHotel className="mr-1 text-orange-400" />{" "}
+                      {item.restaurant?.name || "Unknown"}
                     </p>
-                    <StarRating rating={item.rating} />
+
+                    <div className="flex justify-center">
+                      <StarRating rating={item.rating} />
+                    </div>
+
                     <p className="text-sm text-gray-500 mt-1">
                       Delivery: {item.deliveryTime} mins
                     </p>
@@ -299,8 +302,7 @@ const DishDetail = () => {
                           className="flex items-center gap-2 text-white bg-orange-400 hover:bg-orange-500 rounded-md px-3 py-2 transition"
                           onClick={() => handleAddToCart(item, 1)}
                         >
-                          <FaShoppingCart size={18} />
-                          Add
+                          <FaShoppingCart size={18} /> Add
                         </button>
                       ) : (
                         <div className="flex items-center gap-4 bg-orange-100 border border-orange-300 rounded-md py-2 px-4">

@@ -65,7 +65,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             onClick={() => setIsOpen(false)}
             className={({ isActive }) =>
               `flex items-center px-4 py-3 rounded-lg hover:bg-gray-50 hover:text-primary ${
-                isActive ? "text-primary bg-blue-50" : "text-gray-700"
+                isActive ||
+                (link.name === "Restaurants" &&
+                  location.pathname.startsWith("/admin/add-Restaurant"))
+                  ? "text-primary bg-blue-50"
+                  : "text-gray-700"
               }`
             }
           >
