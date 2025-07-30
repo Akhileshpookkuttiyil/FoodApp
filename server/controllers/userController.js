@@ -3,6 +3,9 @@ import User from "../models/User.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import crypto from "crypto";
+import sendEmail from "../../server/utils/sendEmail.js";
+
+const pendingVerifications = new Map(); // key: email, value: { userData, otp, expiresAt }
 
 // ===================== Generate JWT Token =====================
 const generateToken = (userId, sessionId) => {
@@ -34,6 +37,7 @@ const formatUserResponse = (user) => ({
 });
 
 // ===================== REGISTER CONTROLLER =====================
+
 const registerUser = async (req, res) => {
   try {
     const { firstName, lastName, email, role, password } = req.body;
@@ -53,32 +57,28 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // Create user object
-    const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      role: role || "user",
-      password,
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 5 * 60 * 1000; // expires in 5 minutes
+
+    // Store data temporarily
+    pendingVerifications.set(email, {
+      userData: { firstName, lastName, email, role, password },
+      otp,
+      expiresAt,
     });
 
-    // For normal users, attach sessionId and token
-    if (newUser.role === "user") {
-      const sessionId = crypto.randomBytes(16).toString("hex");
-      newUser.sessionId = sessionId;
+    // Send OTP email
+    await sendEmail(
+      email,
+      "Verify your FoodieMania Account",
+      `Hello ${firstName},\n\nYour OTP is: ${otp}\nIt will expire in 5 minutes.\n\n- FoodieMania Team`
+    );
 
-      await newUser.save();
-
-      const token = generateToken(newUser._id, sessionId);
-      setTokenCookie(res, token);
-    } else {
-      await newUser.save(); // sellers/admins
-    }
-
-    res.status(201).json({
+    return res.status(200).json({
       success: true,
-      message: "User registered successfully.",
-      user: formatUserResponse(newUser),
+      message:
+        "OTP sent to your email. Please verify to complete registration.",
     });
   } catch (error) {
     console.error("Registration error:", error.message);
@@ -86,6 +86,61 @@ const registerUser = async (req, res) => {
       success: false,
       message: "Server error. Please try again later.",
     });
+  }
+};
+
+// ===================== VERIFY OTP CONTROLLER =====================
+
+const verifyOtp = async (req, res) => {
+  try {
+    const email = req.body.email?.toLowerCase().trim();
+    const { otp } = req.body;
+
+    const entry = pendingVerifications.get(email);
+    if (!entry) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "No OTP request found for this email.",
+        });
+    }
+
+    const { userData, otp: validOtp, expiresAt } = entry;
+
+    if (Date.now() > expiresAt) {
+      pendingVerifications.delete(email);
+      return res.status(400).json({ success: false, message: "OTP expired." });
+    }
+
+    if (otp !== validOtp) {
+      return res.status(400).json({ success: false, message: "Invalid OTP." });
+    }
+
+    const newUser = new User(userData);
+    if (newUser.role === "user") {
+      const sessionId = crypto.randomBytes(16).toString("hex");
+      newUser.sessionId = sessionId;
+
+      await newUser.save();
+      const token = generateToken(newUser._id, sessionId);
+      setTokenCookie(res, token);
+    } else {
+      await newUser.save()
+    }
+
+    pendingVerifications.delete(email);
+
+    return res.status(201).json({
+      success: true,
+      message: "Account verified successfully.",
+      user: formatUserResponse(newUser),
+    });
+  } catch (err) {
+    console.error("OTP verification error:", err.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "OTP verification failed." });
   }
 };
 
@@ -283,4 +338,4 @@ const logoutUser = async (req, res) => {
 };
 
 // ===================== EXPORT CONTROLLERS =====================
-export { registerUser, loginUser, logoutUser, isAuthorized };
+export { registerUser, loginUser, logoutUser, isAuthorized, verifyOtp };

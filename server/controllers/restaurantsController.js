@@ -1,11 +1,11 @@
 import Restaurant from "../models/Restaurant.js";
 
-//Get all active restaurants
+// Get all active restaurants with category names
 export const getAllRestaurants = async (req, res) => {
   try {
-    const restaurants = await Restaurant.find({ isActive: true }).select(
-      "name location image rating totalReviews"
-    );
+    const restaurants = await Restaurant.find({ isActive: true })
+      .select("name location image rating categories totalReviews")
+      .populate("categories", "name"); 
 
     res.status(200).json(restaurants);
   } catch (err) {

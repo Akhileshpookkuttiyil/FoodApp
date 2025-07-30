@@ -6,7 +6,6 @@ import {
 import authRole from "../middlewares/authRole.js";
 
 const restaurantRouter = express.Router();
-
 restaurantRouter.get("/getAll", getAllRestaurants);
 
 // Protected seller-only routes

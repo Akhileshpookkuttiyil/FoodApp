@@ -15,14 +15,20 @@ export const addProduct = async (req, res) => {
       rating,
       deliveryTime,
       stock,
+      restaurantId,
     } = req.body;
 
-    // Find the restaurant for this seller
-    const restaurant = await Restaurant.findOne({ owner: req.seller });
-    if (!restaurant) {
+    if (!restaurantId) {
       return res
         .status(404)
         .json({ success: false, message: "Restaurant not found" });
+    }
+
+    const restaurant = await Restaurant.findById(restaurantId);
+    if (!restaurant) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid restaurant ID" });
     }
 
     // Basic validation
@@ -64,17 +70,18 @@ export const addProduct = async (req, res) => {
         .json({ success: false, message: "At least one image is required" });
     }
 
-    // Upload images
+    // Upload images to Cloudinary
     const uploadedImages = await Promise.all(
       req.files.map(async (file) => {
         const result = await cloudinary.uploader.upload(file.path, {
           folder: "products",
         });
-        fs.unlinkSync(file.path);
+        fs.unlinkSync(file.path); // delete temp file
         return result.secure_url;
       })
     );
 
+    // Create product
     const product = new Product({
       name: name.trim(),
       category: category.trim(),

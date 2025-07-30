@@ -12,11 +12,7 @@ const categorySchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: [true, "Category image URL is required"],
-      match: [
-        /^https?:\/\/.*\.(jpg|jpeg|png|webp|gif)(\?.*)?$/i,
-        "Please enter a valid image URL",
-      ],
+      required: [true, "Category image is required"],
     },
     isActive: {
       type: Boolean,

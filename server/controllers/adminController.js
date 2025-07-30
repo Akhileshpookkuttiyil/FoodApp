@@ -4,19 +4,36 @@ import { cloudinary } from "../configs/cloudinary.js";
 import Restaurant from "../models/Restaurant.js";
 import User from "../models/User.js";
 import Order from "../models/Order.js";
+import Category from "../models/Category.js";
 
-// Helper to get coordinates from address or Plus Code
+// Geocoder using OpenStreetMap Nominatim
 const getCoordinatesFromAddress = async (address) => {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  try {
+    const res = await axios.get("https://nominatim.openstreetmap.org/search", {
+      params: {
+        q: address,
+        format: "json",
+        addressdetails: 1,
+        limit: 1,
+      },
+      headers: {
+        "User-Agent": "FoodieMania/1.0 (akhileshpookkuttiyil@gmail.com)",
+      },
+    });
 
-  const res = await axios.get(
-    `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-      address
-    )}&key=${apiKey}`
-  );
+    if (res.data?.length > 0) {
+      const loc = res.data[0];
+      return {
+        latitude: parseFloat(loc.lat),
+        longitude: parseFloat(loc.lon),
+      };
+    }
 
-  const location = res.data?.results?.[0]?.geometry?.location;
-  return location ? { latitude: location.lat, longitude: location.lng } : null;
+    return null;
+  } catch (error) {
+    console.error("Geocoding Error:", error.message);
+    return null;
+  }
 };
 
 export const addRestaurant = async (req, res) => {
@@ -24,54 +41,63 @@ export const addRestaurant = async (req, res) => {
     const { name, description, contactNumber, owner } = req.body;
     const imageFile = req.file;
 
-    // Parse categories - it might come as a JSON string or comma-separated string
-    let categories = [];
-    if (req.body.categories) {
-      try {
-        categories = JSON.parse(req.body.categories);
-        if (!Array.isArray(categories)) categories = [];
-      } catch {
-        // If not JSON, try comma separated
-        categories = req.body.categories.split(",").map((cat) => cat.trim());
-      }
-    }
-
-    // Parse location - expecting JSON string
+    // === Parse location JSON ===
     let location = {};
-    if (req.body.location) {
-      try {
-        location = JSON.parse(req.body.location);
-      } catch {
-        // Optionally handle separate location fields
-        location = {
-          address: req.body.address,
-          city: req.body.city,
-          state: req.body.state,
-          pincode: req.body.pincode,
-        };
-      }
+    try {
+      location = JSON.parse(req.body.location || "{}");
+    } catch {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid location format.",
+      });
     }
 
-    // Validate required fields
-    if (
+    // === Parse categories (CSV or JSON string) ===
+    let categoryNames = [];
+    try {
+      categoryNames = JSON.parse(req.body.categories || "[]");
+      if (!Array.isArray(categoryNames)) throw new Error();
+    } catch {
+      categoryNames = req.body.categories
+        .split(",")
+        .map((c) => c.trim().toLowerCase())
+        .filter(Boolean);
+    }
+
+    // === Basic field validation ===
+    const missing =
       !name ||
       !imageFile ||
-      !Array.isArray(categories) ||
-      categories.length === 0 ||
-      !location?.address ||
-      !location?.city ||
-      !location?.state ||
-      !location?.pincode ||
       !contactNumber ||
-      !owner
-    ) {
+      !owner ||
+      categoryNames.length === 0 ||
+      !location.address ||
+      !location.city ||
+      !location.state ||
+      !location.pincode;
+
+    if (missing) {
       return res.status(400).json({
         success: false,
         message: "Please provide all required fields correctly.",
       });
     }
 
-    // Check for duplicate restaurant in same city
+    // === Find matching categories by name ===
+    const categoryDocs = await Category.find({
+      name: { $in: categoryNames.map((c) => c.toLowerCase()) },
+    });
+
+    if (categoryDocs.length !== categoryNames.length) {
+      return res.status(400).json({
+        success: false,
+        message: "One or more selected categories are invalid.",
+      });
+    }
+
+    const categoryIds = categoryDocs.map((cat) => cat._id);
+
+    // === Prevent duplicate name + city
     const existing = await Restaurant.findOne({
       name: name.trim(),
       "location.city": location.city.trim(),
@@ -84,29 +110,45 @@ export const addRestaurant = async (req, res) => {
       });
     }
 
-    // Upload image to Cloudinary
+    // === Upload image to Cloudinary
     const result = await cloudinary.uploader.upload(imageFile.path, {
       folder: "restaurant",
     });
 
-    fs.unlinkSync(imageFile.path); // remove temp image
+    if (!result?.secure_url) {
+      return res.status(500).json({
+        success: false,
+        message: "Image upload failed.",
+      });
+    }
 
-    // Get coordinates from address
-    const coords = await getCoordinatesFromAddress(location.address);
+    // === Delete local image temp file
+    try {
+      fs.unlinkSync(imageFile.path);
+    } catch (err) {
+      console.warn("Temp file deletion failed:", err.message);
+    }
+
+    // === Geocode address → coords
+    const fullAddress = `${location.address}, ${location.city}, ${location.state}, ${location.pincode}`;
+    const fallbackAddress = `${location.city}, ${location.state}, ${location.pincode}, India`;
+
+    let coords = await getCoordinatesFromAddress(fullAddress);
+    if (!coords) coords = await getCoordinatesFromAddress(fallbackAddress);
 
     if (!coords) {
       return res.status(400).json({
         success: false,
-        message: "Could not fetch coordinates from the given address.",
+        message: "Could not determine coordinates from address.",
       });
     }
 
-    // Create new restaurant
+    // === Save to MongoDB
     const newRestaurant = new Restaurant({
       name: name.trim(),
       description: description?.trim() || "",
       image: result.secure_url,
-      categories: categories.map((cat) => cat.trim()),
+      categories: categoryIds,
       location: {
         address: location.address.trim(),
         city: location.city.trim(),
@@ -115,7 +157,7 @@ export const addRestaurant = async (req, res) => {
         latitude: coords.latitude,
         longitude: coords.longitude,
       },
-      contactNumber: contactNumber.trim(),
+      contactNumber: contactNumber.replace(/\s+/g, "").trim(),
       owner: owner.trim(),
     });
 
@@ -127,7 +169,7 @@ export const addRestaurant = async (req, res) => {
       restaurant: newRestaurant,
     });
   } catch (error) {
-    console.error("Add Restaurant Error:", error.message);
+    console.error("Add Restaurant Error:", error);
     res.status(500).json({
       success: false,
       message: "Server error while adding restaurant.",
@@ -170,8 +212,8 @@ export const getSellers = async (req, res) => {
       .select("firstName lastName email isVerified profileImage createdAt")
       .lean();
 
-    const formattedUsers = users.map((user) => ({
-      id: user._id,
+    const sellers = users.map((user) => ({
+      id: String(user._id),
       name: `${user.firstName} ${user.lastName}`,
       email: user.email,
       status: user.isVerified ? "Active" : "Pending",
@@ -184,12 +226,15 @@ export const getSellers = async (req, res) => {
       imgSrc: user.profileImage || "https://www.gravatar.com/avatar/?d=mp",
     }));
 
-    res.status(200).json(formattedUsers);
+    res.status(200).json({
+      success: true,
+      sellers,
+    });
   } catch (error) {
-    console.error("Failed to fetch users:", error);
+    console.error("Failed to fetch sellers:", error);
     res.status(500).json({
       success: false,
-      message: "Server error while fetching users.",
+      message: "Server error while fetching sellers.",
     });
   }
 };
@@ -200,7 +245,8 @@ export const getRestaurantsForAdmin = async (req, res) => {
       .select(
         "name image rating totalReviews categories location isActive owner"
       )
-      .populate("owner", "firstName");
+      .populate("owner", "firstName")
+      .populate("categories", "name");
 
     const formatted = restaurants.map((r) => ({
       id: r._id,
@@ -208,7 +254,9 @@ export const getRestaurantsForAdmin = async (req, res) => {
       image: r.image,
       rating: r.rating,
       totalReviews: r.totalReviews,
-      category: r.categories?.[0] || "General",
+      categories: r.categories?.length
+        ? r.categories.map((cat) => cat.name)
+        : ["General"],
       location: {
         city: r.location.city,
         state: r.location.state,

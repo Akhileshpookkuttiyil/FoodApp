@@ -4,9 +4,10 @@ const restaurantSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Restaurant name is required"],
+      required: true,
+      unique: true,
+      lowercase: true,
       trim: true,
-      maxlength: 100,
     },
     description: {
       type: String,
@@ -35,7 +36,10 @@ const restaurantSchema = new mongoose.Schema(
         trim: true,
         match: [/^\d{6}$/, "Enter a valid 6-digit pincode"],
       },
+      latitude: { type: Number, required: true },
+      longitude: { type: Number, required: true },
     },
+
     contactNumber: {
       type: String,
       required: [true, "Contact number is required"],
