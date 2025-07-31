@@ -272,15 +272,19 @@ const Navbar = () => {
                       backgroundImage: `url('${user.profileImage}')`,
                     }}
                   ></div>
-                  <div className="flex flex-col justify-center min-h-20 max-w-[200px] overflow-hidden gap-2">
-                    <p className="text-[#757575] text-xs font-bold flex items-center gap-1.5 truncate whitespace-nowrap">
-                      <FaUser className="text-[#757575d2]" />
-                      {user.fullName}
+                  <div className="flex flex-col justify-center min-h-20 w-fit max-w-sm overflow-hidden gap-2">
+                    <p className="text-[#757575] text-xs font-bold flex items-center gap-1.5 truncate">
+                      <FaUser className="text-[#757575d2] shrink-0" />
+                      <span className="truncate" title={user.fullName}>
+                        {user.fullName}
+                      </span>
                     </p>
                     <hr className="border-gray-300" />
-                    <p className="text-[#757575] text-xs flex items-center gap-1.5 truncate whitespace-nowrap">
-                      <FaEnvelope className="text-[#757575d2]" />
-                      {user.email}
+                    <p className="text-[#757575] text-xs flex items-center gap-1.5 truncate">
+                      <FaEnvelope className="text-[#757575d2] shrink-0" />
+                      <span className="truncate" title={user.email}>
+                        {user.email}
+                      </span>
                     </p>
                   </div>
                 </div>
