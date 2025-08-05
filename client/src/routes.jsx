@@ -28,7 +28,7 @@ const ViewProducts = lazy(() => import("./Pages/Seller/ViewProducts"));
 const ViewRestaurants = lazy(() => import("./Pages/Seller/viewRestaurant"));
 const SellerLogin = lazy(() => import("./Pages/Seller/SellerLogin"));
 const DashboardOverview = lazy(() => import("./Pages/Seller/dashboard"));
-const GetOrders = lazy(() => import("./Pages/Seller/getOrders"));
+const GetOrders = lazy(() => import("./Pages/Seller/GetOrders"));
 
 /* eslint-disable */
 const ProtectedRoute = ({ children }) => {
