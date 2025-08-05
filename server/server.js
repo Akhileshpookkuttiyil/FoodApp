@@ -43,7 +43,10 @@ const startServer = async () => {
     app.use(cookieParser());
     app.use(morgan("dev"));
 
-    const allowOrigin = ["http://localhost:5173"];
+    const allowOrigin = [
+      "https://food-app-one-rho.vercel.app",
+      "http://localhost:5173",
+    ];
 
     app.use(cors({ origin: allowOrigin, credentials: true }));
 
