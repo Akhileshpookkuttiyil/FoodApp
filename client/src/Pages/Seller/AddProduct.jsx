@@ -16,6 +16,7 @@ const AddProduct = () => {
   const [restaurantId, setRestaurantId] = useState("");
   const [restaurants, setRestaurants] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLimitedOffer, setIsLimitedOffer] = useState(false);
 
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -91,6 +92,12 @@ const AddProduct = () => {
       return;
     }
 
+    if (isLimitedOffer && !offerPrice) {
+      toast.error("Please enter an Offer Price when using Limited Offer.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const formData = new FormData();
     images.forEach((img) => {
       if (img) formData.append("images", img);
@@ -101,6 +108,7 @@ const AddProduct = () => {
     formData.append("category", category);
     formData.append("price", parseFloat(productPrice));
     if (offerPrice) formData.append("offerPrice", parseFloat(offerPrice));
+    formData.append("isLimitedOffer", isLimitedOffer);
     formData.append("deliveryTime", parseInt(deliveryTime));
     formData.append("stock", parseInt(stock));
     formData.append("restaurantId", restaurantId);
@@ -274,6 +282,18 @@ const AddProduct = () => {
               value={offerPrice}
               onChange={(e) => setOfferPrice(e.target.value)}
             />
+            <div className="flex items-center gap-2 mt-2">
+              <input
+                id="limited-offer"
+                type="checkbox"
+                className="w-4 h-4"
+                checked={isLimitedOffer}
+                onChange={(e) => setIsLimitedOffer(e.target.checked)}
+              />
+              <label htmlFor="limited-offer" className="text-sm font-medium">
+                Mark as Limited Time Offer
+              </label>
+            </div>
           </div>
         </div>
 
