@@ -13,6 +13,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../Context/AppContext";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Navbar = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -119,7 +121,7 @@ const Navbar = () => {
     const fetchLocation = async (lat, lon) => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/location/get?lat=${lat}&lon=${lon}`
+          `${BASE_URL}/api/location/get?lat=${lat}&lon=${lon}`
         );
 
         if (!response.ok) {

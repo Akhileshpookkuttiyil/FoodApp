@@ -253,6 +253,19 @@ const AddProduct = () => {
           </select>
         </div>
 
+        <div className="flex items-center gap-2 mt-2">
+          <input
+            id="limited-offer"
+            type="checkbox"
+            className="w-4 h-4"
+            checked={isLimitedOffer}
+            onChange={(e) => setIsLimitedOffer(e.target.checked)}
+          />
+          <label htmlFor="limited-offer" className="text-sm font-medium">
+            Mark as Limited Time Offer
+          </label>
+        </div>
+
         {/* Price & Offer Price */}
         <div className="flex gap-4 flex-wrap">
           <div className="flex-1">
@@ -282,18 +295,6 @@ const AddProduct = () => {
               value={offerPrice}
               onChange={(e) => setOfferPrice(e.target.value)}
             />
-            <div className="flex items-center gap-2 mt-2">
-              <input
-                id="limited-offer"
-                type="checkbox"
-                className="w-4 h-4"
-                checked={isLimitedOffer}
-                onChange={(e) => setIsLimitedOffer(e.target.checked)}
-              />
-              <label htmlFor="limited-offer" className="text-sm font-medium">
-                Mark as Limited Time Offer
-              </label>
-            </div>
           </div>
         </div>
 
