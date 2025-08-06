@@ -8,7 +8,8 @@ export const reverseGeocode = async (req, res) => {
   }
 
   try {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+
     const response = await fetch(url, {
       headers: {
         "User-Agent": "MyLocationApp/1.0 (akhileshpookkuttiyil@gmail.com)",
@@ -32,7 +33,10 @@ export const reverseGeocode = async (req, res) => {
         .json({ error: "No address found for coordinates" });
     }
 
-    res.json(data);
+    return res.json({
+      displayName: data.display_name,
+      address: data.address,
+    });
   } catch (err) {
     console.error("Internal error during reverse geocoding:", err);
     res.status(500).json({ error: "Internal Server Error" });
