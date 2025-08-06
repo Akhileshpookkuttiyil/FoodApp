@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import PropTypes from "prop-types";
 import { FaStar, FaRegStarHalf } from "react-icons/fa";
 import FilterModal from "../RestaurantList/FilterModal";
-import PropTypes from "prop-types";
 
 const filters = [
   { label: "Nearest", value: "nearest" },
@@ -12,15 +12,26 @@ const filters = [
   { label: "Offers", value: "offers" },
 ];
 
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const toRad = (v) => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return parseFloat(
+    (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1)
+  );
+};
+
 const RestaurantList = ({ selectedCategory }) => {
-  const [restaurants, setRestaurants] = useState([]);
   const [originalRestaurants, setOriginalRestaurants] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
   const [activeFilter, setActiveFilter] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customFilterActive, setCustomFilterActive] = useState(false);
-
   const [customFilters, setCustomFilters] = useState({
     sortBy: "none",
     rating: 0,
@@ -29,184 +40,126 @@ const RestaurantList = ({ selectedCategory }) => {
     drinksNight: false,
   });
 
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const toRad = (value) => (value * Math.PI) / 180;
-    const R = 6371;
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRad(lat1)) *
-        Math.cos(toRad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return parseFloat((R * c).toFixed(1));
-  };
-
+  // Fetch restaurants
   useEffect(() => {
     axios
       .get("/api/restaurant/getAll")
-      .then((res) => {
-        setOriginalRestaurants(res.data);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch restaurants:", err);
-      });
+      .then((res) => setOriginalRestaurants(res.data))
+      .catch((err) => console.error("Failed to fetch restaurants:", err));
   }, []);
 
+  // Get user location
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-        },
-        (err) => {
-          console.error("Geolocation error:", err);
-          setLocationError("Location access denied or unavailable.");
-        }
-      );
-    } else {
-      setLocationError("Geolocation is not supported in this browser.");
-    }
+    navigator.geolocation?.getCurrentPosition(
+      (pos) =>
+        setUserLocation({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        }),
+      () => setLocationError("Location access denied or unavailable.")
+    );
   }, []);
 
-  useEffect(() => {
-    if (originalRestaurants.length > 0) {
-      let updated = [...originalRestaurants];
-
-      if (userLocation) {
-        updated = updated.map((r) => ({
-          ...r,
-          distance:
-            r.location?.latitude && r.location?.longitude
-              ? calculateDistance(
-                  userLocation.lat,
-                  userLocation.lng,
-                  r.location.latitude,
-                  r.location.longitude
-                )
-              : null,
-        }));
-      }
-
-      setRestaurants(updated);
-    }
+  // Add distance to restaurants
+  const restaurantsWithDistance = useMemo(() => {
+    if (!userLocation) return originalRestaurants;
+    return originalRestaurants.map((r) => ({
+      ...r,
+      distance: r.location?.latitude
+        ? calculateDistance(
+            userLocation.lat,
+            userLocation.lng,
+            r.location.latitude,
+            r.location.longitude
+          )
+        : null,
+    }));
   }, [originalRestaurants, userLocation]);
 
+  // Scroll to view if category is selected
   useEffect(() => {
     if (selectedCategory && selectedCategory !== "All") {
-      const target = document.getElementById("restaurent");
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      document
+        .getElementById("restaurent")
+        ?.scrollIntoView({ behavior: "smooth" });
     }
   }, [selectedCategory]);
 
+  // Apply custom filters
   const applyCustomFilters = () => {
-    let filtered = [...originalRestaurants];
+    let filtered = [...restaurantsWithDistance];
+    const { sortBy, rating, distance, happyHours, drinksNight } = customFilters;
 
-    if (userLocation) {
-      filtered = filtered.map((r) => ({
-        ...r,
-        distance:
-          r.location?.latitude && r.location?.longitude
-            ? calculateDistance(
-                userLocation.lat,
-                userLocation.lng,
-                r.location.latitude,
-                r.location.longitude
-              )
-            : null,
-      }));
-    }
-
-    if (customFilters.sortBy === "distance" && userLocation) {
+    if (sortBy === "distance" && userLocation) {
       filtered.sort((a, b) => a.distance - b.distance);
-    }
-
-    if (customFilters.sortBy === "deliveryTime") {
+    } else if (sortBy === "deliveryTime") {
       filtered = filtered
         .filter((r) => /\d+/.test(r.duration))
-        .sort((a, b) => parseInt(a.duration, 10) - parseInt(b.duration, 10));
-    }
-
-    if (customFilters.sortBy === "rating") {
+        .sort((a, b) => parseInt(a.duration) - parseInt(b.duration));
+    } else if (sortBy === "rating") {
       filtered.sort((a, b) => b.rating - a.rating);
     }
 
-    if (customFilters.rating > 0) {
-      filtered = filtered.filter((r) => r.rating >= customFilters.rating);
-    }
+    if (rating > 0) filtered = filtered.filter((r) => r.rating >= rating);
+    if (distance > 0) filtered = filtered.filter((r) => r.distance <= distance);
+    if (happyHours) filtered = filtered.filter((r) => r.happyHours);
+    if (drinksNight) filtered = filtered.filter((r) => r.drinksNight);
 
-    if (customFilters.distance > 0 && userLocation) {
-      filtered = filtered.filter((r) => r.distance <= customFilters.distance);
-    }
-
-    if (customFilters.happyHours) {
-      filtered = filtered.filter((r) => r.happyHours);
-    }
-
-    if (customFilters.drinksNight) {
-      filtered = filtered.filter((r) => r.drinksNight);
-    }
-
-    setRestaurants(filtered);
     setCustomFilterActive(true);
     setActiveFilter(null);
+    return filtered;
   };
 
-  const handleFilterClick = (value) => {
-    setCustomFilterActive(false);
-    setActiveFilter(value === activeFilter ? null : value);
-  };
+  // Filter based on default chips
+  const filteredRestaurants = useMemo(() => {
+    let list = [...restaurantsWithDistance];
 
-  let filteredRestaurants = [...restaurants];
-
-  if (selectedCategory && selectedCategory.toLowerCase() !== "all") {
-    filteredRestaurants = filteredRestaurants.filter((r) =>
-      r.categories?.some(
-        (cat) =>
-          cat?.name &&
-          cat.name.toLowerCase() === selectedCategory.toLowerCase()
-      )
-    );
-  }
-
-  if (activeFilter && !customFilterActive) {
-    switch (activeFilter) {
-      case "nearest":
-        filteredRestaurants = filteredRestaurants
-          .filter((r) => typeof r.distance === "number")
-          .sort((a, b) => a.distance - b.distance);
-        break;
-      case "fast":
-        filteredRestaurants = filteredRestaurants
-          .filter((r) => /\d+/.test(r.duration))
-          .sort((a, b) => parseInt(a.duration, 10) - parseInt(b.duration, 10));
-        break;
-      case "rating":
-        filteredRestaurants = filteredRestaurants.sort(
-          (a, b) => b.rating - a.rating
-        );
-        break;
-      case "veg":
-        filteredRestaurants = filteredRestaurants.filter((r) =>
-          r.categories?.some((cat) =>
-            cat?.name?.toLowerCase().includes("veg")
-          )
-        );
-        break;
-      case "offers":
-        filteredRestaurants = filteredRestaurants.filter((r) => r.hasOffer);
-        break;
-      default:
-        break;
+    if (selectedCategory && selectedCategory !== "All") {
+      list = list.filter((r) =>
+        r.categories?.some(
+          (cat) => cat?.name?.toLowerCase() === selectedCategory.toLowerCase()
+        )
+      );
     }
-  }
+
+    if (customFilterActive) return applyCustomFilters();
+
+    if (activeFilter) {
+      switch (activeFilter) {
+        case "nearest":
+          list = list
+            .filter((r) => typeof r.distance === "number")
+            .sort((a, b) => a.distance - b.distance);
+          break;
+        case "fast":
+          list = list
+            .filter((r) => /\d+/.test(r.duration))
+            .sort((a, b) => parseInt(a.duration) - parseInt(b.duration));
+          break;
+        case "rating":
+          list.sort((a, b) => b.rating - a.rating);
+          break;
+        case "veg":
+          list = list.filter((r) =>
+            r.categories?.some((cat) =>
+              cat?.name?.toLowerCase().includes("veg")
+            )
+          );
+          break;
+        case "offers":
+          list = list.filter((r) => r.hasOffer);
+          break;
+      }
+    }
+
+    return list;
+  }, [
+    restaurantsWithDistance,
+    selectedCategory,
+    activeFilter,
+    customFilterActive,
+    customFilters,
+  ]);
 
   return (
     <div id="restaurent" className="px-4 py-6">
@@ -218,6 +171,7 @@ const RestaurantList = ({ selectedCategory }) => {
         <p className="text-red-600 text-sm mb-4">⚠️ {locationError}</p>
       )}
 
+      {/* Filter buttons */}
       <div className="flex overflow-x-auto gap-3 mb-6 scrollbar-hide">
         <button
           className="whitespace-nowrap px-4 py-2 text-sm font-semibold rounded-full bg-orange-500 text-white"
@@ -226,21 +180,25 @@ const RestaurantList = ({ selectedCategory }) => {
           Filter
         </button>
 
-        {filters.map((filter) => (
+        {filters.map(({ label, value }) => (
           <button
-            key={filter.value}
+            key={value}
             className={`whitespace-nowrap px-4 py-2 text-sm font-semibold rounded-full transition ${
-              activeFilter === filter.value
+              activeFilter === value
                 ? "bg-orange-500 text-white"
                 : "bg-white border border-orange-300 text-gray-700 hover:bg-gray-200"
             }`}
-            onClick={() => handleFilterClick(filter.value)}
+            onClick={() => {
+              setCustomFilterActive(false);
+              setActiveFilter(activeFilter === value ? null : value);
+            }}
           >
-            {filter.label}
+            {label}
           </button>
         ))}
       </div>
 
+      {/* Modal */}
       <FilterModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -252,21 +210,22 @@ const RestaurantList = ({ selectedCategory }) => {
         setFilters={setCustomFilters}
       />
 
+      {/* Grid */}
       <div className="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-1 gap-6">
-        {filteredRestaurants.length > 0 ? (
-          filteredRestaurants.map((restaurant) => (
+        {filteredRestaurants.length ? (
+          filteredRestaurants.map((r) => (
             <div
-              key={restaurant._id}
-              className="bg-white shadow-md rounded-xl overflow-hidden transition transform hover:scale-105 hover:shadow-2xl duration-300"
+              key={r._id}
+              className="bg-white shadow-md rounded-xl overflow-hidden hover:scale-105 hover:shadow-2xl transition duration-300"
             >
               <div className="relative">
                 <img
-                  src={restaurant.image}
-                  alt={restaurant.name}
+                  src={r.image}
+                  alt={r.name}
                   className="w-full h-44 object-cover rounded-t-xl"
                 />
                 <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                  {restaurant.categories?.map((cat) => (
+                  {r.categories?.map((cat) => (
                     <span
                       key={cat._id}
                       className="bg-orange-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow"
@@ -275,7 +234,7 @@ const RestaurantList = ({ selectedCategory }) => {
                     </span>
                   ))}
                 </div>
-                {restaurant.hasOffer && (
+                {r.hasOffer && (
                   <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
                     Offer Available
                   </span>
@@ -284,35 +243,32 @@ const RestaurantList = ({ selectedCategory }) => {
 
               <div className="p-4 text-center space-y-2">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  {restaurant.name}
+                  {r.name}
                 </h3>
                 <p className="text-gray-500 text-sm">
-                  {restaurant.location?.address}, {restaurant.location?.city}
+                  {r.location?.address}, {r.location?.city}
                 </p>
-
-                {userLocation && restaurant.distance && (
-                  <p className="text-gray-600 text-sm">
-                    📍 {restaurant.distance} km
-                  </p>
+                {r.distance && (
+                  <p className="text-gray-600 text-sm">📍 {r.distance} km</p>
                 )}
-
                 <div className="flex items-center justify-between mt-3 text-gray-700 text-sm">
                   <span className="flex items-center">
-                    ⏳ {restaurant.duration || "N/A"}
+                    ⏳ {r.duration || "N/A"}
                   </span>
-
                   <div className="flex items-center text-yellow-500">
-                    {Array.from({ length: 5 }).map((_, index) => {
-                      if (index + 1 <= Math.floor(restaurant.rating)) {
-                        return <FaStar key={index} />;
-                      }
-                      if (restaurant.rating - index > 0) {
-                        return <FaRegStarHalf key={index} />;
-                      }
-                      return <FaStar key={index} className="text-gray-300" />;
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const filled = i + 1 <= Math.floor(r.rating);
+                      const half = r.rating - i > 0 && r.rating - i < 1;
+                      return filled ? (
+                        <FaStar key={i} />
+                      ) : half ? (
+                        <FaRegStarHalf key={i} />
+                      ) : (
+                        <FaStar key={i} className="text-gray-300" />
+                      );
                     })}
                     <span className="ml-1 font-semibold text-gray-700">
-                      {restaurant.rating}
+                      {r.rating}
                     </span>
                   </div>
                 </div>

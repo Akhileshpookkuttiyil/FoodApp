@@ -16,6 +16,7 @@ export const addProduct = async (req, res) => {
       deliveryTime,
       stock,
       restaurantId,
+      isLimitedOffer,
     } = req.body;
 
     if (!restaurantId) {
@@ -93,6 +94,7 @@ export const addProduct = async (req, res) => {
       images: uploadedImages,
       deliveryTime: Number(deliveryTime),
       stock: Number(stock),
+      isLimitedOffer: isLimitedOffer === "true" || isLimitedOffer === true,
     });
 
     const savedProduct = await product.save();
