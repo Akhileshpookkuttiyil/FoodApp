@@ -152,11 +152,17 @@ const Navbar = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => {
+          console.log("Coords:", coords.latitude, coords.longitude); // debug
           if (isMounted) fetchLocation(coords.latitude, coords.longitude);
         },
         (error) => {
           console.log(error);
           if (isMounted) setCurrentLocation("not found");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
         }
       );
     } else {
