@@ -9,6 +9,7 @@ import AdminRoutes from "./AdminRoutes.jsx";
 import { useAppContext } from "./Context/AppContext.jsx";
 import AuthPage from "./Pages/Auth/AuthPage";
 
+
 function AppContent() {
   const location = useLocation();
   const { showLogin } = useAppContext();

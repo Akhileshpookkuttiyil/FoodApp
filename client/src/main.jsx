@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
+import "leaflet/dist/leaflet.css";
 import "./index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AppProvider } from "./Context/AppContext.jsx";
