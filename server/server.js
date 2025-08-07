@@ -44,7 +44,7 @@ const startServer = async () => {
     app.use(morgan("dev"));
 
     const allowOrigin = [
-      "https://foodiemania.vercel.app/",
+      "https://foodiemania.vercel.app",
       "http://localhost:5173",
     ];
 
