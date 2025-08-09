@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const Categories = ({ categories, selectedCategory, setSelectedCategory }) => {
   return (
@@ -9,9 +9,8 @@ const Categories = ({ categories, selectedCategory, setSelectedCategory }) => {
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-md text-sm font-medium ${
-              isSelected ? "bg-orange-500 text-white" : "bg-white text-gray-700"
-            }`}
+            className={`rounded-md text-sm font-medium px-4 py-1 w-auto max-w-full 
+    ${isSelected ? "bg-orange-500 text-white" : "bg-white text-gray-700"}`}
           >
             {category}
           </button>
